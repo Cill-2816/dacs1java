@@ -104,6 +104,6 @@ public class RestaurantManagement extends JFrame {
 
     public static void main(String[] args) {
         new RestaurantManagement();
-        System.out.println("12345");
+        System.out.println("145");
     }
 }
