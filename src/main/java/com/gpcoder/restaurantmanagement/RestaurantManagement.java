@@ -6,9 +6,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,66 +18,97 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class RestaurantManagement extends JFrame {
 
+    private JLabel imageLabel;
+    private Image originalImage;
+
     public RestaurantManagement() {
         setTitle("Restaurant Login");
-        setSize(1080, 520);
+        setSize(1400, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(1, 2));
 
-        // Left panel with image
-        JPanel leftPanel = new JPanel();
+        // Left panel
+        JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(new Color(30, 30, 30));
-        leftPanel.setLayout(new BorderLayout());
 
-        ImageIcon originalIcon = new ImageIcon("C:\\Users\\DUC ANH\\Pictures\\Saved Pictures\\ChatGPT Image 08_15_39 23 thg 4, 2025.png");
-        Image scaledImage = originalIcon.getImage().getScaledInstance(520, 520, Image.SCALE_SMOOTH);
-        JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
+        // Load and scale image dynamically
+        ImageIcon originalIcon = new ImageIcon("C:\\Users\\DUC ANH\\Pictures\\Saved Pictures\\ChatGPT Image 22_42_20 23 thg 4, 2025.png");
+        originalImage = originalIcon.getImage();
+        imageLabel = new JLabel();
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
         imageLabel.setVerticalAlignment(JLabel.CENTER);
         leftPanel.add(imageLabel, BorderLayout.CENTER);
 
+        // Resize image automatically with panel
+        leftPanel.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent evt) {
+                int w = leftPanel.getWidth();
+                int h = leftPanel.getHeight();
+                if (w > 0 && h > 0) {
+                    Image scaled = originalImage.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(scaled));
+                }
+            }
+        });
+
         // Right panel
-        JPanel rightPanelWrapper = new JPanel(new GridBagLayout());
-        rightPanelWrapper.setBackground(new Color(30, 30, 30));
+        JPanel rightPanel = createRightPanel();
+
+        // Split pane
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+        splitPane.setResizeWeight(0.66); // Tỷ lệ chia ban đầu
+        splitPane.setDividerSize(0);
+        splitPane.setEnabled(false); // Ngăn kéo divider
+
+        add(splitPane);
+
+        // Gắn tỷ lệ động cho split pane khi resize
+        bindSplitRatio(splitPane, 2.0 / 3.0);
+
+        setVisible(true);
+    }
+
+    private JPanel createRightPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(30, 30, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
 
         JLabel welcomeLabel = new JLabel("Welcome Back!");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 30));
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setHorizontalAlignment(JLabel.CENTER);
-        rightPanelWrapper.add(welcomeLabel, gbc);
+        panel.add(welcomeLabel, gbc);
 
         gbc.gridy = 1;
         JLabel subLabel = new JLabel("Please enter your details");
         subLabel.setFont(new Font("Arial", Font.BOLD, 14));
         subLabel.setForeground(Color.LIGHT_GRAY);
         subLabel.setHorizontalAlignment(JLabel.CENTER);
-        rightPanelWrapper.add(subLabel, gbc);
+        panel.add(subLabel, gbc);
 
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.LINE_END;
-        JLabel userLabel = new JLabel("User Name:");
+        JLabel userLabel = new JLabel("Username:");
         userLabel.setFont(new Font("Arial", Font.BOLD, 16));
         userLabel.setForeground(Color.WHITE);
-        rightPanelWrapper.add(userLabel, gbc);
+        panel.add(userLabel, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
         JTextField userField = new JTextField(15);
-        rightPanelWrapper.add(userField, gbc);
+        panel.add(userField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -84,12 +116,12 @@ public class RestaurantManagement extends JFrame {
         JLabel passLabel = new JLabel("Password:");
         passLabel.setFont(new Font("Arial", Font.BOLD, 16));
         passLabel.setForeground(Color.WHITE);
-        rightPanelWrapper.add(passLabel, gbc);
+        panel.add(passLabel, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
         JPasswordField passField = new JPasswordField(15);
-        rightPanelWrapper.add(passField, gbc);
+        panel.add(passField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -99,7 +131,7 @@ public class RestaurantManagement extends JFrame {
         rememberCheck.setFont(new Font("Arial", Font.BOLD, 14));
         rememberCheck.setForeground(Color.WHITE);
         rememberCheck.setOpaque(false);
-        rightPanelWrapper.add(rememberCheck, gbc);
+        panel.add(rememberCheck, gbc);
 
         gbc.gridy = 5;
         gbc.fill = GridBagConstraints.NONE;
@@ -109,13 +141,21 @@ public class RestaurantManagement extends JFrame {
         loginButton.setBackground(new Color(255, 94, 58));
         loginButton.setForeground(Color.WHITE);
         loginButton.setPreferredSize(new Dimension(250, 40));
-        rightPanelWrapper.add(loginButton, gbc);
+        panel.add(loginButton, gbc);
 
-        add(leftPanel);
-        add(rightPanelWrapper);
-
-        setVisible(true);
+        return panel;
     }
+
+    // Gắn tỉ lệ chia động cho split pane
+    private void bindSplitRatio(JSplitPane splitPane, double ratio) {
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                splitPane.setDividerLocation((int) (getWidth() * ratio));
+            }
+        });
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(RestaurantManagement::new);
     }
