@@ -1,4 +1,5 @@
 package com.gpcoder.restaurantmanagement;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -45,7 +46,12 @@ public class RestaurantManagement extends JFrame {
         descLabel.setForeground(Color.WHITE);
         descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel imageLabel = new JLabel(new ImageIcon("C:\\Users\\DUC ANH\\Pictures\\Saved Pictures\\ChatGPT Image 08_10_54 23 thg 4, 2025.png")); // thay bằng đường dẫn ảnh thực
+        JLabel imageLabel = new JLabel(new ImageIcon(
+                "C:\\Users\\DUC ANH\\Pictures\\Saved Pictures\\ChatGPT Image 08_10_54 23 thg 4, 2025.png")); // thay
+                                                                                                             // bằng
+                                                                                                             // đường
+                                                                                                             // dẫn ảnh
+                                                                                                             // thực
         imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         leftPanel.add(Box.createVerticalGlue());
@@ -104,5 +110,6 @@ public class RestaurantManagement extends JFrame {
 
     public static void main(String[] args) {
         new RestaurantManagement();
+        System.out.println(123);
     }
 }
