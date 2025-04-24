@@ -38,7 +38,7 @@ public class RestaurantManagement extends JFrame {
         leftPanel.setBackground(new Color(30, 30, 30));
 
         // Load and scale image dynamically
-        ImageIcon originalIcon = new ImageIcon("C:\\Users\\DUC ANH\\Pictures\\Saved Pictures\\ChatGPT Image 22_42_20 23 thg 4, 2025.png");
+        ImageIcon originalIcon = new ImageIcon("image/login.png");
         originalImage = originalIcon.getImage();
         imageLabel = new JLabel();
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
