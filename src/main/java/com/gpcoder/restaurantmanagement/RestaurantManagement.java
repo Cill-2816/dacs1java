@@ -17,7 +17,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -81,7 +80,6 @@ public class RestaurantManagement extends JFrame {
         setVisible(true);
     }
 
-    // Hàm cập nhật và scale ảnh
     private void updateImage(int width, int height) {
         if (width > 0 && height > 0 && originalImage != null) {
             Image scaled = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
@@ -89,9 +87,8 @@ public class RestaurantManagement extends JFrame {
         }
     }
 
-    // Hàm slideshow đổi ảnh theo thời gian
     private void startImageSlideshow(JPanel leftPanel) {
-        imageTimer = new Timer(4500, e -> {
+        imageTimer = new Timer(3000, e -> {
             currentImageIndex = (currentImageIndex + 1) % imagePaths.length;
             originalImage = new ImageIcon(imagePaths[currentImageIndex]).getImage();
             updateImage(leftPanel.getWidth(), leftPanel.getHeight());
@@ -128,46 +125,14 @@ public class RestaurantManagement extends JFrame {
 
         // Username
         gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        JLabel userLabel = new JLabel("Username:");
-        userLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        userLabel.setForeground(Color.WHITE);
-        panel.add(userLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        JTextField userField = new JTextField(20);
-        userField.setForeground(Color.WHITE);
-        userField.setBackground(new Color(50, 50, 50));
-        userField.setBorder(null);
-        userField.setPreferredSize(new Dimension(0, 35));
-        userField.setFont(new Font("Arial", Font.PLAIN, 15));
-        panel.add(userField, gbc);
+        panel.add(createInputField("image/user_icon.png", new PlaceholderTextField("Username")), gbc);
 
         // Password
-        gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        JLabel passLabel = new JLabel("Password:");
-        passLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        passLabel.setForeground(Color.WHITE);
-        panel.add(passLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        JPasswordField passField = new JPasswordField(20);
-        passField.setBackground(new Color(50, 50, 50));
-        passField.setBorder(null);
-        passField.setForeground(Color.WHITE);
-        passField.setPreferredSize(new Dimension(0, 35));
-        passField.setFont(new Font("Arial", Font.PLAIN, 15));
-        panel.add(passField, gbc);
+        panel.add(createInputField("image/lock_icon.png", new PlaceholderPasswordField("Password")), gbc);
 
         // Remember me
-        gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.LINE_START;
         JCheckBox rememberCheck = new JCheckBox("Remember username");
         rememberCheck.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -178,7 +143,6 @@ public class RestaurantManagement extends JFrame {
 
         // Login button
         gbc.gridy = 5;
-        gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton loginButton = new JButton("Log In");
         loginButton.setFont(new Font("Arial", Font.BOLD, 18));
@@ -191,7 +155,33 @@ public class RestaurantManagement extends JFrame {
         return panel;
     }
 
-    // Tự chia lại tỉ lệ khi resize cửa sổ
+    private JPanel createInputField(String iconPath, JTextField textField) {
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BorderLayout(8, 0));
+        inputPanel.setBackground(new Color(50, 50, 50));
+        inputPanel.setPreferredSize(new Dimension(300, 40));
+    
+        // Icon
+        JLabel iconLabel = new JLabel();
+        iconLabel.setIcon(new ImageIcon(new ImageIcon(iconPath).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+        iconLabel.setPreferredSize(new Dimension(40, 40));
+        iconLabel.setHorizontalAlignment(JLabel.CENTER);
+    
+        // TextField style
+        textField.setBackground(new Color(50, 50, 50));
+        textField.setBorder(null);
+        textField.setForeground(Color.WHITE);
+        textField.setFont(new Font("Arial", Font.PLAIN, 16));
+        textField.setCaretColor(Color.WHITE);
+    
+        // Add to panel
+        inputPanel.add(iconLabel, BorderLayout.WEST);
+        inputPanel.add(textField, BorderLayout.CENTER);
+    
+        return inputPanel;
+    }
+    
+
     private void bindSplitRatio(JSplitPane splitPane, double ratio) {
         addComponentListener(new ComponentAdapter() {
             @Override
