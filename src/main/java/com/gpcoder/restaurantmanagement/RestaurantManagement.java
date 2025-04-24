@@ -11,7 +11,6 @@ import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -78,73 +77,89 @@ public class RestaurantManagement extends JFrame {
     private JPanel createRightPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(30, 30, 30));
-
+    
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
-
+    
+        // Logo image
+        JLabel logoLabel = new JLabel();
+        logoLabel.setHorizontalAlignment(JLabel.CENTER);
+        ImageIcon logoIcon = new ImageIcon("image/logo.png"); // Đảm bảo file logo.png nằm trong thư mục image/
+        Image logoImage = logoIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        logoLabel.setIcon(new ImageIcon(logoImage));
+        gbc.gridy = 0;
+        panel.add(logoLabel, gbc);
+    
+        // Welcome text
         JLabel welcomeLabel = new JLabel("Welcome Back!");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 36));
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setHorizontalAlignment(JLabel.CENTER);
+        gbc.gridy = 1;
         panel.add(welcomeLabel, gbc);
-
+    
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.LINE_END;
         JLabel userLabel = new JLabel("Username:");
-        userLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        userLabel.setFont(new Font("Arial", Font.BOLD, 18));
         userLabel.setForeground(Color.WHITE);
         panel.add(userLabel, gbc);
-        
+    
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
-        JTextField userField = new JTextField(15);
-        userField.setBackground(null);
-        userField.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 150), 1));
+        JTextField userField = new JTextField(20);
         userField.setForeground(Color.WHITE);
+        userField.setBackground(new Color(50, 50, 50));
+        userField.setBorder(null);
+        userField.setPreferredSize(new Dimension(0, 35));
         panel.add(userField, gbc);
-
+    
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.LINE_END;
         JLabel passLabel = new JLabel("Password:");
-        passLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        passLabel.setFont(new Font("Arial", Font.BOLD, 18));
         passLabel.setForeground(Color.WHITE);
         panel.add(passLabel, gbc);
-
+    
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
-        JPasswordField passField = new JPasswordField(15);
-        passField.setBackground(null);
-        passField.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 150), 1));
+        JPasswordField passField = new JPasswordField(20);
+        passField.setBackground(new Color(50, 50, 50));
+        passField.setBorder(null);
         passField.setForeground(Color.WHITE);
+        passField.setPreferredSize(new Dimension(0, 35));
         panel.add(passField, gbc);
-
+    
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.LINE_START;
-        JCheckBox rememberCheck = new JCheckBox("Remember me");
-        rememberCheck.setFont(new Font("Arial", Font.PLAIN, 14));
+        JCheckBox rememberCheck = new JCheckBox("Remember username");
+        rememberCheck.setFont(new Font("Arial", Font.PLAIN, 16));
         rememberCheck.setForeground(Color.WHITE);
+        rememberCheck.setBorder(null);
         rememberCheck.setOpaque(false);
         panel.add(rememberCheck, gbc);
-
+    
         gbc.gridy = 5;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton loginButton = new JButton("Log In");
-        loginButton.setFont(new Font("Arial", Font.BOLD, 15));
+        loginButton.setFont(new Font("Arial", Font.BOLD, 18));
         loginButton.setBackground(new Color(255, 94, 58));
         loginButton.setForeground(Color.WHITE);
-        loginButton.setPreferredSize(new Dimension(250, 40));
+        loginButton.setBorder(null);
+        loginButton.setPreferredSize(new Dimension(300, 50));
         panel.add(loginButton, gbc);
-
+    
         return panel;
     }
+    
 
     // Gắn tỉ lệ chia động cho split pane
     private void bindSplitRatio(JSplitPane splitPane, double ratio) {
