@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -11,6 +13,7 @@ import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -90,13 +93,6 @@ public class RestaurantManagement extends JFrame {
         welcomeLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(welcomeLabel, gbc);
 
-        gbc.gridy = 1;
-        JLabel subLabel = new JLabel("Please enter your details");
-        subLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        subLabel.setForeground(Color.LIGHT_GRAY);
-        subLabel.setHorizontalAlignment(JLabel.CENTER);
-        panel.add(subLabel, gbc);
-
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.LINE_END;
@@ -104,10 +100,12 @@ public class RestaurantManagement extends JFrame {
         userLabel.setFont(new Font("Arial", Font.BOLD, 16));
         userLabel.setForeground(Color.WHITE);
         panel.add(userLabel, gbc);
-
+        
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
         JTextField userField = new JTextField(15);
+        userField.setBackground(null);
+        userField.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 150), 1));
         panel.add(userField, gbc);
 
         gbc.gridx = 0;
@@ -121,6 +119,8 @@ public class RestaurantManagement extends JFrame {
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
         JPasswordField passField = new JPasswordField(15);
+        passField.setBackground(null);
+        passField.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 150), 1));
         panel.add(passField, gbc);
 
         gbc.gridx = 0;
@@ -128,7 +128,7 @@ public class RestaurantManagement extends JFrame {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.LINE_START;
         JCheckBox rememberCheck = new JCheckBox("Remember me");
-        rememberCheck.setFont(new Font("Arial", Font.BOLD, 14));
+        rememberCheck.setFont(new Font("Arial", Font.PLAIN, 14));
         rememberCheck.setForeground(Color.WHITE);
         rememberCheck.setOpaque(false);
         panel.add(rememberCheck, gbc);
