@@ -158,7 +158,6 @@ public class RestaurantManagement extends JFrame {
         loginButton.setBorder(null);
         loginButton.setPreferredSize(new Dimension(300, 50));
         panel.add(loginButton, gbc);
-    
         return panel;
     }
     
