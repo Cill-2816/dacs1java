@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -106,6 +104,7 @@ public class RestaurantManagement extends JFrame {
         JTextField userField = new JTextField(15);
         userField.setBackground(null);
         userField.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 150), 1));
+        userField.setForeground(Color.WHITE);
         panel.add(userField, gbc);
 
         gbc.gridx = 0;
@@ -121,6 +120,7 @@ public class RestaurantManagement extends JFrame {
         JPasswordField passField = new JPasswordField(15);
         passField.setBackground(null);
         passField.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 150), 1));
+        passField.setForeground(Color.WHITE);
         panel.add(passField, gbc);
 
         gbc.gridx = 0;
