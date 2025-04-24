@@ -116,6 +116,7 @@ public class RestaurantManagement extends JFrame {
         userField.setBackground(new Color(50, 50, 50));
         userField.setBorder(null);
         userField.setPreferredSize(new Dimension(0, 35));
+        userField.setFont(new Font("Arial", Font.PLAIN, 15));
         panel.add(userField, gbc);
     
         gbc.gridx = 0;
@@ -133,6 +134,7 @@ public class RestaurantManagement extends JFrame {
         passField.setBorder(null);
         passField.setForeground(Color.WHITE);
         passField.setPreferredSize(new Dimension(0, 35));
+        passField.setFont(new Font("Arial", Font.PLAIN, 15));
         panel.add(passField, gbc);
     
         gbc.gridx = 0;
