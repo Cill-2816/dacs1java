@@ -8,6 +8,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -16,11 +18,14 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
+import com.gpcoder.security.Hashpassword;
 
 public class RestaurantManagement extends JFrame {
 
@@ -126,11 +131,13 @@ public class RestaurantManagement extends JFrame {
 
         // Username
         gbc.gridy = 2;
-        panel.add(createInputField("image/user_icon.png", new PlaceholderTextField("Username")), gbc);
+        PlaceholderTextField userfield = new PlaceholderTextField("Username");
+        panel.add(createInputField("image/user_icon.png", userfield), gbc);
 
         // Password
         gbc.gridy = 3;
-        panel.add(createInputField("image/lock_icon.png", new PlaceholderPasswordField("Password")), gbc);
+        PlaceholderTextField passfield = new PlaceholderTextField("Username");
+        panel.add(createInputField("image/lock_icon.png", passfield), gbc);
 
         // Remember me
         gbc.gridy = 4;
@@ -152,6 +159,32 @@ public class RestaurantManagement extends JFrame {
         loginButton.setBorder(null);
         loginButton.setPreferredSize(new Dimension(300, 50));
         panel.add(loginButton, gbc);
+
+        loginButton.addActionListener(new ActionListener() {	
+            @Override
+            public void actionPerformed(ActionEvent e) {
+		        try {
+                    String password = passfield.getActualText();
+                    String username = userfield.getActualText();
+                    Hashpassword a = new Hashpassword();
+                    if (a.verifyUser(username, password)) {
+                        JOptionPane.showMessageDialog(null, 
+					            "Login successful!", 
+					            "Successfully", 
+					            JOptionPane.WARNING_MESSAGE);
+
+                    } else {
+                        JOptionPane.showMessageDialog(null, 
+					            "Incorrect username or password!", 
+					            "Warning", 
+					            JOptionPane.WARNING_MESSAGE);
+
+                    }
+		        } catch (Exception e2) {
+                    System.out.println(e2);
+		        }
+            }
+        });
 
         return panel;
     }
