@@ -29,9 +29,10 @@ public class RestaurantManagement extends JFrame {
 
     // Thêm các ảnh vào mảng này
     private String[] imagePaths = {
-        "image/login.png",
+        "image/login1.png",
         "image/login2.png",
-        "image/login3.png"
+        "image/login3.png",
+        "image/login4.png"
     };
     private int currentImageIndex = 0;
     private Timer imageTimer;
