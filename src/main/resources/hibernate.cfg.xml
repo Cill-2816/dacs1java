@@ -6,7 +6,7 @@
         <!-- Database setting -->
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="hibernate.connection.url">
-            jdbc:mysql://localhost:3306/students_db?useSSL=false&amp;serverTimezone=UTC
+            jdbc:mysql://localhost:3306/RestaurantManagement?useSSL=false&amp;serverTimezone=UTC
         </property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">123456</property>
@@ -18,7 +18,7 @@
         <property name="hbm2ddl.auto">update</property>
  
         <!-- Entity mapping -->
-        <mapping class="com.gpcoder.javafinal2.model.Student" />
+        <mapping class="com.gpcoder.model.Staff" />
          
     </session-factory>
 </hibernate-configuration>

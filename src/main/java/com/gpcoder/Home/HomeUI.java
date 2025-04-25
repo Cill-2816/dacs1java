@@ -1,4 +1,4 @@
-package com.gpcoder.Home;
+package com.gpcoder.home;
 
 public class HomeUI {
     
