@@ -258,19 +258,19 @@ public class RestaurantManagement extends JFrame {
     }
 
     public static void main(String[] args) {
-        // SwingUtilities.invokeLater(RestaurantManagement::new);
-        Session session = HibernateUtils.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        tx.commit();
-        session.close();
+        SwingUtilities.invokeLater(RestaurantManagement::new);
+        // Session session = HibernateUtils.getSessionFactory().openSession();
+        // Transaction tx = session.beginTransaction();
+        // tx.commit();
+        // session.close();
 
-        session = HibernateUtils.getSessionFactory().openSession();
-        List <Staff> staffs = session.createQuery("from Staff", Staff.class).list();
-        session.close();
+        // session = HibernateUtils.getSessionFactory().openSession();
+        // List <Staff> staffs = session.createQuery("from Staff", Staff.class).list();
+        // session.close();
         
-        for (Staff s : staffs)
-        {
-            System.out.println(s);
-        }
+        // for (Staff s : staffs)
+        // {
+        //     System.out.println(s);
+        // }
     }
 }
