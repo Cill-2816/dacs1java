@@ -161,6 +161,31 @@ public class RestaurantManagement extends JFrame {
         loginButton.setPreferredSize(new Dimension(300, 50));
         panel.add(loginButton, gbc);
 
+        passfield.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+		        try {
+                    String password = passfield.getActualText();
+                    String username = userfield.getActualText();
+                    Hashpassword a = new Hashpassword();
+                    if (a.verifyUser(username, password)) {
+                        JOptionPane.showMessageDialog(null, 
+					            "Login successful!", 
+					            "Successfully", 
+					            JOptionPane.WARNING_MESSAGE);
+
+                    } else {
+                        JOptionPane.showMessageDialog(null, 
+					            "Incorrect username or password!", 
+					            "Warning", 
+					            JOptionPane.WARNING_MESSAGE);
+
+                    }
+		        } catch (Exception e2) {
+                    System.out.println(e2);
+		        }
+            }
+        });
         loginButton.addActionListener(new ActionListener() {	
             @Override
             public void actionPerformed(ActionEvent e) {
