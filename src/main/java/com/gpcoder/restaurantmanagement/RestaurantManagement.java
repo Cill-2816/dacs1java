@@ -136,8 +136,9 @@ public class RestaurantManagement extends JFrame {
 
         // Password
         gbc.gridy = 3;
-        PlaceholderTextField passfield = new PlaceholderTextField("Username");
+        PlaceholderPasswordField passfield = new PlaceholderPasswordField("Password");
         panel.add(createInputField("image/lock_icon.png", passfield), gbc);
+
 
         // Remember me
         gbc.gridy = 4;
