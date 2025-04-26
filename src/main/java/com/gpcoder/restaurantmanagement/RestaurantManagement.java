@@ -146,9 +146,12 @@ public class RestaurantManagement extends JFrame {
         JCheckBox rememberCheck = new JCheckBox("Remember username");
         rememberCheck.setFont(new Font("Arial", Font.PLAIN, 16));
         rememberCheck.setForeground(Color.WHITE);
+        rememberCheck.setBackground(new Color(30, 30, 30)); // cho chắc ăn nền khớp panel
         rememberCheck.setBorder(null);
+        rememberCheck.setFocusPainted(false); // <<< thêm dòng này để tắt focus border
         rememberCheck.setOpaque(false);
         panel.add(rememberCheck, gbc);
+
 
         // Login button
         gbc.gridy = 5;
@@ -164,26 +167,26 @@ public class RestaurantManagement extends JFrame {
         passfield.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-		        try {
+		try {
                     String password = passfield.getActualText();
                     String username = userfield.getActualText();
                     Hashpassword a = new Hashpassword();
                     if (a.verifyUser(username, password)) {
-                        JOptionPane.showMessageDialog(null, 
-					            "Login successful!", 
-					            "Successfully", 
-					            JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null,
+					"Login successful!", 
+					"Successfully", 
+					JOptionPane.WARNING_MESSAGE);
 
                     } else {
-                        JOptionPane.showMessageDialog(null, 
-					            "Incorrect username or password!", 
-					            "Warning", 
-					            JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null,
+					"Incorrect username or password!",
+					"Warning", 
+					JOptionPane.WARNING_MESSAGE);
 
                     }
-		        } catch (Exception e2) {
+		} catch (Exception e2) {
                     System.out.println(e2);
-		        }
+		}
             }
         });
         loginButton.addActionListener(new ActionListener() {	

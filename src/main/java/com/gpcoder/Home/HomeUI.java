@@ -24,9 +24,35 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+
+// =======================
+// Bo góc cho JButton
+class RoundedButton extends JButton {
+    private int radius;
+
+    public RoundedButton(String text, int radius) {
+        super(text);
+        this.radius = radius;
+        setOpaque(false);
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2.setColor(getBackground());
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+
+        super.paintComponent(g);
+        g2.dispose();
+    }
+}
 
 public class HomeUI extends JFrame {
 
@@ -68,7 +94,7 @@ public class HomeUI extends JFrame {
             button.setFocusPainted(false);
             button.setBackground(item.equals("Menu") ? new Color(255, 87, 34) : new Color(44, 47, 51));
             button.setForeground(Color.WHITE);
-            button.setFont(new Font("Poppins", Font.PLAIN, 16));
+            button.setFont(new Font("Arial", Font.BOLD, 20));
             button.setBorderPainted(false);
             button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             button.addMouseListener(new MouseAdapter() {
@@ -115,10 +141,49 @@ public class HomeUI extends JFrame {
         userInfo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
         topBar.add(userInfo, BorderLayout.EAST);
 
+        // ===== Search Panel =====
+        JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
+        searchPanel.setBackground(new Color(24, 26, 27));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        PlaceholderTextField searchField = new PlaceholderTextField("Search a food...");
+        searchField.setPreferredSize(new Dimension(400, 40));
+        searchField.setFont(new Font("Arial", Font.ITALIC, 14));
+        searchField.setBackground(new Color(44, 47, 51));
+        searchField.setForeground(Color.GRAY);
+        searchField.setCaretColor(Color.WHITE);
+        searchField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (searchField.getText().equals("Search a food...")) {
+                    searchField.setText("");
+                    searchField.setForeground(Color.WHITE);
+                }
+            }
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (searchField.getText().trim().isEmpty()) {
+                    searchField.setText("Search a food...");
+                    searchField.setForeground(Color.GRAY);
+                }
+            }
+        });
+
+        RoundedButton filterButton = new RoundedButton("", 20);
+        filterButton.setPreferredSize(new Dimension(50, 40));
+        filterButton.setBackground(new Color(44, 47, 51));
+        ImageIcon filterIcon = new ImageIcon("image/setting.png");
+        Image filterImg = filterIcon.getImage().getScaledInstance(64,64, Image.SCALE_SMOOTH);
+        filterButton.setIcon(new ImageIcon(filterImg));
+        filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(filterButton, BorderLayout.EAST);
+
         // ===== Filter Panel =====
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.setBackground(new Color(24, 26, 27));
-
         String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
         String[] icons = {"dish.png", "dish.png", "dish.png", "dish.png"};
         final RoundedButton[] selectedFilterBtn = {null};
@@ -128,7 +193,7 @@ public class HomeUI extends JFrame {
             String iconPath = icons[i];
 
             ImageIcon icon = new ImageIcon("image/" + iconPath);
-            Image img = icon.getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH);
+            Image img = icon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
             icon = new ImageIcon(img);
 
             RoundedButton filterBtn = new RoundedButton(filter, 30);
@@ -140,14 +205,12 @@ public class HomeUI extends JFrame {
             filterBtn.setForeground(Color.WHITE);
             filterBtn.setFont(new Font("Poppins", Font.BOLD, 14));
             filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
             filterBtn.addMouseListener(new MouseAdapter() {
                 public void mouseEntered(MouseEvent e) {
                     if (selectedFilterBtn[0] != filterBtn) {
                         filterBtn.setBackground(new Color(60, 63, 67));
                     }
                 }
-
                 public void mouseExited(MouseEvent e) {
                     if (selectedFilterBtn[0] != filterBtn) {
                         filterBtn.setBackground(new Color(44, 47, 51));
@@ -233,51 +296,12 @@ public class HomeUI extends JFrame {
 
             contentPanel.add(itemCard);
         }
-        // ===== Search Panel =====
-        JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
-        searchPanel.setBackground(new Color(24, 26, 27));
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        JTextField searchField = new JTextField();
-        searchField.setPreferredSize(new Dimension(400, 40));
-        searchField.setFont(new Font("Poppins", Font.PLAIN, 14));
-        searchField.setBackground(new Color(44, 47, 51));
-        searchField.setForeground(Color.WHITE);
-        searchField.setCaretColor(Color.WHITE);
-        searchField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        searchField.setText("Search a food...");
-        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (searchField.getText().equals("Search a food...")) {
-                    searchField.setText("");
-                }
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (searchField.getText().isEmpty()) {
-                    searchField.setText("Search a food...");
-                }
-            }
-        });
-
-        RoundedButton filterButton = new RoundedButton("", 20);
-        filterButton.setPreferredSize(new Dimension(50, 40));
-        filterButton.setBackground(new Color(44, 47, 51));
-
-        // Load icon filter
-        ImageIcon filterIcon = new ImageIcon("image/filter.png"); // nhớ thêm file filter.png nhé
-        Image filterImg = filterIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        filterButton.setIcon(new ImageIcon(filterImg));
-        filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(filterButton, BorderLayout.EAST);
-
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel();
         orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
         orderPanel.setBackground(new Color(30, 32, 34));
-        orderPanel.setPreferredSize(new Dimension(250, getHeight()));
+        orderPanel.setPreferredSize(new Dimension(300, 0));
         orderPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel orderTitle = new JLabel("Order Process");
@@ -315,60 +339,36 @@ public class HomeUI extends JFrame {
             orderPanel.add(stepLabel);
         }
 
+        // ===== Gộp các panel lại =====
+        JPanel leftSide = new JPanel(new BorderLayout());
+        leftSide.setBackground(new Color(24, 26, 27));
+        leftSide.add(searchPanel, BorderLayout.NORTH);
+
+        JPanel middlePanel = new JPanel(new BorderLayout());
+        middlePanel.setBackground(new Color(24, 26, 27));
+        middlePanel.add(filterPanel, BorderLayout.NORTH);
+        middlePanel.add(contentPanel, BorderLayout.CENTER);
+
+        leftSide.add(middlePanel, BorderLayout.CENTER);
+
         JPanel contentArea = new JPanel(new BorderLayout());
         contentArea.setBackground(new Color(24, 26, 27));
         contentArea.add(topBar, BorderLayout.NORTH);
 
-        JPanel centerAndOrder = new JPanel(new BorderLayout());
-        centerAndOrder.setBackground(new Color(24, 26, 27));
-        JPanel topSearchAndFilterPanel = new JPanel();
-        topSearchAndFilterPanel.setLayout(new BoxLayout(topSearchAndFilterPanel, BoxLayout.Y_AXIS));
-        topSearchAndFilterPanel.setBackground(new Color(24, 26, 27));
-        topSearchAndFilterPanel.add(searchPanel);
-        topSearchAndFilterPanel.add(filterPanel);
-        
-        centerAndOrder.add(topSearchAndFilterPanel, BorderLayout.NORTH);
-        
-        centerAndOrder.add(contentPanel, BorderLayout.CENTER);
-        centerAndOrder.add(orderPanel, BorderLayout.EAST);
+        JPanel centerArea = new JPanel(new BorderLayout());
+        centerArea.setBackground(new Color(24, 26, 27));
+        centerArea.add(leftSide, BorderLayout.CENTER);
+        centerArea.add(orderPanel, BorderLayout.EAST);
 
-        contentArea.add(centerAndOrder, BorderLayout.CENTER);
+        contentArea.add(centerArea, BorderLayout.CENTER);
 
         mainPanel.add(sidebar, BorderLayout.WEST);
         mainPanel.add(contentArea, BorderLayout.CENTER);
 
         setContentPane(mainPanel);
     }
-    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(HomeUI::new);
-    }
-}
-
-// =======================
-// Bo góc cho JButton
-class RoundedButton extends JButton {
-    private int radius;
-
-    public RoundedButton(String text, int radius) {
-        super(text);
-        this.radius = radius;
-        setOpaque(false);
-        setFocusPainted(false);
-        setBorderPainted(false);
-        setContentAreaFilled(false);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        g2.setColor(getBackground());
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
-
-        super.paintComponent(g);
-        g2.dispose();
     }
 }
