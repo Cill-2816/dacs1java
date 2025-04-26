@@ -7,11 +7,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -26,33 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-
-// =======================
-// Bo góc cho JButton
-class RoundedButton extends JButton {
-    private int radius;
-
-    public RoundedButton(String text, int radius) {
-        super(text);
-        this.radius = radius;
-        setOpaque(false);
-        setFocusPainted(false);
-        setBorderPainted(false);
-        setContentAreaFilled(false);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        g2.setColor(getBackground());
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
-
-        super.paintComponent(g);
-        g2.dispose();
-    }
-}
 
 public class HomeUI extends JFrame {
 
