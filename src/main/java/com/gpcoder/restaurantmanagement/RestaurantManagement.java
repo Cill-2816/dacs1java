@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,11 +25,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import com.gpcoder.Utils.HibernateUtils;
-import com.gpcoder.model.Staff;
 import com.gpcoder.security.Hashpassword;
 
 public class RestaurantManagement extends JFrame {

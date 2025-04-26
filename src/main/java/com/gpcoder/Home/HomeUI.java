@@ -1,5 +1,265 @@
 package com.gpcoder.home;
 
-public class HomeUI {
-    
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+public class HomeUI extends JFrame {
+
+    public HomeUI() {
+        setTitle("Mr. Chefs - Menu");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1440, 900);
+        setLocationRelativeTo(null);
+        UI();
+        setVisible(true);
+    }
+
+    public void UI() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(new Color(24, 26, 27));
+
+        // ===== Sidebar =====
+        JPanel sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBackground(new Color(34, 37, 41));
+        sidebar.setPreferredSize(new Dimension(220, getHeight()));
+
+        ImageIcon logoIcon = new ImageIcon("image/logo.png"); // đường dẫn tới file ảnh logo của bạn
+        Image scaledImage = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        logoIcon = new ImageIcon(scaledImage);
+
+        JLabel logo = new JLabel(logoIcon);
+        logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        sidebar.add(logo);
+
+
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        String[] menuItems = {"Menu", "Table Service", "Reservation", "Delivery", "Accounting"};
+        for (String item : menuItems) {
+            JButton button = new JButton(item);
+            button.setMaximumSize(new Dimension(200, 45));
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+            button.setFocusPainted(false);
+            button.setBackground(item.equals("Menu") ? new Color(255, 87, 34) : new Color(44, 47, 51));
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("Poppins", Font.PLAIN, 16));
+            button.setBorderPainted(false);
+            button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            button.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    button.setBackground(new Color(60, 63, 67));
+                }
+                public void mouseExited(MouseEvent e) {
+                    button.setBackground(item.equals("Menu") ? new Color(255, 87, 34) : new Color(44, 47, 51));
+                }
+            });
+            sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+            sidebar.add(button);
+        }
+
+        sidebar.add(Box.createVerticalGlue());
+
+        JButton profileButton = new JButton("Profile");
+        profileButton.setMaximumSize(new Dimension(200, 35));
+        profileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        profileButton.setBackground(new Color(44, 47, 51));
+        profileButton.setForeground(Color.WHITE);
+        profileButton.setFont(new Font("Poppins", Font.PLAIN, 14));
+        profileButton.setBorderPainted(false);
+        sidebar.add(profileButton);
+
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setMaximumSize(new Dimension(200, 35));
+        logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoutButton.setBackground(new Color(44, 47, 51));
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.setFont(new Font("Poppins", Font.PLAIN, 14));
+        logoutButton.setBorderPainted(false);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        sidebar.add(logoutButton);
+
+        // ===== Top Bar =====
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setBackground(new Color(36, 40, 45));
+        topBar.setPreferredSize(new Dimension(getWidth(), 60));
+
+        JLabel userInfo = new JLabel("👤 Kristin Watson (Waiter)  ");
+        userInfo.setForeground(Color.WHITE);
+        userInfo.setFont(new Font("Poppins", Font.PLAIN, 14));
+        userInfo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
+        topBar.add(userInfo, BorderLayout.EAST);
+
+        // ===== Filter Panel =====
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.setBackground(new Color(24, 26, 27));
+        String[] filters = {"All", "Breakfast", "Lunch", "Dinner", "Fastfood"};
+        for (String filter : filters) {
+            JButton filterBtn = new JButton(filter);
+            filterBtn.setPreferredSize(new Dimension(120, 35));
+            filterBtn.setBackground(new Color(44, 47, 51));
+            filterBtn.setForeground(Color.WHITE);
+            filterBtn.setFocusPainted(false);
+            filterBtn.setFont(new Font("Poppins", Font.BOLD, 14));
+            filterBtn.setBorderPainted(false);
+            filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            filterBtn.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    filterBtn.setBackground(new Color(60, 63, 67));
+                }
+                public void mouseExited(MouseEvent e) {
+                    filterBtn.setBackground(new Color(44, 47, 51));
+                }
+            });
+            filterPanel.add(filterBtn);
+        }
+
+        // ===== Content Panel =====
+        JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
+        contentPanel.setBackground(new Color(24, 26, 27));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        for (int i = 0; i < 6; i++) {
+            JPanel itemCard = new JPanel();
+            itemCard.setLayout(new BoxLayout(itemCard, BoxLayout.Y_AXIS));
+            itemCard.setBackground(new Color(36, 40, 45));
+            itemCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+            itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            JLabel title = new JLabel("Southwest Scramble Bowl");
+            title.setForeground(Color.WHITE);
+            title.setFont(new Font("Poppins", Font.BOLD, 14));
+            title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JLabel desc = new JLabel("<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
+            desc.setForeground(new Color(180, 180, 180));
+            desc.setFont(new Font("Poppins", Font.PLAIN, 12));
+            desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JLabel price = new JLabel("$17.65");
+            price.setForeground(Color.WHITE);
+            price.setFont(new Font("Poppins", Font.BOLD, 16));
+            price.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            control.setBackground(new Color(36, 40, 45));
+            JButton minus = new JButton("-");
+            JLabel qty = new JLabel("0");
+            qty.setForeground(Color.WHITE);
+            qty.setFont(new Font("Poppins", Font.BOLD, 14));
+            JButton plus = new JButton("+");
+
+            minus.addActionListener(e -> {
+                int count = Integer.parseInt(qty.getText());
+                if (count > 0) qty.setText(String.valueOf(count - 1));
+            });
+
+            plus.addActionListener(e -> {
+                int count = Integer.parseInt(qty.getText());
+                qty.setText(String.valueOf(count + 1));
+            });
+
+            control.add(minus);
+            control.add(qty);
+            control.add(plus);
+
+            itemCard.add(title);
+            itemCard.add(Box.createRigidArea(new Dimension(0, 5)));
+            itemCard.add(desc);
+            itemCard.add(Box.createRigidArea(new Dimension(0, 5)));
+            itemCard.add(price);
+            itemCard.add(Box.createRigidArea(new Dimension(0, 5)));
+            itemCard.add(control);
+
+            contentPanel.add(itemCard);
+        }
+
+        // ===== Order Process Panel =====
+        JPanel orderPanel = new JPanel();
+        orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
+        orderPanel.setBackground(new Color(30, 32, 34));
+        orderPanel.setPreferredSize(new Dimension(250, getHeight()));
+        orderPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel orderTitle = new JLabel("Order Process");
+        orderTitle.setForeground(Color.WHITE);
+        orderTitle.setFont(new Font("Poppins", Font.BOLD, 16));
+        orderTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        orderPanel.add(orderTitle);
+
+        String[] steps = {
+            "1. Add Food Items",
+            "2. Type of Order",
+            "3. Select Table",
+            "4. Customer Info",
+            "5. Payment"
+        };
+
+        for (String step : steps) {
+            JLabel stepLabel = new JLabel("<html><u>" + step + "</u></html>");
+            stepLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            stepLabel.setForeground(Color.LIGHT_GRAY);
+            stepLabel.setFont(new Font("Poppins", Font.PLAIN, 14));
+            stepLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+            stepLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            stepLabel.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    JOptionPane.showMessageDialog(null, step + " clicked!");
+                }
+                public void mouseEntered(MouseEvent e) {
+                    stepLabel.setForeground(Color.WHITE);
+                }
+                public void mouseExited(MouseEvent e) {
+                    stepLabel.setForeground(Color.LIGHT_GRAY);
+                }
+            });
+            orderPanel.add(stepLabel);
+        }
+
+        // ===== Wrap topBar + center + order =====
+        JPanel contentArea = new JPanel(new BorderLayout());
+        contentArea.setBackground(new Color(24, 26, 27));
+        contentArea.add(topBar, BorderLayout.NORTH);
+
+        JPanel centerAndOrder = new JPanel(new BorderLayout());
+        centerAndOrder.setBackground(new Color(24, 26, 27));
+        centerAndOrder.add(filterPanel, BorderLayout.NORTH);
+        centerAndOrder.add(contentPanel, BorderLayout.CENTER);
+        centerAndOrder.add(orderPanel, BorderLayout.EAST);
+
+        contentArea.add(centerAndOrder, BorderLayout.CENTER);
+
+        // ===== Add to Main Panel =====
+        mainPanel.add(sidebar, BorderLayout.WEST);
+        mainPanel.add(contentArea, BorderLayout.CENTER);
+
+        setContentPane(mainPanel);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(HomeUI::new);
+    }
 }
