@@ -7,8 +7,11 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -21,6 +24,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 public class HomeUI extends JFrame {
@@ -44,7 +49,7 @@ public class HomeUI extends JFrame {
         sidebar.setBackground(new Color(34, 37, 41));
         sidebar.setPreferredSize(new Dimension(220, getHeight()));
 
-        ImageIcon logoIcon = new ImageIcon("image/logo.png"); // đường dẫn tới file ảnh logo của bạn
+        ImageIcon logoIcon = new ImageIcon("image/logo.png");
         Image scaledImage = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         logoIcon = new ImageIcon(scaledImage);
 
@@ -52,7 +57,6 @@ public class HomeUI extends JFrame {
         logo.setAlignmentX(Component.CENTER_ALIGNMENT);
         logo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         sidebar.add(logo);
-
 
         sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
 
@@ -114,24 +118,57 @@ public class HomeUI extends JFrame {
         // ===== Filter Panel =====
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.setBackground(new Color(24, 26, 27));
-        String[] filters = {"All", "Breakfast", "Lunch", "Dinner", "Fastfood"};
-        for (String filter : filters) {
-            JButton filterBtn = new JButton(filter);
-            filterBtn.setPreferredSize(new Dimension(120, 35));
+
+        String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
+        String[] icons = {"dish.png", "dish.png", "dish.png", "dish.png"};
+        final RoundedButton[] selectedFilterBtn = {null};
+
+        for (int i = 0; i < filters.length; i++) {
+            String filter = filters[i];
+            String iconPath = icons[i];
+
+            ImageIcon icon = new ImageIcon("image/" + iconPath);
+            Image img = icon.getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH);
+            icon = new ImageIcon(img);
+
+            RoundedButton filterBtn = new RoundedButton(filter, 30);
+            filterBtn.setPreferredSize(new Dimension(200, 60));
+            filterBtn.setHorizontalAlignment(SwingConstants.LEFT);
+            filterBtn.setIcon(icon);
+            filterBtn.setIconTextGap(10);
             filterBtn.setBackground(new Color(44, 47, 51));
             filterBtn.setForeground(Color.WHITE);
-            filterBtn.setFocusPainted(false);
             filterBtn.setFont(new Font("Poppins", Font.BOLD, 14));
-            filterBtn.setBorderPainted(false);
             filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
             filterBtn.addMouseListener(new MouseAdapter() {
                 public void mouseEntered(MouseEvent e) {
-                    filterBtn.setBackground(new Color(60, 63, 67));
+                    if (selectedFilterBtn[0] != filterBtn) {
+                        filterBtn.setBackground(new Color(60, 63, 67));
+                    }
                 }
+
                 public void mouseExited(MouseEvent e) {
-                    filterBtn.setBackground(new Color(44, 47, 51));
+                    if (selectedFilterBtn[0] != filterBtn) {
+                        filterBtn.setBackground(new Color(44, 47, 51));
+                    }
                 }
             });
+
+            filterBtn.addActionListener(e -> {
+                if (selectedFilterBtn[0] != null) {
+                    selectedFilterBtn[0].setBackground(new Color(44, 47, 51));
+                }
+                selectedFilterBtn[0] = filterBtn;
+                filterBtn.setBackground(new Color(255, 87, 34));
+                System.out.println(filter + " selected!");
+            });
+
+            if (filter.equals("All")) {
+                selectedFilterBtn[0] = filterBtn;
+                filterBtn.setBackground(new Color(255, 87, 34));
+            }
+
             filterPanel.add(filterBtn);
         }
 
@@ -196,8 +233,47 @@ public class HomeUI extends JFrame {
 
             contentPanel.add(itemCard);
         }
+        // ===== Search Panel =====
+        JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
+        searchPanel.setBackground(new Color(24, 26, 27));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // ===== Order Process Panel =====
+        JTextField searchField = new JTextField();
+        searchField.setPreferredSize(new Dimension(400, 40));
+        searchField.setFont(new Font("Poppins", Font.PLAIN, 14));
+        searchField.setBackground(new Color(44, 47, 51));
+        searchField.setForeground(Color.WHITE);
+        searchField.setCaretColor(Color.WHITE);
+        searchField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        searchField.setText("Search a food...");
+        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (searchField.getText().equals("Search a food...")) {
+                    searchField.setText("");
+                }
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (searchField.getText().isEmpty()) {
+                    searchField.setText("Search a food...");
+                }
+            }
+        });
+
+        RoundedButton filterButton = new RoundedButton("", 20);
+        filterButton.setPreferredSize(new Dimension(50, 40));
+        filterButton.setBackground(new Color(44, 47, 51));
+
+        // Load icon filter
+        ImageIcon filterIcon = new ImageIcon("image/filter.png"); // nhớ thêm file filter.png nhé
+        Image filterImg = filterIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        filterButton.setIcon(new ImageIcon(filterImg));
+        filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(filterButton, BorderLayout.EAST);
+
+
+        // ===== Order Panel =====
         JPanel orderPanel = new JPanel();
         orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
         orderPanel.setBackground(new Color(30, 32, 34));
@@ -239,27 +315,60 @@ public class HomeUI extends JFrame {
             orderPanel.add(stepLabel);
         }
 
-        // ===== Wrap topBar + center + order =====
         JPanel contentArea = new JPanel(new BorderLayout());
         contentArea.setBackground(new Color(24, 26, 27));
         contentArea.add(topBar, BorderLayout.NORTH);
 
         JPanel centerAndOrder = new JPanel(new BorderLayout());
         centerAndOrder.setBackground(new Color(24, 26, 27));
-        centerAndOrder.add(filterPanel, BorderLayout.NORTH);
+        JPanel topSearchAndFilterPanel = new JPanel();
+        topSearchAndFilterPanel.setLayout(new BoxLayout(topSearchAndFilterPanel, BoxLayout.Y_AXIS));
+        topSearchAndFilterPanel.setBackground(new Color(24, 26, 27));
+        topSearchAndFilterPanel.add(searchPanel);
+        topSearchAndFilterPanel.add(filterPanel);
+        
+        centerAndOrder.add(topSearchAndFilterPanel, BorderLayout.NORTH);
+        
         centerAndOrder.add(contentPanel, BorderLayout.CENTER);
         centerAndOrder.add(orderPanel, BorderLayout.EAST);
 
         contentArea.add(centerAndOrder, BorderLayout.CENTER);
 
-        // ===== Add to Main Panel =====
         mainPanel.add(sidebar, BorderLayout.WEST);
         mainPanel.add(contentArea, BorderLayout.CENTER);
 
         setContentPane(mainPanel);
     }
+    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(HomeUI::new);
+    }
+}
+
+// =======================
+// Bo góc cho JButton
+class RoundedButton extends JButton {
+    private int radius;
+
+    public RoundedButton(String text, int radius) {
+        super(text);
+        this.radius = radius;
+        setOpaque(false);
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2.setColor(getBackground());
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+
+        super.paintComponent(g);
+        g2.dispose();
     }
 }
