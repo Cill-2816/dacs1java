@@ -174,7 +174,7 @@ public class HomeUI extends JFrame {
 
         JLabel userInfo = new JLabel("👤 Kristin Watson (Waiter)  ");
         userInfo.setForeground(Color.WHITE);
-        userInfo.setFont(new Font("Poppins", Font.PLAIN, 14));
+        userInfo.setFont(new Font("Arial", Font.PLAIN, 14));
         userInfo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
         topBar.add(userInfo, BorderLayout.EAST);
 
@@ -242,7 +242,7 @@ public class HomeUI extends JFrame {
         filterBtn.setIconTextGap(10);
         filterBtn.setBackground(new Color(44, 47, 51));
         filterBtn.setForeground(Color.WHITE);
-        filterBtn.setFont(new Font("Poppins", Font.BOLD, 14));
+        filterBtn.setFont(new Font("Arial", Font.BOLD, 14));
         filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         
         filterBtn.addMouseListener(new MouseAdapter() {
@@ -302,7 +302,7 @@ public class HomeUI extends JFrame {
 
             JLabel price = new JLabel("$17.65");
             price.setForeground(Color.WHITE);
-            price.setFont(new Font("Poppins", Font.BOLD, 16));
+            price.setFont(new Font("Arial", Font.BOLD, 16));
             price.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -310,7 +310,7 @@ public class HomeUI extends JFrame {
             JButton minus = new JButton("-");
             JLabel qty = new JLabel("0");
             qty.setForeground(Color.WHITE);
-            qty.setFont(new Font("Poppins", Font.BOLD, 14));
+            qty.setFont(new Font("Arial", Font.BOLD, 14));
             JButton plus = new JButton("+");
 
             minus.addActionListener(e -> {
