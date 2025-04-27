@@ -27,9 +27,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-public class HomeUI extends JFrame {
+public class HomeUIAdmin extends JFrame {
 
-    public HomeUI() {
+    public HomeUIAdmin() {
         setTitle("Mr. Chefs - Menu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1440, 900);
@@ -42,7 +42,7 @@ public class HomeUI extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(new Color(24, 26, 27));
 
-                // ===== Sidebar =====
+                    // ===== Sidebar =====
             JPanel sidebar = new JPanel();
             sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
             sidebar.setBackground(new Color(30, 32, 34));
@@ -59,12 +59,11 @@ public class HomeUI extends JFrame {
             sidebar.add(logo);
 
             // Menu items
-            String[] menuItems = {"All", "Breakfast", "Lunch", "Dinner"};
+            String[] menuItems = {"Menu", "Reservation", "Accounting"};
             String[] iconPaths = {
-                "image/dish.png",
-                "image/breakfast.png",
-                "image/lunch.png",
-                "image/dinner.png"
+                "image/menu.png",
+                "image/reservation.png",
+                "image/accounting.png"
             };
 
             Color selectedColor = new Color(255, 87, 34);
@@ -72,7 +71,7 @@ public class HomeUI extends JFrame {
             Color hoverColor = new Color(60, 63, 65);
 
             List<JButton> buttons = new ArrayList<>();
-            final JButton[] selectedButton = {null}; // lưu nút đang chọn
+            final JButton[] selectedButton = {null};
 
             for (int i = 0; i < menuItems.length; i++) {
                 String item = menuItems[i];
@@ -82,7 +81,7 @@ public class HomeUI extends JFrame {
                 button.setAlignmentX(Component.CENTER_ALIGNMENT);
                 button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
                 button.setFocusPainted(false);
-                button.setBackground(item.equals("All") ? selectedColor : defaultColor);
+                button.setBackground(item.equals("Menu") ? selectedColor : defaultColor);
                 button.setForeground(Color.WHITE);
                 button.setFont(new Font("Arial", Font.BOLD, 18));
                 button.setBorderPainted(false);
@@ -92,7 +91,7 @@ public class HomeUI extends JFrame {
 
                 // Set icon
                 ImageIcon icon = new ImageIcon(iconPath);
-                Image scaledIcon = icon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+                Image scaledIcon = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
                 button.setIcon(new ImageIcon(scaledIcon));
 
                 button.addMouseListener(new MouseAdapter() {
@@ -123,7 +122,7 @@ public class HomeUI extends JFrame {
                 sidebar.add(button);
             }
 
-            // Đặt mặc định nút "All" được chọn
+            // Đặt mặc định nút "Menu" được chọn
             selectedButton[0] = buttons.get(0);
 
 
@@ -241,6 +240,64 @@ public class HomeUI extends JFrame {
 
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(filterButton, BorderLayout.EAST);
+
+        // ===== Filter Panel =====
+    JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 8)); // Cách trái 20px, top-bottom 8px
+    filterPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20)); // Lề trên 10px, lề trái phải 20px
+    filterPanel.setBackground(new Color(24, 26, 27));
+
+    String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
+    String[] icons = {"dish.png", "breakfast.png", "lunch.png", "dinner.png"};
+    final RoundedButton[] selectedFilterBtn = {null};
+
+    for (int i = 0; i < filters.length; i++) {
+        String filter = filters[i];
+        String iconPath = icons[i];
+
+        ImageIcon icon = new ImageIcon("image/" + iconPath);
+        Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Icon vừa phải
+        icon = new ImageIcon(img);
+
+        RoundedButton filterBtn = new RoundedButton(filter, 30);
+        filterBtn.setPreferredSize(new Dimension(170, 60)); // Giữ nguyên chiều rộng bạn đang dùng
+        filterBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        filterBtn.setIcon(icon);
+        filterBtn.setIconTextGap(10);
+        filterBtn.setBackground(new Color(44, 47, 51));
+        filterBtn.setForeground(Color.WHITE);
+        filterBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+        filterBtn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                if (selectedFilterBtn[0] != filterBtn) {
+                    filterBtn.setBackground(new Color(60, 63, 67));
+                }
+            }
+            public void mouseExited(MouseEvent e) {
+                if (selectedFilterBtn[0] != filterBtn) {
+                    filterBtn.setBackground(new Color(44, 47, 51));
+                }
+            }
+        });
+
+        filterBtn.addActionListener(e -> {
+            if (selectedFilterBtn[0] != null) {
+                selectedFilterBtn[0].setBackground(new Color(44, 47, 51));
+            }
+            selectedFilterBtn[0] = filterBtn;
+            filterBtn.setBackground(new Color(255, 87, 34));
+            System.out.println(filter + " selected!");
+        });
+
+        if (filter.equals("All")) {
+            selectedFilterBtn[0] = filterBtn;
+            filterBtn.setBackground(new Color(255, 87, 34));
+        }
+
+        filterPanel.add(filterBtn);
+    }
+
 
         // ===== Content Panel =====
         JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
@@ -405,6 +462,7 @@ public class HomeUI extends JFrame {
 
         JPanel middlePanel = new JPanel(new BorderLayout());
         middlePanel.setBackground(new Color(24, 26, 27));
+        middlePanel.add(filterPanel, BorderLayout.NORTH);
         middlePanel.add(contentPanel, BorderLayout.CENTER);
 
         leftSide.add(middlePanel, BorderLayout.CENTER);
@@ -427,6 +485,6 @@ public class HomeUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(HomeUI::new);
+        SwingUtilities.invokeLater(HomeUIAdmin::new);
     }
 }
