@@ -19,7 +19,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -211,22 +210,22 @@ public class HomeUI extends JFrame {
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         for (int i = 0; i < 6; i++) {
-            JPanel itemCard = new JPanel();
+            RoundedPanel itemCard = new RoundedPanel(20);
             itemCard.setLayout(new BoxLayout(itemCard, BoxLayout.Y_AXIS));
             itemCard.setBackground(new Color(36, 40, 45));
             itemCard.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+            BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
             itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             JLabel title = new JLabel("Southwest Scramble Bowl");
             title.setForeground(Color.WHITE);
-            title.setFont(new Font("Poppins", Font.BOLD, 14));
+            title.setFont(new Font("Arial", Font.BOLD, 14));
             title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel desc = new JLabel("<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
             desc.setForeground(new Color(180, 180, 180));
-            desc.setFont(new Font("Poppins", Font.PLAIN, 12));
+            desc.setFont(new Font("Arial", Font.BOLD, 12));
             desc.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel price = new JLabel("$17.65");
@@ -268,46 +267,104 @@ public class HomeUI extends JFrame {
         }
 
         // ===== Order Panel =====
-        JPanel orderPanel = new JPanel();
-        orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
-        orderPanel.setBackground(new Color(30, 32, 34));
-        orderPanel.setPreferredSize(new Dimension(300, 0));
-        orderPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+JPanel orderPanel = new JPanel(new BorderLayout());
+orderPanel.setPreferredSize(new Dimension(300, 0));
+orderPanel.setBackground(new Color(30, 32, 34));
+orderPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel orderTitle = new JLabel("Order Process");
-        orderTitle.setForeground(Color.WHITE);
-        orderTitle.setFont(new Font("Poppins", Font.BOLD, 16));
-        orderTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-        orderPanel.add(orderTitle);
+// Title
+JLabel orderTitle = new JLabel("Order Process", SwingConstants.CENTER);
+orderTitle.setForeground(Color.WHITE);
+orderTitle.setFont(new Font("Arial", Font.BOLD, 18));
+orderTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+orderPanel.add(orderTitle, BorderLayout.NORTH);
 
-        String[] steps = {
-            "1. Add Food Items",
-            "2. Type of Order",
-            "3. Select Table",
-            "4. Customer Info",
-            "5. Payment"
-        };
+// Panel chứa các bước
+JPanel stepsPanel = new JPanel();
+stepsPanel.setLayout(new GridLayout(5, 1, 10, 10)); // 5 dòng, 1 cột, cách nhau 10px
+stepsPanel.setBackground(new Color(30, 32, 34));
 
-        for (String step : steps) {
-            JLabel stepLabel = new JLabel("<html><u>" + step + "</u></html>");
-            stepLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            stepLabel.setForeground(Color.LIGHT_GRAY);
-            stepLabel.setFont(new Font("Poppins", Font.PLAIN, 14));
-            stepLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-            stepLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            stepLabel.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    JOptionPane.showMessageDialog(null, step + " clicked!");
-                }
-                public void mouseEntered(MouseEvent e) {
-                    stepLabel.setForeground(Color.WHITE);
-                }
-                public void mouseExited(MouseEvent e) {
-                    stepLabel.setForeground(Color.LIGHT_GRAY);
-                }
-            });
-            orderPanel.add(stepLabel);
+String[] steps = {
+    "Add Food Items",
+    "Type of Order",
+    "Select Table",
+    "Customer Info",
+    "Payment"
+};
+
+// Tạo font chung cho dễ chỉnh sửa sau này
+Font stepFont = new Font("Arial", Font.PLAIN, 16);
+Font numberFont = new Font("Arial", Font.BOLD, 14);
+
+int stepNumber = 1;
+for (String step : steps) {
+    JButton stepButton = new JButton();
+    stepButton.setBackground(new Color(30, 32, 34));
+    stepButton.setFocusPainted(false);
+    stepButton.setBorder(BorderFactory.createLineBorder(new Color(30, 32, 34)));
+    stepButton.setFont(stepFont);
+    stepButton.setOpaque(true);
+
+    // Sắp xếp nội dung dọc
+    stepButton.setLayout(new BoxLayout(stepButton, BoxLayout.Y_AXIS));
+
+    // Số thứ tự
+    JLabel numberLabel = new JLabel(String.valueOf(stepNumber), SwingConstants.CENTER);
+    numberLabel.setForeground(Color.WHITE);
+    numberLabel.setFont(numberFont);
+    numberLabel.setOpaque(true);
+    numberLabel.setBackground(new Color(45, 48, 52));
+    numberLabel.setPreferredSize(new Dimension(30, 30));
+    numberLabel.setMaximumSize(new Dimension(30, 30));
+    numberLabel.setMinimumSize(new Dimension(30, 30));
+    numberLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    // Nội dung chữ
+    JLabel textLabel = new JLabel(step, SwingConstants.CENTER);
+    textLabel.setForeground(Color.WHITE);
+    textLabel.setFont(stepFont);
+    textLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0)); // Cách số 8px
+    textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    // Thêm vào button
+    stepButton.add(Box.createVerticalGlue());
+    stepButton.add(numberLabel);
+    stepButton.add(Box.createRigidArea(new Dimension(0, 5)));
+    stepButton.add(textLabel);
+    stepButton.add(Box.createVerticalGlue());
+
+    // Quan trọng: ép full chiều ngang
+    stepButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+    stepButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+    stepButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+    stepButton.setPreferredSize(new Dimension(Short.MAX_VALUE, 80));
+
+    // Hiệu ứng hover (thay đổi màu nền)
+    Color defaultBackground = stepButton.getBackground();
+    Color hoverBackground = new Color(60, 63, 65); // màu sáng hơn khi hover
+
+    stepButton.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            stepButton.setBackground(hoverBackground);
         }
+
+        @Override
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            stepButton.setBackground(defaultBackground);
+            stepButton.setBorder(BorderFactory.createLineBorder(defaultBackground)); // trở lại như cũ
+        }
+    });
+    stepsPanel.add(stepButton);
+    stepNumber++;
+}
+
+orderPanel.add(stepsPanel, BorderLayout.CENTER);
+
+
+
+
+
 
         // ===== Gộp các panel lại =====
         JPanel leftSide = new JPanel(new BorderLayout());
