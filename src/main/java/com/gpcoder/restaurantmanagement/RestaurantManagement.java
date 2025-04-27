@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import com.gpcoder.home.HomeUI;
 import com.gpcoder.security.Hashpassword;
 
 public class RestaurantManagement extends JFrame {
@@ -201,7 +202,8 @@ public class RestaurantManagement extends JFrame {
 					            "Login successful!", 
 					            "Successfully", 
 					            JOptionPane.WARNING_MESSAGE);
-
+                        SwingUtilities.invokeLater(HomeUI::new);
+                        dispose();
                     } else {
                         JOptionPane.showMessageDialog(null, 
 					            "Incorrect username or password!", 
