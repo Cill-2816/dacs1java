@@ -335,7 +335,7 @@ public class HomeUIAdmin extends JFrame {
     contentPanel.setBackground(new Color(24, 26, 27));
     contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
 
         RoundedPanel itemCard = new RoundedPanel(20);
         itemCard.setLayout(new BorderLayout());
