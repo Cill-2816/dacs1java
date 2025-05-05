@@ -233,10 +233,42 @@ public class HomeUIAdmin extends JFrame {
         RoundedButton filterButton = new RoundedButton("", 20);
         filterButton.setPreferredSize(new Dimension(50, 40));
         filterButton.setBackground(new Color(44, 47, 51));
-        ImageIcon filterIcon = new ImageIcon("image/setting.png");
-        Image filterImg = filterIcon.getImage().getScaledInstance(64,64, Image.SCALE_SMOOTH);
+        ImageIcon filterIcon = new ImageIcon("image/add.png");
+        Image filterImg = filterIcon.getImage().getScaledInstance(60,60, Image.SCALE_SMOOTH);
         filterButton.setIcon(new ImageIcon(filterImg));
         filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+        // Hiệu ứng hover và nhấn cho filterButton
+        Color defaultFilterColor = new Color(44, 47, 51);
+        Color hoverFilterColor = new Color(60, 63, 65);
+        Color pressedFilterColor = new Color(84, 88, 95);
+
+        filterButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                filterButton.setBackground(hoverFilterColor);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                filterButton.setBackground(defaultFilterColor);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                filterButton.setBackground(pressedFilterColor);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (filterButton.contains(e.getPoint())) {
+                    filterButton.setBackground(hoverFilterColor); // vẫn đang ở trong nút
+                } else {
+                    filterButton.setBackground(defaultFilterColor); // rời khỏi nút
+                }
+            }
+        });
+
 
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(filterButton, BorderLayout.EAST);
@@ -300,66 +332,77 @@ public class HomeUIAdmin extends JFrame {
 
 
         // ===== Content Panel =====
-        JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
-        contentPanel.setBackground(new Color(24, 26, 27));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
+contentPanel.setBackground(new Color(24, 26, 27));
+contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        for (int i = 0; i < 6; i++) {
-            RoundedPanel itemCard = new RoundedPanel(20);
-            itemCard.setLayout(new BoxLayout(itemCard, BoxLayout.Y_AXIS));
-            itemCard.setBackground(new Color(36, 40, 45));
-            itemCard.setBorder(BorderFactory.createCompoundBorder(
+for (int i = 0; i < 6; i++) {
+
+    RoundedPanel itemCard = new RoundedPanel(20);
+    itemCard.setLayout(new BorderLayout());           // BorderLayout để dễ “neo” xuống đáy
+    itemCard.setBackground(new Color(36, 40, 45));
+    itemCard.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-            itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-            JLabel title = new JLabel("Southwest Scramble Bowl");
-            title.setForeground(Color.WHITE);
-            title.setFont(new Font("Arial", Font.BOLD, 14));
-            title.setAlignmentX(Component.CENTER_ALIGNMENT);
+    // ----- Thành phần hiển thị -----
+    JLabel title = new JLabel("Southwest Scramble Bowl");
+    title.setForeground(Color.WHITE);
+    title.setFont(new Font("Arial", Font.BOLD, 14));
+    title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            JLabel desc = new JLabel("<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
-            desc.setForeground(new Color(180, 180, 180));
-            desc.setFont(new Font("Arial", Font.BOLD, 12));
-            desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+    JLabel desc = new JLabel(
+        "<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
+    desc.setForeground(new Color(180, 180, 180));
+    desc.setFont(new Font("Arial", Font.BOLD, 12));
+    desc.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            JLabel price = new JLabel("$17.65");
-            price.setForeground(Color.WHITE);
-            price.setFont(new Font("Arial", Font.BOLD, 16));
-            price.setAlignmentX(Component.CENTER_ALIGNMENT);
+    JLabel price = new JLabel("$17.65");
+    price.setForeground(Color.WHITE);
+    price.setFont(new Font("Arial", Font.BOLD, 16));
+    price.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            control.setBackground(new Color(36, 40, 45));
-            JButton minus = new JButton("-");
-            JLabel qty = new JLabel("0");
-            qty.setForeground(Color.WHITE);
-            qty.setFont(new Font("Arial", Font.BOLD, 14));
-            JButton plus = new JButton("+");
+    JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    control.setBackground(new Color(36, 40, 45));
+    JButton minus = new JButton("-");
+    JLabel qty = new JLabel("0");
+    qty.setForeground(Color.WHITE);
+    qty.setFont(new Font("Arial", Font.BOLD, 14));
+    JButton plus = new JButton("+");
 
-            minus.addActionListener(e -> {
-                int count = Integer.parseInt(qty.getText());
-                if (count > 0) qty.setText(String.valueOf(count - 1));
-            });
+    minus.addActionListener(e -> {
+        int count = Integer.parseInt(qty.getText());
+        if (count > 0) qty.setText(String.valueOf(count - 1));
+    });
+    plus.addActionListener(e -> {
+        int count = Integer.parseInt(qty.getText());
+        qty.setText(String.valueOf(count + 1));
+    });
 
-            plus.addActionListener(e -> {
-                int count = Integer.parseInt(qty.getText());
-                qty.setText(String.valueOf(count + 1));
-            });
+    control.add(minus);
+    control.add(qty);
+    control.add(plus);
 
-            control.add(minus);
-            control.add(qty);
-            control.add(plus);
+    // ----- Panel con xếp dọc -----
+    JPanel details = new JPanel();
+    details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
+    details.setOpaque(false);                          // kế thừa màu nền của itemCard
 
-            itemCard.add(title);
-            itemCard.add(Box.createRigidArea(new Dimension(0, 5)));
-            itemCard.add(desc);
-            itemCard.add(Box.createRigidArea(new Dimension(0, 5)));
-            itemCard.add(price);
-            itemCard.add(Box.createRigidArea(new Dimension(0, 5)));
-            itemCard.add(control);
+    details.add(title);
+    details.add(Box.createRigidArea(new Dimension(0, 5)));
+    details.add(desc);
+    details.add(Box.createRigidArea(new Dimension(0, 5)));
+    details.add(price);
+    details.add(Box.createRigidArea(new Dimension(0, 5)));
+    details.add(control);
 
-            contentPanel.add(itemCard);
-        }
+    // “Neo” panel con xuống đáy
+    itemCard.add(details, BorderLayout.SOUTH);
+
+    contentPanel.add(itemCard);
+}
+
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel(new BorderLayout());
