@@ -59,7 +59,7 @@ public class HomeUIAdmin extends JFrame {
             sidebar.add(logo);
 
             // Menu items
-            String[] menuItems = {"Menu", "Reservation", "Accounting"};
+            String[] sidebarItem = {"Menu", "Reservation", "Accounting"};
             String[] iconPaths = {
                 "image/menu.png",
                 "image/reservation.png",
@@ -73,8 +73,8 @@ public class HomeUIAdmin extends JFrame {
             List<JButton> buttons = new ArrayList<>();
             final JButton[] selectedButton = {null};
 
-            for (int i = 0; i < menuItems.length; i++) {
-                String item = menuItems[i];
+            for (int i = 0; i < sidebarItem.length; i++) {
+                String item = sidebarItem[i];
                 String iconPath = iconPaths[i];
 
                 JButton button = new JButton(item);
@@ -335,8 +335,9 @@ public class HomeUIAdmin extends JFrame {
     contentPanel.setBackground(new Color(24, 26, 27));
     contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        for (int i = 0; i < 6; i++) {
+    List<MenuItem> menuItems = MenuData.getSampleMenu();
 
+    for (MenuItem item : menuItems) {
         RoundedPanel itemCard = new RoundedPanel(20);
         itemCard.setLayout(new BorderLayout());
         itemCard.setBackground(new Color(36, 40, 45));
@@ -344,96 +345,97 @@ public class HomeUIAdmin extends JFrame {
                 BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        // ----- Thành phần hiển thị -----
-        JLabel title = new JLabel("Southwest Scramble Bowl");
+    
+        // ===== Hiển thị thông tin =====
+        JLabel title = new JLabel(item.getName());
         title.setForeground(Color.WHITE);
-        title.setFont(new Font("Arial", Font.BOLD, 14));
+        title.setFont(new Font("Arial", Font.BOLD, 18));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+    
         JLabel desc = new JLabel(
-                "<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
+                "<html><div style='text-align: center;'>" + item.getDescription() + "</div></html>");
         desc.setForeground(new Color(180, 180, 180));
-        desc.setFont(new Font("Arial", Font.BOLD, 12));
+        desc.setFont(new Font("Arial", Font.BOLD, 14));
         desc.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel price = new JLabel("$17.65");
+    
+        JLabel price = new JLabel(item.getPrice());
         price.setForeground(Color.WHITE);
-        price.setFont(new Font("Arial", Font.BOLD, 16));
-        price.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            // ===== Nút Edit và Delete =====
-            JPanel control = new JPanel(new BorderLayout());
-        control.setBackground(new Color(36, 40, 45));
-        control.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // padding trái/phải nếu muốn
-
-        // Resize icon nhỏ lại nếu chưa
+        price.setFont(new Font("Arial", Font.BOLD, 18));
+        price.setHorizontalAlignment(SwingConstants.CENTER); // căn giữa khi ở BorderLayout.CENTER
+    
+        // ===== Hình ảnh món ăn =====
+        ImageIcon foodImage;
+        try {
+            foodImage = new ImageIcon(item.getImagePath());
+            Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+            foodImage = new ImageIcon(scaledImage);
+        } catch (Exception e) {
+            foodImage = new ImageIcon(); // fallback nếu ảnh lỗi
+        }
+        JLabel imageLabel = new JLabel(foodImage);
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+        // ===== Nút Edit và Delete =====
         ImageIcon editIcon = new ImageIcon(new ImageIcon("image/edit.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
         ImageIcon deleteIcon = new ImageIcon(new ImageIcon("image/delete.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
-
+    
         JButton editButton = new JButton(editIcon);
         JButton deleteButton = new JButton(deleteIcon);
-
-    // Tùy chỉnh nút icon
-        Color defaultBtnColor = new Color(44, 47, 51);
+    
+        Color defaultBtnColor = new Color(36,40,45);
         Color hoverBtnColor = new Color(60, 63, 65);
         Color pressedBtnColor = new Color(84, 88, 95);
-
-    for (JButton button : new JButton[]{editButton, deleteButton}) {
-        button.setPreferredSize(new Dimension(42, 42));
-        button.setBackground(defaultBtnColor);
-        button.setContentAreaFilled(true);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                button.setBackground(hoverBtnColor);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                button.setBackground(defaultBtnColor);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                button.setBackground(pressedBtnColor);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (button.contains(e.getPoint())) {
+    
+        for (JButton button : new JButton[]{editButton, deleteButton}) {
+            button.setPreferredSize(new Dimension(42, 42));
+            button.setBackground(defaultBtnColor);
+            button.setContentAreaFilled(true);
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+            button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    
+            button.addMouseListener(new MouseAdapter() {
+                @Override public void mouseEntered(MouseEvent e) {
                     button.setBackground(hoverBtnColor);
-                } else {
+                }
+                @Override public void mouseExited(MouseEvent e) {
                     button.setBackground(defaultBtnColor);
                 }
-            }
-        });
-    }
-    // Đặt 2 nút ở trái và phải
-        control.add(editButton, BorderLayout.WEST);
-        control.add(deleteButton, BorderLayout.EAST);
-
-
-        // ===== Panel con xếp dọc =====
+                @Override public void mousePressed(MouseEvent e) {
+                    button.setBackground(pressedBtnColor);
+                }
+                @Override public void mouseReleased(MouseEvent e) {
+                    button.setBackground(button.contains(e.getPoint()) ? hoverBtnColor : defaultBtnColor);
+                }
+            });
+        }
+    
+        // ===== Panel chứa giá tiền và 2 nút =====
+        JPanel priceAndControlPanel = new JPanel(new BorderLayout());
+        priceAndControlPanel.setOpaque(false);
+        priceAndControlPanel.add(price, BorderLayout.CENTER);
+        priceAndControlPanel.add(editButton, BorderLayout.WEST);
+        priceAndControlPanel.add(deleteButton, BorderLayout.EAST);
+    
+        // ===== Panel chứa tất cả thành phần =====
         JPanel details = new JPanel();
         details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
         details.setOpaque(false);
-
+    
+        // Đẩy xuống dưới chút cho cân
+        details.add(Box.createVerticalStrut(10));
+        details.add(imageLabel);
+        details.add(Box.createVerticalStrut(10));
         details.add(title);
-        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(Box.createVerticalStrut(5));
         details.add(desc);
-        details.add(Box.createRigidArea(new Dimension(0, 5)));
-        details.add(price);
-        details.add(Box.createRigidArea(new Dimension(0, 5)));
-        details.add(control);
-
-        itemCard.add(details, BorderLayout.SOUTH);
+        details.add(Box.createVerticalStrut(10));
+        details.add(priceAndControlPanel);
+    
+        itemCard.add(details, BorderLayout.CENTER);
         contentPanel.add(itemCard);
-}
+    }
+    
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel(new BorderLayout());

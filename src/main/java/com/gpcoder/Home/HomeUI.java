@@ -59,7 +59,7 @@ public class HomeUI extends JFrame {
             sidebar.add(logo);
 
             // Menu items
-            String[] menuItems = {"All", "Breakfast", "Lunch", "Dinner"};
+            String[] sidebarItem = {"All", "Breakfast", "Lunch", "Dinner"};
             String[] iconPaths = {
                 "image/dish.png",
                 "image/breakfast.png",
@@ -74,8 +74,8 @@ public class HomeUI extends JFrame {
             List<JButton> buttons = new ArrayList<>();
             final JButton[] selectedButton = {null}; // lưu nút đang chọn
 
-            for (int i = 0; i < menuItems.length; i++) {
-                String item = menuItems[i];
+            for (int i = 0; i < sidebarItem.length; i++) {
+                String item = sidebarItem[i];
                 String iconPath = iconPaths[i];
 
                 JButton button = new JButton(item);
@@ -271,78 +271,111 @@ public class HomeUI extends JFrame {
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(filterButton, BorderLayout.EAST);
 
-                // ===== Content Panel =====
-        JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
-        contentPanel.setBackground(new Color(24, 26, 27));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            // ===== Content Panel =====
+            JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
+            contentPanel.setBackground(new Color(24, 26, 27));
+            contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            
+            List<MenuItem> menuItems = MenuData.getSampleMenu();
+            for (MenuItem item : menuItems) {
+                    RoundedPanel itemCard = new RoundedPanel(20);
+                    itemCard.setLayout(new BorderLayout());
+                    itemCard.setBackground(new Color(36, 40, 45));
+                    itemCard.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
+                            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+                    itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                
+                    // ===== Hiển thị thông tin =====
+                    JLabel title = new JLabel(item.getName());
+                    title.setForeground(Color.WHITE);
+                    title.setFont(new Font("Arial", Font.BOLD, 18));
+                    title.setAlignmentX(Component.CENTER_ALIGNMENT);
+                
+                    JLabel desc = new JLabel(
+                            "<html><div style='text-align: center;'>" + item.getDescription() + "</div></html>");
+                    desc.setForeground(new Color(180, 180, 180));
+                    desc.setFont(new Font("Arial", Font.BOLD, 14));
+                    desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+                
+                    JLabel price = new JLabel(item.getPrice());
+                    price.setForeground(Color.WHITE);
+                    price.setFont(new Font("Arial", Font.BOLD, 16));
+                    price.setAlignmentX(Component.CENTER_ALIGNMENT);
+                
+                    // ===== Hình ảnh món ăn =====
+                    ImageIcon foodImage;
+                    try {
+                        foodImage = new ImageIcon(item.getImagePath());
+                        Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+                        foodImage = new ImageIcon(scaledImage);
+                    } catch (Exception e) {
+                        foodImage = new ImageIcon(); // fallback nếu ảnh lỗi
+                    }
+        JLabel imageLabel = new JLabel(foodImage);
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        for (int i = 0; i < 6; i++) {
+            // ===== Panel chứa nút trừ/cộng và số lượng =====
+        JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        control.setBackground(new Color(36, 40, 45));
 
-            RoundedPanel itemCard = new RoundedPanel(20);
-            itemCard.setLayout(new BorderLayout());           // BorderLayout để dễ “neo” xuống đáy
-            itemCard.setBackground(new Color(36, 40, 45));
-            itemCard.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-                    BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-            itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        // Load icon và scale
+        ImageIcon minusIcon = new ImageIcon("image/minus.png");
+        ImageIcon plusIcon = new ImageIcon("image/plus.png");
 
-            // ----- Thành phần hiển thị -----
-            JLabel title = new JLabel("Southwest Scramble Bowl");
-            title.setForeground(Color.WHITE);
-            title.setFont(new Font("Arial", Font.BOLD, 14));
-            title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        Image scaledMinus = minusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
+        Image scaledPlus = plusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
 
-            JLabel desc = new JLabel(
-                "<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
-            desc.setForeground(new Color(180, 180, 180));
-            desc.setFont(new Font("Arial", Font.BOLD, 12));
-            desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+        minusIcon = new ImageIcon(scaledMinus);
+        plusIcon = new ImageIcon(scaledPlus);
 
-            JLabel price = new JLabel("$17.65");
-            price.setForeground(Color.WHITE);
-            price.setFont(new Font("Arial", Font.BOLD, 16));
-            price.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // ===== Tạo CircleButton cho minus và plus =====
+        CircleButton minus = new CircleButton(minusIcon, new Color(52, 53, 56), 32);
+        minus.setHoverColor(Color.decode("#5A5B5E")); // xám sáng hơn
 
-            JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            control.setBackground(new Color(36, 40, 45));
-            JButton minus = new JButton("-");
-            JLabel qty = new JLabel("0");
-            qty.setForeground(Color.WHITE);
-            qty.setFont(new Font("Arial", Font.BOLD, 14));
-            JButton plus = new JButton("+");
+        CircleButton plus = new CircleButton(plusIcon, new Color(235, 87, 87), 32);
+        plus.setHoverColor(Color.decode("#FF6B6B")); // đỏ sáng hơn
 
-            minus.addActionListener(e -> {
-                int count = Integer.parseInt(qty.getText());
-                if (count > 0) qty.setText(String.valueOf(count - 1));
-            });
-            plus.addActionListener(e -> {
-                int count = Integer.parseInt(qty.getText());
-                qty.setText(String.valueOf(count + 1));
-            });
 
-            control.add(minus);
-            control.add(qty);
-            control.add(plus);
+        // ===== Số lượng =====
+        JLabel qty = new JLabel("0");
+        qty.setForeground(Color.WHITE);
+        qty.setFont(new Font("Arial", Font.BOLD, 14));
 
-            // ----- Panel con xếp dọc -----
-            JPanel details = new JPanel();
-            details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
-            details.setOpaque(false);                          // kế thừa màu nền của itemCard
+        // ===== Sự kiện tăng/giảm =====
+        minus.addActionListener(e -> {
+            int count = Integer.parseInt(qty.getText());
+            if (count > 0) qty.setText(String.valueOf(count - 1));
+        });
 
-            details.add(title);
-            details.add(Box.createRigidArea(new Dimension(0, 5)));
-            details.add(desc);
-            details.add(Box.createRigidArea(new Dimension(0, 5)));
-            details.add(price);
-            details.add(Box.createRigidArea(new Dimension(0, 5)));
-            details.add(control);
+        plus.addActionListener(e -> {
+            int count = Integer.parseInt(qty.getText());
+            qty.setText(String.valueOf(count + 1));
+        });
 
-            // “Neo” panel con xuống đáy
-            itemCard.add(details, BorderLayout.SOUTH);
+        // ===== Thêm vào panel =====
+        control.add(minus);
+        control.add(qty);
+        control.add(plus);
 
-            contentPanel.add(itemCard);
+            // ===== Panel chứa tất cả thành phần =====
+        JPanel details = new JPanel();
+        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
+        details.setOpaque(false);
+        details.add(Box.createVerticalGlue());
+        details.add(imageLabel);
+        details.add(Box.createRigidArea(new Dimension(0, 10)));
+        details.add(title);
+        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(desc);
+        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(price);
+        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(control);
+    
+        itemCard.add(details, BorderLayout.CENTER);
+        contentPanel.add(itemCard);
         }
-
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel(new BorderLayout());
