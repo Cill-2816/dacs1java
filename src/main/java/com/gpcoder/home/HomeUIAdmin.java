@@ -269,38 +269,37 @@ public class HomeUIAdmin extends JFrame {
             }
         });
 
-
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(filterButton, BorderLayout.EAST);
 
         // ===== Filter Panel =====
-    JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 8)); // Cách trái 20px, top-bottom 8px
-    filterPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20)); // Lề trên 10px, lề trái phải 20px
-    filterPanel.setBackground(new Color(24, 26, 27));
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 8)); // Cách trái 20px, top-bottom 8px
+        filterPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20)); // Lề trên 10px, lề trái phải 20px
+        filterPanel.setBackground(new Color(24, 26, 27));
 
-    String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
-    String[] icons = {"dish.png", "breakfast.png", "lunch.png", "dinner.png"};
-    final RoundedButton[] selectedFilterBtn = {null};
+        String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
+        String[] icons = {"dish.png", "breakfast.png", "lunch.png", "dinner.png"};
+        final RoundedButton[] selectedFilterBtn = {null};
 
-    for (int i = 0; i < filters.length; i++) {
-        String filter = filters[i];
-        String iconPath = icons[i];
+        for (int i = 0; i < filters.length; i++) {
+            String filter = filters[i];
+            String iconPath = icons[i];
 
-        ImageIcon icon = new ImageIcon("image/" + iconPath);
-        Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Icon vừa phải
-        icon = new ImageIcon(img);
+            ImageIcon icon = new ImageIcon("image/" + iconPath);
+            Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Icon vừa phải
+            icon = new ImageIcon(img);
 
-        RoundedButton filterBtn = new RoundedButton(filter, 30);
-        filterBtn.setPreferredSize(new Dimension(170, 60)); // Giữ nguyên chiều rộng bạn đang dùng
-        filterBtn.setHorizontalAlignment(SwingConstants.LEFT);
-        filterBtn.setIcon(icon);
-        filterBtn.setIconTextGap(10);
-        filterBtn.setBackground(new Color(44, 47, 51));
-        filterBtn.setForeground(Color.WHITE);
-        filterBtn.setFont(new Font("Arial", Font.BOLD, 16));
-        filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
-        filterBtn.addMouseListener(new MouseAdapter() {
+            RoundedButton filterBtn = new RoundedButton(filter, 30);
+            filterBtn.setPreferredSize(new Dimension(170, 60)); // Giữ nguyên chiều rộng bạn đang dùng
+            filterBtn.setHorizontalAlignment(SwingConstants.LEFT);
+            filterBtn.setIcon(icon);
+            filterBtn.setIconTextGap(10);
+            filterBtn.setBackground(new Color(44, 47, 51));
+            filterBtn.setForeground(Color.WHITE);
+            filterBtn.setFont(new Font("Arial", Font.BOLD, 16));
+            filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            
+            filterBtn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 if (selectedFilterBtn[0] != filterBtn) {
                     filterBtn.setBackground(new Color(60, 63, 67));

@@ -189,8 +189,6 @@ public class HomeUI extends JFrame {
             // Add Profile-Logout panel vào sidebar
             sidebar.add(profileLogoutPanel);
 
-
-
         // ===== Top Bar =====
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(36, 40, 45));
