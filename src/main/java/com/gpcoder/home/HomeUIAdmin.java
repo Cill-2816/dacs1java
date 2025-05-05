@@ -297,7 +297,7 @@ public class HomeUIAdmin extends JFrame {
         filterBtn.setIconTextGap(10);
         filterBtn.setBackground(new Color(44, 47, 51));
         filterBtn.setForeground(Color.WHITE);
-        filterBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        filterBtn.setFont(new Font("Arial", Font.BOLD, 16));
         filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         
         filterBtn.addMouseListener(new MouseAdapter() {
@@ -308,7 +308,7 @@ public class HomeUIAdmin extends JFrame {
             }
             public void mouseExited(MouseEvent e) {
                 if (selectedFilterBtn[0] != filterBtn) {
-                    filterBtn.setBackground(new Color(44, 47, 51));
+                    filterBtn.setBackground(new Color(44, 47, 50));
                 }
             }
         });

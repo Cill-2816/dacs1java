@@ -238,6 +238,37 @@ public class HomeUI extends JFrame {
         Image filterImg = filterIcon.getImage().getScaledInstance(64,64, Image.SCALE_SMOOTH);
         filterButton.setIcon(new ImageIcon(filterImg));
         filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        // Hiệu ứng hover và nhấn cho filterButton
+        Color defaultFilterColor = new Color(44, 47, 51);
+        Color hoverFilterColor = new Color(60, 63, 65);
+        Color pressedFilterColor = new Color(84, 88, 95);
+
+        filterButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                filterButton.setBackground(hoverFilterColor);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                filterButton.setBackground(defaultFilterColor);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                filterButton.setBackground(pressedFilterColor);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (filterButton.contains(e.getPoint())) {
+                    filterButton.setBackground(hoverFilterColor); // vẫn đang ở trong nút
+                } else {
+                    filterButton.setBackground(defaultFilterColor); // rời khỏi nút
+                }
+            }
+        });
+
 
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(filterButton, BorderLayout.EAST);
