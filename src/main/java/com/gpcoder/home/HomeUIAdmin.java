@@ -331,78 +331,110 @@ public class HomeUIAdmin extends JFrame {
     }
 
 
-        // ===== Content Panel =====
-JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
-contentPanel.setBackground(new Color(24, 26, 27));
-contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                // ===== Content Panel =====
+    JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
+    contentPanel.setBackground(new Color(24, 26, 27));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
 
-    RoundedPanel itemCard = new RoundedPanel(20);
-    itemCard.setLayout(new BorderLayout());           // BorderLayout để dễ “neo” xuống đáy
-    itemCard.setBackground(new Color(36, 40, 45));
-    itemCard.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-    itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        RoundedPanel itemCard = new RoundedPanel(20);
+        itemCard.setLayout(new BorderLayout());
+        itemCard.setBackground(new Color(36, 40, 45));
+        itemCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-    // ----- Thành phần hiển thị -----
-    JLabel title = new JLabel("Southwest Scramble Bowl");
-    title.setForeground(Color.WHITE);
-    title.setFont(new Font("Arial", Font.BOLD, 14));
-    title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // ----- Thành phần hiển thị -----
+        JLabel title = new JLabel("Southwest Scramble Bowl");
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Arial", Font.BOLD, 14));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    JLabel desc = new JLabel(
-        "<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
-    desc.setForeground(new Color(180, 180, 180));
-    desc.setFont(new Font("Arial", Font.BOLD, 12));
-    desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel desc = new JLabel(
+                "<html><div style='text-align: center;'>Perfectly seasoned scrambled eggs served with toast.</div></html>");
+        desc.setForeground(new Color(180, 180, 180));
+        desc.setFont(new Font("Arial", Font.BOLD, 12));
+        desc.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    JLabel price = new JLabel("$17.65");
-    price.setForeground(Color.WHITE);
-    price.setFont(new Font("Arial", Font.BOLD, 16));
-    price.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel price = new JLabel("$17.65");
+        price.setForeground(Color.WHITE);
+        price.setFont(new Font("Arial", Font.BOLD, 16));
+        price.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
-    control.setBackground(new Color(36, 40, 45));
-    JButton minus = new JButton("-");
-    JLabel qty = new JLabel("0");
-    qty.setForeground(Color.WHITE);
-    qty.setFont(new Font("Arial", Font.BOLD, 14));
-    JButton plus = new JButton("+");
+            // ===== Nút Edit và Delete =====
+            JPanel control = new JPanel(new BorderLayout());
+        control.setBackground(new Color(36, 40, 45));
+        control.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10)); // padding trái/phải nếu muốn
 
-    minus.addActionListener(e -> {
-        int count = Integer.parseInt(qty.getText());
-        if (count > 0) qty.setText(String.valueOf(count - 1));
-    });
-    plus.addActionListener(e -> {
-        int count = Integer.parseInt(qty.getText());
-        qty.setText(String.valueOf(count + 1));
-    });
+        // Resize icon nhỏ lại nếu chưa
+        ImageIcon editIcon = new ImageIcon(new ImageIcon("image/edit.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
+        ImageIcon deleteIcon = new ImageIcon(new ImageIcon("image/delete.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
 
-    control.add(minus);
-    control.add(qty);
-    control.add(plus);
+        JButton editButton = new JButton(editIcon);
+        JButton deleteButton = new JButton(deleteIcon);
 
-    // ----- Panel con xếp dọc -----
-    JPanel details = new JPanel();
-    details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
-    details.setOpaque(false);                          // kế thừa màu nền của itemCard
+    // Tùy chỉnh nút icon
+        Color defaultBtnColor = new Color(44, 47, 51);
+        Color hoverBtnColor = new Color(60, 63, 65);
+        Color pressedBtnColor = new Color(84, 88, 95);
 
-    details.add(title);
-    details.add(Box.createRigidArea(new Dimension(0, 5)));
-    details.add(desc);
-    details.add(Box.createRigidArea(new Dimension(0, 5)));
-    details.add(price);
-    details.add(Box.createRigidArea(new Dimension(0, 5)));
-    details.add(control);
+    for (JButton button : new JButton[]{editButton, deleteButton}) {
+        button.setPreferredSize(new Dimension(42, 42));
+        button.setBackground(defaultBtnColor);
+        button.setContentAreaFilled(true);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-    // “Neo” panel con xuống đáy
-    itemCard.add(details, BorderLayout.SOUTH);
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(hoverBtnColor);
+            }
 
-    contentPanel.add(itemCard);
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(defaultBtnColor);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                button.setBackground(pressedBtnColor);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (button.contains(e.getPoint())) {
+                    button.setBackground(hoverBtnColor);
+                } else {
+                    button.setBackground(defaultBtnColor);
+                }
+            }
+        });
+    }
+    // Đặt 2 nút ở trái và phải
+        control.add(editButton, BorderLayout.WEST);
+        control.add(deleteButton, BorderLayout.EAST);
+
+
+        // ===== Panel con xếp dọc =====
+        JPanel details = new JPanel();
+        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
+        details.setOpaque(false);
+
+        details.add(title);
+        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(desc);
+        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(price);
+        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(control);
+
+        itemCard.add(details, BorderLayout.SOUTH);
+        contentPanel.add(itemCard);
 }
-
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel(new BorderLayout());
