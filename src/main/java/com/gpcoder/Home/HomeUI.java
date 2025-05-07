@@ -285,7 +285,7 @@ public class HomeUI extends JFrame {
                 itemCard.setBackground(new Color(36, 40, 45));
                 itemCard.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-                    BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+                    BorderFactory.createEmptyBorder(25, 10, 10, 10)));
                 itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             
                 // ===== Title =====
@@ -385,6 +385,14 @@ public class HomeUI extends JFrame {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16); // cuộn mượt
+
+                // Custom thanh cuộn
+        scrollPane.getVerticalScrollBar().setUI(new DarkScrollBarUI());
+        scrollPane.getHorizontalScrollBar().setUI(new DarkScrollBarUI()); // nếu muốn dùng ngang
+        scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, new JPanel() {{
+            setOpaque(false);           // lấp góc trống, cùng màu nền
+        }});
+
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel(new BorderLayout());

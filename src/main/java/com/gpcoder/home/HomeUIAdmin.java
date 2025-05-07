@@ -332,115 +332,123 @@ public class HomeUIAdmin extends JFrame {
 
 
                 // ===== Content Panel (3 cột, xuống hàng tự động) =====
-JPanel contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
-contentPanel.setBackground(new Color(24, 26, 27));
-contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    JPanel contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
+    contentPanel.setBackground(new Color(24, 26, 27));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-List<MenuItem> menuItems = MenuData.getSampleMenu();
-for (MenuItem item : menuItems) {
-    RoundedPanel itemCard = new RoundedPanel(20);
-    itemCard.setPreferredSize(new Dimension(230, 300));
-    itemCard.setLayout(new BorderLayout());
-    itemCard.setBackground(new Color(36, 40, 45));
-    itemCard.setBorder(BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-        BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-    itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    List<MenuItem> menuItems = MenuData.getSampleMenu();
+    for (MenuItem item : menuItems) {
+        RoundedPanel itemCard = new RoundedPanel(20);
+        itemCard.setPreferredSize(new Dimension(230, 300));
+        itemCard.setLayout(new BorderLayout());
+        itemCard.setBackground(new Color(36, 40, 45));
+        itemCard.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-    // ===== Title =====
-    JLabel title = new JLabel(item.getName());
-    title.setForeground(Color.WHITE);
-    title.setFont(new Font("Arial", Font.BOLD, 18));
-    title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // ===== Title =====
+        JLabel title = new JLabel(item.getName());
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    // ===== Description =====
-    JLabel desc = new JLabel("<html><div style='text-align: center;'>" + item.getDescription() + "</div></html>");
-    desc.setForeground(new Color(180, 180, 180));
-    desc.setFont(new Font("Arial", Font.BOLD, 14));
-    desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // ===== Description =====
+        JLabel desc = new JLabel("<html><div style='text-align: center;'>" + item.getDescription() + "</div></html>");
+        desc.setForeground(new Color(180, 180, 180));
+        desc.setFont(new Font("Arial", Font.BOLD, 14));
+        desc.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    // ===== Price =====
-    JLabel price = new JLabel(item.getPrice());
-    price.setForeground(Color.WHITE);
-    price.setFont(new Font("Arial", Font.BOLD, 18));
-    price.setHorizontalAlignment(SwingConstants.CENTER);
+        // ===== Price =====
+        JLabel price = new JLabel(item.getPrice());
+        price.setForeground(Color.WHITE);
+        price.setFont(new Font("Arial", Font.BOLD, 18));
+        price.setHorizontalAlignment(SwingConstants.CENTER);
 
-    // ===== Food Image =====
-    ImageIcon foodImage;
-    try {
-        foodImage = new ImageIcon(item.getImagePath());
-        Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
-        foodImage = new ImageIcon(scaledImage);
-    } catch (Exception e) {
-        foodImage = new ImageIcon(); // fallback
+        // ===== Food Image =====
+        ImageIcon foodImage;
+        try {
+            foodImage = new ImageIcon(item.getImagePath());
+            Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+            foodImage = new ImageIcon(scaledImage);
+        } catch (Exception e) {
+            foodImage = new ImageIcon(); // fallback
+        }
+        JLabel imageLabel = new JLabel(foodImage);
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // ===== Edit/Delete Buttons =====
+        ImageIcon editIcon = new ImageIcon(new ImageIcon("image/edit.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
+        ImageIcon deleteIcon = new ImageIcon(new ImageIcon("image/delete.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
+
+        JButton editButton = new JButton(editIcon);
+        JButton deleteButton = new JButton(deleteIcon);
+
+        Color defaultBtnColor = new Color(36, 40, 45);
+        Color hoverBtnColor = new Color(60, 63, 65);
+        Color pressedBtnColor = new Color(84, 88, 95);
+
+        for (JButton button : new JButton[]{editButton, deleteButton}) {
+            button.setPreferredSize(new Dimension(42, 42));
+            button.setBackground(defaultBtnColor);
+            button.setContentAreaFilled(true);
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+            button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            button.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    button.setBackground(hoverBtnColor);
+                }
+                public void mouseExited(MouseEvent e) {
+                    button.setBackground(defaultBtnColor);
+                }
+                public void mousePressed(MouseEvent e) {
+                    button.setBackground(pressedBtnColor);
+                }
+                public void mouseReleased(MouseEvent e) {
+                    button.setBackground(button.contains(e.getPoint()) ? hoverBtnColor : defaultBtnColor);
+                }
+            });
+        }
+
+        JPanel priceAndControlPanel = new JPanel(new BorderLayout());
+        priceAndControlPanel.setOpaque(false);
+        priceAndControlPanel.add(price, BorderLayout.CENTER);
+        priceAndControlPanel.add(editButton, BorderLayout.WEST);
+        priceAndControlPanel.add(deleteButton, BorderLayout.EAST);
+
+        JPanel details = new JPanel();
+        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
+        details.setOpaque(false);
+        details.add(Box.createVerticalStrut(10));
+        details.add(imageLabel);
+        details.add(Box.createVerticalStrut(10));
+        details.add(title);
+        details.add(Box.createVerticalStrut(5));
+        details.add(desc);
+        details.add(Box.createVerticalStrut(10));
+        details.add(priceAndControlPanel);
+
+        itemCard.add(details, BorderLayout.CENTER);
+        contentPanel.add(itemCard);
     }
-    JLabel imageLabel = new JLabel(foodImage);
-    imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    // ===== Edit/Delete Buttons =====
-    ImageIcon editIcon = new ImageIcon(new ImageIcon("image/edit.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
-    ImageIcon deleteIcon = new ImageIcon(new ImageIcon("image/delete.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
+        // ===== ScrollPane trực tiếp chứa contentPanel =====
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setPreferredSize(new Dimension(0, 600)); // chiều cao đủ 2 hàng
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // cuộn mượt
 
-    JButton editButton = new JButton(editIcon);
-    JButton deleteButton = new JButton(deleteIcon);
+        // Custom thanh cuộn
+        scrollPane.getVerticalScrollBar().setUI(new DarkScrollBarUI());
+        scrollPane.getHorizontalScrollBar().setUI(new DarkScrollBarUI()); // nếu muốn dùng ngang
+        scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, new JPanel() {{
+            setOpaque(false);           // lấp góc trống, cùng màu nền
+        }});
 
-    Color defaultBtnColor = new Color(36, 40, 45);
-    Color hoverBtnColor = new Color(60, 63, 65);
-    Color pressedBtnColor = new Color(84, 88, 95);
-
-    for (JButton button : new JButton[]{editButton, deleteButton}) {
-        button.setPreferredSize(new Dimension(42, 42));
-        button.setBackground(defaultBtnColor);
-        button.setContentAreaFilled(true);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        button.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                button.setBackground(hoverBtnColor);
-            }
-            public void mouseExited(MouseEvent e) {
-                button.setBackground(defaultBtnColor);
-            }
-            public void mousePressed(MouseEvent e) {
-                button.setBackground(pressedBtnColor);
-            }
-            public void mouseReleased(MouseEvent e) {
-                button.setBackground(button.contains(e.getPoint()) ? hoverBtnColor : defaultBtnColor);
-            }
-        });
-    }
-
-    JPanel priceAndControlPanel = new JPanel(new BorderLayout());
-    priceAndControlPanel.setOpaque(false);
-    priceAndControlPanel.add(price, BorderLayout.CENTER);
-    priceAndControlPanel.add(editButton, BorderLayout.WEST);
-    priceAndControlPanel.add(deleteButton, BorderLayout.EAST);
-
-    JPanel details = new JPanel();
-    details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
-    details.setOpaque(false);
-    details.add(Box.createVerticalStrut(10));
-    details.add(imageLabel);
-    details.add(Box.createVerticalStrut(10));
-    details.add(title);
-    details.add(Box.createVerticalStrut(5));
-    details.add(desc);
-    details.add(Box.createVerticalStrut(10));
-    details.add(priceAndControlPanel);
-
-    itemCard.add(details, BorderLayout.CENTER);
-    contentPanel.add(itemCard);
-}
-
-// ===== ScrollPane trực tiếp chứa contentPanel =====
-JScrollPane scrollPane = new JScrollPane(contentPanel);
-scrollPane.setPreferredSize(new Dimension(0, 600)); // chiều cao đủ 2 hàng
-scrollPane.setBorder(BorderFactory.createEmptyBorder());
-scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-scrollPane.getVerticalScrollBar().setUnitIncrement(16); // cuộn mượt
 
 
 
@@ -533,44 +541,44 @@ scrollPane.getVerticalScrollBar().setUnitIncrement(16); // cuộn mượt
                 stepButton.setBorder(BorderFactory.createLineBorder(defaultBackground)); // trở lại như cũ
             }
         });
-    stepsPanel.add(stepButton);
-    stepNumber++;
-}
-    orderPanel.add(stepsPanel, BorderLayout.CENTER);
+        stepsPanel.add(stepButton);
+        stepNumber++;
+    }
+        orderPanel.add(stepsPanel, BorderLayout.CENTER);
 
-        // ===== Gộp các panel lại =====
-JPanel leftSide = new JPanel(new BorderLayout());
-leftSide.setBackground(new Color(24, 26, 27));
-leftSide.add(searchPanel, BorderLayout.NORTH);
+                // ===== Gộp các panel lại =====
+        JPanel leftSide = new JPanel(new BorderLayout());
+        leftSide.setBackground(new Color(24, 26, 27));
+        leftSide.add(searchPanel, BorderLayout.NORTH);
 
-// middlePanel chứa filter + scroll content
-JPanel middlePanel = new JPanel(new BorderLayout());
-middlePanel.setBackground(new Color(24, 26, 27));
-middlePanel.add(filterPanel, BorderLayout.NORTH);
-middlePanel.add(scrollPane, BorderLayout.CENTER); // scrollPane thay cho contentPanel
+        // middlePanel chứa filter + scroll content
+        JPanel middlePanel = new JPanel(new BorderLayout());
+        middlePanel.setBackground(new Color(24, 26, 27));
+        middlePanel.add(filterPanel, BorderLayout.NORTH);
+        middlePanel.add(scrollPane, BorderLayout.CENTER); // scrollPane thay cho contentPanel
 
-leftSide.add(middlePanel, BorderLayout.CENTER);
+        leftSide.add(middlePanel, BorderLayout.CENTER);
 
-// Top bar chứa thông tin người dùng
-JPanel contentArea = new JPanel(new BorderLayout());
-contentArea.setBackground(new Color(24, 26, 27));
-contentArea.add(topBar, BorderLayout.NORTH);
+        // Top bar chứa thông tin người dùng
+        JPanel contentArea = new JPanel(new BorderLayout());
+        contentArea.setBackground(new Color(24, 26, 27));
+        contentArea.add(topBar, BorderLayout.NORTH);
 
-// centerArea gồm phần trái (menu/filter/content) và phải (order)
-JPanel centerArea = new JPanel(new BorderLayout());
-centerArea.setBackground(new Color(24, 26, 27));
-centerArea.add(leftSide, BorderLayout.CENTER);
-centerArea.add(orderPanel, BorderLayout.EAST);
+        // centerArea gồm phần trái (menu/filter/content) và phải (order)
+        JPanel centerArea = new JPanel(new BorderLayout());
+        centerArea.setBackground(new Color(24, 26, 27));
+        centerArea.add(leftSide, BorderLayout.CENTER);
+        centerArea.add(orderPanel, BorderLayout.EAST);
 
-// contentArea gồm topBar + centerArea
-contentArea.add(centerArea, BorderLayout.CENTER);
+        // contentArea gồm topBar + centerArea
+        contentArea.add(centerArea, BorderLayout.CENTER);
 
-// mainPanel gồm sidebar trái và phần còn lại
-mainPanel.add(sidebar, BorderLayout.WEST);
-mainPanel.add(contentArea, BorderLayout.CENTER);
+        // mainPanel gồm sidebar trái và phần còn lại
+        mainPanel.add(sidebar, BorderLayout.WEST);
+        mainPanel.add(contentArea, BorderLayout.CENTER);
 
-// Gán vào cửa sổ chính
-setContentPane(mainPanel);
+        // Gán vào cửa sổ chính
+        setContentPane(mainPanel);
 
 
     }
