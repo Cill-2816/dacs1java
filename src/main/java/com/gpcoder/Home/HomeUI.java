@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
@@ -272,51 +273,53 @@ public class HomeUI extends JFrame {
         searchPanel.add(filterButton, BorderLayout.EAST);
 
             // ===== Content Panel =====
-            JPanel contentPanel = new JPanel(new GridLayout(2, 3, 20, 20));
+            JPanel contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
             contentPanel.setBackground(new Color(24, 26, 27));
             contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             
             List<MenuItem> menuItems = MenuData.getSampleMenu();
             for (MenuItem item : menuItems) {
-                    RoundedPanel itemCard = new RoundedPanel(20);
-                    itemCard.setLayout(new BorderLayout());
-                    itemCard.setBackground(new Color(36, 40, 45));
-                    itemCard.setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-                            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-                    itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                
-                    // ===== Hiển thị thông tin =====
-                    JLabel title = new JLabel(item.getName());
-                    title.setForeground(Color.WHITE);
-                    title.setFont(new Font("Arial", Font.BOLD, 18));
-                    title.setAlignmentX(Component.CENTER_ALIGNMENT);
-                
-                    JLabel desc = new JLabel(
-                            "<html><div style='text-align: center;'>" + item.getDescription() + "</div></html>");
-                    desc.setForeground(new Color(180, 180, 180));
-                    desc.setFont(new Font("Arial", Font.BOLD, 14));
-                    desc.setAlignmentX(Component.CENTER_ALIGNMENT);
-                
-                    JLabel price = new JLabel(item.getPrice());
-                    price.setForeground(Color.WHITE);
-                    price.setFont(new Font("Arial", Font.BOLD, 16));
-                    price.setAlignmentX(Component.CENTER_ALIGNMENT);
-                
-                    // ===== Hình ảnh món ăn =====
-                    ImageIcon foodImage;
-                    try {
-                        foodImage = new ImageIcon(item.getImagePath());
-                        Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
-                        foodImage = new ImageIcon(scaledImage);
-                    } catch (Exception e) {
-                        foodImage = new ImageIcon(); // fallback nếu ảnh lỗi
-                    }
-        JLabel imageLabel = new JLabel(foodImage);
-        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                RoundedPanel itemCard = new RoundedPanel(20);
+                itemCard.setPreferredSize(new Dimension(230, 300));
+                itemCard.setLayout(new BorderLayout());
+                itemCard.setBackground(new Color(36, 40, 45));
+                itemCard.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
+                    BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+                itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            
+                // ===== Title =====
+                JLabel title = new JLabel(item.getName());
+                title.setForeground(Color.WHITE);
+                title.setFont(new Font("Arial", Font.BOLD, 18));
+                title.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+                // ===== Description =====
+                JLabel desc = new JLabel("<html><div style='text-align: center;'>" + item.getDescription() + "</div></html>");
+                desc.setForeground(new Color(180, 180, 180));
+                desc.setFont(new Font("Arial", Font.BOLD, 14));
+                desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+                // ===== Price =====
+                JLabel price = new JLabel(item.getPrice());
+                price.setForeground(Color.WHITE);
+                price.setFont(new Font("Arial", Font.BOLD, 18));
+                price.setHorizontalAlignment(SwingConstants.CENTER);
+            
+                // ===== Food Image =====
+                ImageIcon foodImage;
+                try {
+                    foodImage = new ImageIcon(item.getImagePath());
+                    Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+                    foodImage = new ImageIcon(scaledImage);
+                } catch (Exception e) {
+                    foodImage = new ImageIcon(); // fallback
+                }
+                JLabel imageLabel = new JLabel(foodImage);
+                imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             // ===== Panel chứa nút trừ/cộng và số lượng =====
-        JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER, 30,0));
         control.setBackground(new Color(36, 40, 45));
 
         // Load icon và scale
@@ -362,20 +365,26 @@ public class HomeUI extends JFrame {
         JPanel details = new JPanel();
         details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
         details.setOpaque(false);
-        details.add(Box.createVerticalGlue());
+        details.add(Box.createVerticalStrut(10));
         details.add(imageLabel);
-        details.add(Box.createRigidArea(new Dimension(0, 10)));
+        details.add(Box.createVerticalStrut(10));
         details.add(title);
-        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(Box.createVerticalStrut(5));
         details.add(desc);
-        details.add(Box.createRigidArea(new Dimension(0, 5)));
-        details.add(price);
-        details.add(Box.createRigidArea(new Dimension(0, 5)));
+        details.add(Box.createVerticalStrut(10));
         details.add(control);
-    
+
         itemCard.add(details, BorderLayout.CENTER);
         contentPanel.add(itemCard);
-        }
+    }
+
+        // ===== ScrollPane trực tiếp chứa contentPanel =====
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setPreferredSize(new Dimension(0, 600)); // chiều cao đủ 2 hàng
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // cuộn mượt
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel(new BorderLayout());
@@ -475,27 +484,33 @@ public class HomeUI extends JFrame {
         JPanel leftSide = new JPanel(new BorderLayout());
         leftSide.setBackground(new Color(24, 26, 27));
         leftSide.add(searchPanel, BorderLayout.NORTH);
-
+        
+        // middlePanel chứa filter + scroll content
         JPanel middlePanel = new JPanel(new BorderLayout());
         middlePanel.setBackground(new Color(24, 26, 27));
-        middlePanel.add(contentPanel, BorderLayout.CENTER);
-
+        middlePanel.add(scrollPane, BorderLayout.CENTER); // scrollPane thay cho contentPanel
+        
         leftSide.add(middlePanel, BorderLayout.CENTER);
-
+        
+        // Top bar chứa thông tin người dùng
         JPanel contentArea = new JPanel(new BorderLayout());
         contentArea.setBackground(new Color(24, 26, 27));
         contentArea.add(topBar, BorderLayout.NORTH);
-
+        
+        // centerArea gồm phần trái (menu/filter/content) và phải (order)
         JPanel centerArea = new JPanel(new BorderLayout());
         centerArea.setBackground(new Color(24, 26, 27));
         centerArea.add(leftSide, BorderLayout.CENTER);
         centerArea.add(orderPanel, BorderLayout.EAST);
-
+        
+        // contentArea gồm topBar + centerArea
         contentArea.add(centerArea, BorderLayout.CENTER);
-
+        
+        // mainPanel gồm sidebar trái và phần còn lại
         mainPanel.add(sidebar, BorderLayout.WEST);
         mainPanel.add(contentArea, BorderLayout.CENTER);
-
+        
+        // Gán vào cửa sổ chính
         setContentPane(mainPanel);
     }
 
