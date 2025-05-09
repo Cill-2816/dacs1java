@@ -1,0 +1,77 @@
+package com.gpcoder.model;
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
+@Entity
+@IdClass(HistorychatId.class)
+@Table(name="historychat")
+public class Historychat implements Serializable {
+    @Id
+    @Column(name="sent_id")
+    private String sent_id;
+
+    @Id
+    @Column(name="recieve_id")
+    private String recieve_id;
+
+    @Column(name="message_type")
+    private String message_type;
+
+    @Column(name="message")
+    private String message;
+
+    public Historychat() {
+    }
+
+    public String getSent_id() {
+        return sent_id;
+    }
+
+    public String getRecieve_id() {
+        return recieve_id;
+    }
+
+    public String getMessage_type() {
+        return message_type;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setSent_id(String sent_id) {
+        this.sent_id = sent_id;
+    }
+
+    public void setRecieve_id(String recieve_id) {
+        this.recieve_id = recieve_id;
+    }
+
+    public void setMessage_type(String message_type) {
+        this.message_type = message_type;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    
+    public Historychat(String sent_id, String recieve_id, String message_type, String message) {
+        this.sent_id = sent_id;
+        this.recieve_id = recieve_id;
+        this.message_type = message_type;
+        this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return "Historychat [sent_id=" + sent_id + ", recieve_id=" + recieve_id + ", message_type=" + message_type
+                + ", message=" + message + "]";
+    }
+
+}

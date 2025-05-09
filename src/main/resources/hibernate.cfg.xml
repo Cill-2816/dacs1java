@@ -19,6 +19,7 @@
  
         <!-- Entity mapping -->
         <mapping class="com.gpcoder.model.Staff" />
+        <mapping class="com.gpcoder.model.Historychat" />
          
     </session-factory>
 </hibernate-configuration>

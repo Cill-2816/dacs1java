@@ -12,6 +12,10 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -25,6 +29,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import com.gpcoder.model.Historychat;
+
 public class InternalChatUI extends JFrame {
     private JPanel chatBody;
     private JScrollPane chatScrollPane;
@@ -33,6 +39,10 @@ public class InternalChatUI extends JFrame {
     private JButton sendButton;
     private ChatHeaderPanel chatHeader;
     private String lastSender = "";
+    private Socket socket;
+    private ObjectOutputStream outStream;
+    private ObjectInputStream inStream;
+
 
     public InternalChatUI() {
         setTitle("Internal Chat");
@@ -99,7 +109,7 @@ public class InternalChatUI extends JFrame {
         inputField.setFont(new Font("Arial", Font.PLAIN, 16));
         inputField.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         inputField.setToolTipText("Send message (Enter to send)");
-        inputField.addActionListener(e -> sendMessage());
+        inputField.addActionListener(e -> sendMessage(inputField.getText().trim()));
 
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panelColor);
@@ -110,7 +120,7 @@ public class InternalChatUI extends JFrame {
         sendButton = new JButton(sendIcon);
         styleFlatButton(sendButton);
         sendButton.setToolTipText("Send message (Enter to send)");
-        sendButton.addActionListener(e -> sendMessage());
+        sendButton.addActionListener(e -> sendMessage(inputField.getText().trim()));
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         rightPanel.setBackground(panelColor);
@@ -147,10 +157,40 @@ public class InternalChatUI extends JFrame {
         // getContentPane().add(mockBob, BorderLayout.NORTH); // Đặt nút ở trên để test
 
         setVisible(true);
+
+        new Thread(this::runNetworking).start();
     }
 
-    private void sendMessage() {
-        String message = inputField.getText().trim();
+    private void runNetworking() {
+    try {
+        this.socket = new Socket("localhost", 12345);
+        this.outStream = new ObjectOutputStream(socket.getOutputStream());
+        this.inStream = new ObjectInputStream(socket.getInputStream());
+
+
+        // Nhận lịch sử
+        List<Historychat> historyList = (List<Historychat>) inStream.readObject();
+        System.out.println("Đã nhận " + historyList.size() + " bản ghi lịch sử.");
+        for (Historychat chat : historyList) {
+            SwingUtilities.invokeLater(() ->
+                receiveMessage(chat.getSent_id(), chat.getMessage())
+            );
+        }
+
+        // Nghe tiếp tin mới
+        while (true) {
+            Historychat chat = (Historychat) inStream.readObject();
+            SwingUtilities.invokeLater(() ->
+                receiveMessage(chat.getSent_id(), chat.getMessage())
+            );
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+    private void sendMessage(String message) {
+        
         if (!message.isEmpty()) {
             String sender = "Me";
             boolean isMine = true;
