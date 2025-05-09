@@ -10,8 +10,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 public class BubblePanel extends JPanel {
-    public BubblePanel(String sender, String message, boolean isMine, boolean isContinuation) {
+    public BubblePanel(String sender, String message, boolean isMine, boolean isContinuation, LocalDateTime timesent) {
         setLayout(new BorderLayout());
         setOpaque(false);
 
@@ -68,7 +68,8 @@ public class BubblePanel extends JPanel {
         bubble.add(msgLabel);
 
         // === Thời gian ===
-        JLabel timeLabel = new JLabel(new SimpleDateFormat("HH:mm").format(new Date()));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        JLabel timeLabel = new JLabel(timesent.format(formatter));
         timeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
         timeLabel.setForeground(new Color(200, 200, 200));
         timeLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);

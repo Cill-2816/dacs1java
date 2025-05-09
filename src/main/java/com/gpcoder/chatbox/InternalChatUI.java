@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -109,7 +110,7 @@ public class InternalChatUI extends JFrame {
         inputField.setFont(new Font("Arial", Font.PLAIN, 16));
         inputField.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         inputField.setToolTipText("Send message (Enter to send)");
-        inputField.addActionListener(e -> sendMessage(inputField.getText().trim()));
+        inputField.addActionListener(e -> sendMessage(inputField.getText().trim(), LocalDateTime.now()));
 
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panelColor);
@@ -120,7 +121,7 @@ public class InternalChatUI extends JFrame {
         sendButton = new JButton(sendIcon);
         styleFlatButton(sendButton);
         sendButton.setToolTipText("Send message (Enter to send)");
-        sendButton.addActionListener(e -> sendMessage(inputField.getText().trim()));
+        sendButton.addActionListener(e -> sendMessage(inputField.getText().trim(), LocalDateTime.now()));
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         rightPanel.setBackground(panelColor);
@@ -172,16 +173,21 @@ public class InternalChatUI extends JFrame {
         List<Historychat> historyList = (List<Historychat>) inStream.readObject();
         System.out.println("Đã nhận " + historyList.size() + " bản ghi lịch sử.");
         for (Historychat chat : historyList) {
-            SwingUtilities.invokeLater(() ->
-                receiveMessage(chat.getSent_id(), chat.getMessage())
-            );
-        }
+        SwingUtilities.invokeLater(() -> {
+            if (chat.getSent_id().equals("Chauttn")) {
+                sendMessage(chat.getMessage(), chat.getSent_time());
+            } else {
+                receiveMessage(chat.getSent_id(), chat.getMessage(), chat.getSent_time());
+            }
+        });
+}
+
 
         // Nghe tiếp tin mới
         while (true) {
             Historychat chat = (Historychat) inStream.readObject();
             SwingUtilities.invokeLater(() ->
-                receiveMessage(chat.getSent_id(), chat.getMessage())
+                receiveMessage(chat.getSent_id(), chat.getMessage(), chat.getSent_time())
             );
         }
     } catch (Exception e) {
@@ -189,14 +195,14 @@ public class InternalChatUI extends JFrame {
     }
 }
 
-    private void sendMessage(String message) {
+    private void sendMessage(String message, LocalDateTime timesent) {
         
         if (!message.isEmpty()) {
             String sender = "Me";
             boolean isMine = true;
             boolean isContinuation = sender.equals(lastSender);
 
-            BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation);
+            BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation, timesent);
 
             for (Component comp : chatBody.getComponents()) {
                 if ("spacer".equals(comp.getName())) {
@@ -234,11 +240,11 @@ public class InternalChatUI extends JFrame {
     }
     
     // CUSTOM NHẬN TIN NHẮN
-    private void receiveMessage(String sender, String message) {
+    private void receiveMessage(String sender, String message, LocalDateTime timesent) {
         boolean isMine = false;
         boolean isContinuation = sender.equals(lastSender);
 
-        BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation);
+        BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation, timesent);
 
         for (Component comp : chatBody.getComponents()) {
             if ("spacer".equals(comp.getName())) {
