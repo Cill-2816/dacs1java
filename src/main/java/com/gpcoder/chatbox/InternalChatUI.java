@@ -138,6 +138,13 @@ public class InternalChatUI extends JFrame {
                 }
             }
         });
+        // JButton mockBob = new JButton("Test Bob");
+        // mockBob.addActionListener(e -> receiveMessage("Bob", "Hey, I'm Bob 👋"));
+        // mockBob.setFocusable(false);
+        // mockBob.setBackground(new Color(70, 130, 180));
+        // mockBob.setForeground(Color.WHITE);
+
+        // getContentPane().add(mockBob, BorderLayout.NORTH); // Đặt nút ở trên để test
 
         setVisible(true);
     }
