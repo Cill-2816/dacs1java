@@ -1,5 +1,6 @@
 package com.gpcoder.model;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,7 +26,18 @@ public class Historychat implements Serializable {
     @Column(name="message")
     private String message;
 
+    @Column(name="sent_time")
+    private LocalDateTime sent_time;
+
     public Historychat() {
+    }
+
+    public Historychat(String message, String message_type, String recieve_id, String sent_id, LocalDateTime sent_time) {
+        this.message = message;
+        this.message_type = message_type;
+        this.recieve_id = recieve_id;
+        this.sent_id = sent_id;
+        this.sent_time = sent_time;
     }
 
     public String getSent_id() {
@@ -60,18 +72,18 @@ public class Historychat implements Serializable {
         this.message = message;
     }
 
-    
-    public Historychat(String sent_id, String recieve_id, String message_type, String message) {
-        this.sent_id = sent_id;
-        this.recieve_id = recieve_id;
-        this.message_type = message_type;
-        this.message = message;
-    }
-
     @Override
     public String toString() {
         return "Historychat [sent_id=" + sent_id + ", recieve_id=" + recieve_id + ", message_type=" + message_type
                 + ", message=" + message + "]";
+    }
+
+    public LocalDateTime getSent_time() {
+        return sent_time;
+    }
+
+    public void setSent_time(LocalDateTime sent_time) {
+        this.sent_time = sent_time;
     }
 
 }
