@@ -10,12 +10,18 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,7 +68,7 @@ public class InternalChatUI extends JFrame {
         setLayout(new BorderLayout());
 
         //set nguoi dung hien tai
-        this.currentuser = "Anhtdd";
+        this.currentuser = "Chauttn";
 
         DefaultListModel<User> model = new DefaultListModel<>();
         model.addElement(new User("Chauttn","Chau", "image/avata.png"));
@@ -156,22 +162,43 @@ public class InternalChatUI extends JFrame {
         sendButton = new JButton(sendIcon);
         styleFlatButton(sendButton);
         sendButton.setToolTipText("Send message (Enter to send)");
-        sendButton.addActionListener(e -> {
-            try {
-                String text_message = inputField.getText().trim();
-                if (selectedFile == null) {
-                    sendMessage(text_message, LocalDateTime.now());
-                    outStream.writeObject("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
-                    outStream.flush();
+        sendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String text_message = inputField.getText().trim();
+                    if (selectedFile == null) {
+                        sendMessage(text_message, LocalDateTime.now());
+                        outStream.writeObject("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
+                        outStream.flush();
+                    }
+                    else {
+                        sendFile(selectedFile, LocalDateTime.now());
+                        File sentDir = new File("sent_file");
+                        if (!sentDir.exists()) {
+                            sentDir.mkdirs(); // tạo thư mục nếu chưa có
+                        }
+                        
+                        File copiedFile = new File(sentDir, selectedFile.getName());
+                        try (InputStream in = new FileInputStream(selectedFile);
+                            OutputStream out = new FileOutputStream(copiedFile)) {
+
+                            byte[] buffer = new byte[4096];
+                            int length;
+                            while ((length = in.read(buffer)) > 0) {
+                                out.write(buffer, 0, length);
+                            }
+                            System.out.println("thanh cong");
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            System.out.println("that bai");
+                        }
+                        outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_file/"+selectedFile.getName());
+                        outStream.flush();
+                    }
+                } catch (IOException ex) {
                 }
-                else {
-                    sendFile(selectedFile, LocalDateTime.now());
-                    outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_file/"+selectedFile.getName());
-                    outStream.flush();
-                }
-            } catch (IOException ex) {
             }
-            
         });
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
