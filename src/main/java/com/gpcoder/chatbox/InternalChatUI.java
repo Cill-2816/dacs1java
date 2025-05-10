@@ -44,6 +44,7 @@ public class InternalChatUI extends JFrame {
     private Socket socket;
     private ObjectOutputStream outStream;
     private ObjectInputStream inStream;
+    private String currentuser;
 
 
     public InternalChatUI() {
@@ -57,6 +58,9 @@ public class InternalChatUI extends JFrame {
         Color textColor = Color.WHITE;
 
         setLayout(new BorderLayout());
+
+        //set nguoi dung hien tai
+        this.currentuser = "Chauttn";
 
         DefaultListModel<User> model = new DefaultListModel<>();
         model.addElement(new User("Chauttn","Chau", "image/avata.png"));
@@ -115,9 +119,9 @@ public class InternalChatUI extends JFrame {
             try {
                 String text_message = inputField.getText().trim();
                 sendMessage(text_message, LocalDateTime.now());
-                outStream.writeObject("NEW_MESSAGE:" + "Chauttn" + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
+                outStream.writeObject("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
                 outStream.flush();
-                System.out.println("NEW_MESSAGE:" + "Chauttn" + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
+                System.out.println("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
             } catch (IOException ex) {
             }
             
@@ -160,7 +164,7 @@ public class InternalChatUI extends JFrame {
                     chatHeader.setUser(selected, true);
                     chatBody.removeAll();
 
-                    requestHistory("Chauttn",selected.getUsername());
+                    requestHistory(currentuser,selected.getUsername());
                 }
             }
         });
@@ -204,7 +208,7 @@ public class InternalChatUI extends JFrame {
                     chatBody.removeAll();
                     for (Historychat o : list) {
                         if (o instanceof Historychat) {
-                            if (o.getSent_id().equals("Chauttn")) {
+                            if (o.getSent_id().equals(currentuser)) {
                                 sendMessage(o.getMessage(), o.getSent_time());
                             } else {
                                 receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
