@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -78,16 +79,28 @@ public void run() {
         while ((obj = in.readObject()) != null) {
             if (obj instanceof String) {
                 String command = (String) obj;
+                
                 if (command.startsWith("GET_HISTORY:")) {
-                    String username = command.substring("GET_HISTORY:".length());
-                    List<Historychat> historyList = getHistory(username);
+                    String[] username = command.split(":",3);
+                    List<Historychat> historyList = getHistory(username[1],username[2]);
                     out.writeObject(historyList);
                     out.flush();
                     System.out.println("Gửi lại danh sách history cho client: " + username);
                     for (Historychat chat : historyList) {
                         System.out.println(chat);
                     }
-                } else {
+                } else if (command.startsWith("NEW_MESSAGE:")) {
+                    String[] username = command.split(":",4);
+                    try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+                        session.beginTransaction();
+                        session.save(new Historychat(username[3],"text",username[2],username[1],LocalDateTime.now()));
+                        session.getTransaction().commit();
+                    } catch (Exception e) {
+                        System.out.println("Loi khi truy van history: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+                else {
                     System.out.println("Lệnh không hợp lệ từ client: " + command);
                 }
             } else if (obj instanceof Historychat) {
@@ -113,11 +126,12 @@ public void run() {
 
 
 
-    public List<Historychat> getHistory(String username) {
+    public List<Historychat> getHistory(String username, String username2) {
     try (Session session = HibernateUtils.getSessionFactory().openSession()) {
         List<Historychat> result = session.createQuery(
-            "from Historychat where sent_id = :sender or recieve_id = :sender", Historychat.class)
+            "from Historychat where (sent_id = :sender and recieve_id = :reciever) or (recieve_id = :sender and sent_id = :reciever) order by sent_time asc", Historychat.class)
             .setParameter("sender", username)
+            .setParameter("reciever", username2)
             .list();
         return result != null ? result : new ArrayList<>();
     } catch (Exception e) {

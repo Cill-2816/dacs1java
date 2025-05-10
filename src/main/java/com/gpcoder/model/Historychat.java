@@ -4,19 +4,14 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 @Entity
-@IdClass(HistorychatId.class)
 @Table(name="historychat")
 public class Historychat implements Serializable {
-    @Id
     @Column(name="sent_id")
     private String sent_id;
 
-    @Id
     @Column(name="recieve_id")
     private String recieve_id;
 

@@ -59,9 +59,9 @@ public class InternalChatUI extends JFrame {
         setLayout(new BorderLayout());
 
         DefaultListModel<User> model = new DefaultListModel<>();
-        model.addElement(new User("Chau", "image/avata.png"));
-        model.addElement(new User("Danh", "image/avata.png"));
-        model.addElement(new User("Khai", "image/avata.png"));
+        model.addElement(new User("Chauttn","Chau", "image/avata.png"));
+        model.addElement(new User("Anhtdd","Anh", "image/avata.png"));
+        model.addElement(new User("Khaipm","Khai", "image/avata.png"));
 
         userList = new JList<>(model);
         userList.setCellRenderer(new UserCellRenderer());
@@ -111,7 +111,17 @@ public class InternalChatUI extends JFrame {
         inputField.setFont(new Font("Arial", Font.PLAIN, 16));
         inputField.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         inputField.setToolTipText("Send message (Enter to send)");
-        inputField.addActionListener(e -> sendMessage(inputField.getText().trim(), LocalDateTime.now()));
+        inputField.addActionListener(e -> {
+            try {
+                String text_message = inputField.getText().trim();
+                sendMessage(text_message, LocalDateTime.now());
+                outStream.writeObject("NEW_MESSAGE:" + "Chauttn" + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
+                outStream.flush();
+                System.out.println("NEW_MESSAGE:" + "Chauttn" + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
+            } catch (IOException ex) {
+            }
+            
+        });
 
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(panelColor);
@@ -146,24 +156,11 @@ public class InternalChatUI extends JFrame {
             if (!e.getValueIsAdjusting()) {
                 User selected = userList.getSelectedValue();
                 if (selected != null) {
+
                     chatHeader.setUser(selected, true);
                     chatBody.removeAll();
-                    
-                    // List<Historychat> messages = new ArrayList<>();
-                    // Historychat a = new Historychat("Hello Danh", "text", "Danhtdd", "Chauttn", LocalDateTime.now());
-                    // messages.add(a);
 
-                    // for (Historychat o : messages) {
-                    //     if (o instanceof Historychat) {
-                    //         if (o.getSent_id().equals("Chauttn")) {
-                    //             sendMessage(o.getMessage(), o.getSent_time());
-                    //         } else {
-                    //             receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
-                    //         }
-                    //     }
-                    // }
-
-                    requestHistory("Chauttn");
+                    requestHistory("Chauttn",selected.getUsername());
                 }
             }
         });
@@ -173,10 +170,10 @@ public class InternalChatUI extends JFrame {
         new Thread(this::runNetworking).start();
     }
 
-    private void requestHistory(String username) {
+    private void requestHistory(String username, String username2) {
         try {
             if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
-                outStream.writeObject("GET_HISTORY:" + username);
+                outStream.writeObject("GET_HISTORY:" + username + ":" + username2);
                 outStream.flush();
             }
         } catch (IOException e) {
