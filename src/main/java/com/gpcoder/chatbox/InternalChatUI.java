@@ -68,7 +68,7 @@ public class InternalChatUI extends JFrame {
         setLayout(new BorderLayout());
 
         //set nguoi dung hien tai
-        this.currentuser = "Chauttn";
+        this.currentuser = "Anhtdd";
 
         DefaultListModel<User> model = new DefaultListModel<>();
         model.addElement(new User("Chauttn","Chau", "image/avata.png"));
@@ -260,10 +260,29 @@ public class InternalChatUI extends JFrame {
             Object obj = inStream.readObject();
 
             if (obj != null && obj instanceof Historychat) {
-                Historychat chat = (Historychat) obj;
-                SwingUtilities.invokeLater(() -> 
-                    receiveMessage(chat.getSent_id(), chat.getMessage(), chat.getSent_time())
+                Historychat o = (Historychat) obj;
+                SwingUtilities.invokeLater(() -> {
+                    if (o.getSent_id().equals(currentuser)) {
+                                if (o.getMessage_type().equals("text")) {
+                                    sendMessage(o.getMessage(), o.getSent_time());
+                                }
+                                else {
+                                    File file = new File(o.getMessage());
+                                    sendFile(file, o.getSent_time());
+                                }
+                            } else {
+                                if (o.getMessage_type().equals("text")) {
+                                    receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
+                                }
+                                else {
+                                    File file = new File(o.getMessage());
+                                    receiveFile(o.getSent_id(),file, o.getSent_time());
+                                }
+                                
+                            }
+                        }
                 );
+                
             } else if (obj != null && obj instanceof List<?>) {
                 List<Historychat> list = (List<Historychat>) obj;
                 // Clear chatBody trước khi hiển thị lịch sử mới
