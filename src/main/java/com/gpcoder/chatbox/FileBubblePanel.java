@@ -3,6 +3,7 @@ package com.gpcoder.chatbox;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -10,6 +11,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -17,12 +26,15 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
-public class BubblePanel extends JPanel {
-    public BubblePanel(String sender, String message, boolean isMine, boolean isContinuation, LocalDateTime timesent) {
+public class FileBubblePanel extends JPanel {
+    private final File sourceFile;
+    public FileBubblePanel(String filename, long fileSizeBytes, File sourceFile, boolean isMine, boolean isContinuation, LocalDateTime timesent) {
+        this.sourceFile = sourceFile;
         setLayout(new BorderLayout());
         setOpaque(false);
 
@@ -42,30 +54,27 @@ public class BubblePanel extends JPanel {
         };
 
         bubble.setLayout(new BoxLayout(bubble, BoxLayout.Y_AXIS));
-        bubble.setBackground(isMine ? new Color(0, 132, 255) : new Color(60, 63, 65));
+        bubble.setBackground(new Color(60, 63, 65));
         bubble.setOpaque(false);
         bubble.setForeground(Color.WHITE);
-        bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        bubble.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
         bubble.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
 
-        // === Tên người gửi (ẩn nếu là continuation hoặc của mình) ===
-        // if (!isContinuation && !isMine) {
-        //     JLabel senderLabel = new JLabel(sender);
-        //     senderLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        //     senderLabel.setForeground(new Color(180, 180, 180));
-        //     bubble.add(senderLabel);
-        //     bubble.add(Box.createVerticalStrut(4));
-        // }
-
-        // === Nội dung ===
-        JTextArea msgLabel = new JTextArea(message);
+        // === Nội dung (có icon) ===
+        ImageIcon icon = new ImageIcon("image/iconfile.jpg");
+        Image scaled = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+        JLabel msgLabel = new JLabel(filename, new ImageIcon(scaled), JLabel.LEFT);
         msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         msgLabel.setForeground(Color.WHITE);
         msgLabel.setOpaque(false);
-        msgLabel.setEditable(false);
-        msgLabel.setLineWrap(true);
-        msgLabel.setWrapStyleWord(true);
         bubble.add(msgLabel);
+
+        // === Kích thước ===
+        JLabel filesizeLabel = new JLabel(formatSize(fileSizeBytes));
+        filesizeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        filesizeLabel.setForeground(Color.GRAY);
+        filesizeLabel.setOpaque(false);
+        bubble.add(filesizeLabel);
 
         // === Thời gian ===
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -110,5 +119,42 @@ public class BubblePanel extends JPanel {
         } else {
             add(wrapper, BorderLayout.CENTER);
         }
+
+        // 👉 Click để tải file
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                downloadFile();
+            }
+        });
+    }
+
+    private void downloadFile() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setSelectedFile(new File(sourceFile.getName())); // gợi ý tên gốc
+        int result = chooser.showSaveDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File destFile = chooser.getSelectedFile();
+            try (InputStream in = new FileInputStream(sourceFile);
+                 OutputStream out = new FileOutputStream(destFile)) {
+
+                byte[] buffer = new byte[4096];
+                int length;
+                while ((length = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, length);
+                }
+                JOptionPane.showMessageDialog(this, "Tải file thành công!");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Tải file thất bại.");
+            }
+        }
+    }
+
+    private String formatSize(long bytes) {
+        if (bytes >= 1024 * 1024) return String.format("%.2f MB", bytes / 1024.0 / 1024);
+        else if (bytes >= 1024) return String.format("%.2f KB", bytes / 1024.0);
+        else return bytes + " B";
     }
 }

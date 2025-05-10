@@ -93,8 +93,22 @@ public void run() {
                     String[] username = command.split(":",4);
                     try (Session session = HibernateUtils.getSessionFactory().openSession()) {
                         session.beginTransaction();
-                        session.save(new Historychat(username[3],"text",username[2],username[1],LocalDateTime.now()));
+                        Historychat chat = new Historychat(username[3],"text",username[2],username[1],LocalDateTime.now());
+                        session.save(chat);
                         session.getTransaction().commit();
+                        Server.broadcast(chat, this);
+                    } catch (Exception e) {
+                        System.out.println("Loi khi truy van history: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                } else if (command.startsWith("NEW_FILE:")) {
+                    String[] username = command.split(":",4);
+                    try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+                        session.beginTransaction();
+                        Historychat chat = new Historychat(username[3],"file",username[2],username[1],LocalDateTime.now());
+                        session.save(chat);
+                        session.getTransaction().commit();
+                        Server.broadcast(chat, this);
                     } catch (Exception e) {
                         System.out.println("Loi khi truy van history: " + e.getMessage());
                         e.printStackTrace();
@@ -103,12 +117,6 @@ public void run() {
                 else {
                     System.out.println("Lệnh không hợp lệ từ client: " + command);
                 }
-            } else if (obj instanceof Historychat) {
-                Historychat chat = (Historychat) obj;
-                System.out.println("Nhận tin nhắn từ " + chat.getSent_id() + ": " + chat.getMessage());
-
-                // Gửi tới các client khác (broadcast)
-                Server.broadcast(chat, this);
             } else {
                 System.out.println("Loại dữ liệu không xác định: " + obj.getClass().getName());
             }

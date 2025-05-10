@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -23,6 +24,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -45,7 +47,7 @@ public class InternalChatUI extends JFrame {
     private ObjectOutputStream outStream;
     private ObjectInputStream inStream;
     private String currentuser;
-
+    private File selectedFile;
 
     public InternalChatUI() {
         setTitle("Internal Chat");
@@ -66,6 +68,14 @@ public class InternalChatUI extends JFrame {
         model.addElement(new User("Chauttn","Chau", "image/avata.png"));
         model.addElement(new User("Anhtdd","Anh", "image/avata.png"));
         model.addElement(new User("Khaipm","Khai", "image/avata.png"));
+
+        for (int i = 0; i < model.getSize(); i++) {
+            User user = model.getElementAt(i);
+            if (user.getUsername().equals(currentuser)) {
+                model.removeElementAt(i);
+                break; 
+            }
+        }
 
         userList = new JList<>(model);
         userList.setCellRenderer(new UserCellRenderer());
@@ -103,6 +113,16 @@ public class InternalChatUI extends JFrame {
         attachButton.setToolTipText("Attach a file");
         imageButton.setToolTipText("Send an image");
 
+        attachButton.addActionListener(e -> {
+            JFileChooser chooser = new JFileChooser();
+            int result = chooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                selectedFile = chooser.getSelectedFile();
+                sendButton.setEnabled(true);
+                inputField.setText(selectedFile.getName());
+            }
+        });
+
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         leftPanel.setBackground(panelColor);
         leftPanel.add(attachButton);
@@ -136,7 +156,23 @@ public class InternalChatUI extends JFrame {
         sendButton = new JButton(sendIcon);
         styleFlatButton(sendButton);
         sendButton.setToolTipText("Send message (Enter to send)");
-        sendButton.addActionListener(e -> sendMessage(inputField.getText().trim(), LocalDateTime.now()));
+        sendButton.addActionListener(e -> {
+            try {
+                String text_message = inputField.getText().trim();
+                if (selectedFile == null) {
+                    sendMessage(text_message, LocalDateTime.now());
+                    outStream.writeObject("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
+                    outStream.flush();
+                }
+                else {
+                    sendFile(selectedFile, LocalDateTime.now());
+                    outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_file/"+selectedFile.getName());
+                    outStream.flush();
+                }
+            } catch (IOException ex) {
+            }
+            
+        });
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         rightPanel.setBackground(panelColor);
@@ -209,9 +245,22 @@ public class InternalChatUI extends JFrame {
                     for (Historychat o : list) {
                         if (o instanceof Historychat) {
                             if (o.getSent_id().equals(currentuser)) {
-                                sendMessage(o.getMessage(), o.getSent_time());
+                                if (o.getMessage_type().equals("text")) {
+                                    sendMessage(o.getMessage(), o.getSent_time());
+                                }
+                                else {
+                                    File file = new File(o.getMessage());
+                                    sendFile(file, o.getSent_time());
+                                }
                             } else {
-                                receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
+                                if (o.getMessage_type().equals("text")) {
+                                    receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
+                                }
+                                else {
+                                    File file = new File(o.getMessage());
+                                    receiveFile(o.getSent_id(),file, o.getSent_time());
+                                }
+                                
                             }
                         }
                     }
@@ -226,13 +275,56 @@ public class InternalChatUI extends JFrame {
     }
 
     private void sendMessage(String message, LocalDateTime timesent) {
-        
         if (!message.isEmpty()) {
             String sender = "Me";
             boolean isMine = true;
             boolean isContinuation = sender.equals(lastSender);
 
             BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation, timesent);
+
+            for (Component comp : chatBody.getComponents()) {
+                if ("spacer".equals(comp.getName())) {
+                    chatBody.remove(comp);
+                    break;
+                }
+            }
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = chatBody.getComponentCount();
+            gbc.weightx = 1.0;
+            gbc.anchor = isMine ? GridBagConstraints.EAST : GridBagConstraints.WEST;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            chatBody.add(bubble, gbc);
+
+            GridBagConstraints spacer = new GridBagConstraints();
+            spacer.gridx = 0;
+            spacer.gridy = chatBody.getComponentCount();
+            spacer.weighty = 1.0;
+            spacer.fill = GridBagConstraints.VERTICAL;
+
+            JPanel empty = new JPanel();
+            empty.setOpaque(false);
+            empty.setName("spacer");
+            chatBody.add(empty, spacer);
+
+            chatBody.revalidate();
+            JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+
+            inputField.setText("");
+            lastSender = sender;
+        }
+    }
+
+    private void sendFile(File file, LocalDateTime timesent) {
+
+        if (!file.getName().isEmpty()) {
+            String sender = "Me";
+            boolean isMine = true;
+            boolean isContinuation = sender.equals(lastSender);
+
+            FileBubblePanel bubble = new FileBubblePanel(file.getName(), file.length(), file, isMine, isContinuation, LocalDateTime.now());
 
             for (Component comp : chatBody.getComponents()) {
                 if ("spacer".equals(comp.getName())) {
@@ -275,6 +367,45 @@ public class InternalChatUI extends JFrame {
         boolean isContinuation = sender.equals(lastSender);
 
         BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation, timesent);
+
+        for (Component comp : chatBody.getComponents()) {
+            if ("spacer".equals(comp.getName())) {
+                chatBody.remove(comp);
+                break;
+            }
+        }
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = chatBody.getComponentCount();
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        chatBody.add(bubble, gbc);
+
+        GridBagConstraints spacer = new GridBagConstraints();
+        spacer.gridx = 0;
+        spacer.gridy = chatBody.getComponentCount();
+        spacer.weighty = 1.0;
+        spacer.fill = GridBagConstraints.VERTICAL;
+
+        JPanel empty = new JPanel();
+        empty.setOpaque(false);
+        empty.setName("spacer");
+        chatBody.add(empty, spacer);
+
+        chatBody.revalidate();
+        JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
+
+        lastSender = sender;
+    }
+
+    private void receiveFile(String sender, File file, LocalDateTime timesent) {
+        boolean isMine = false;
+        boolean isContinuation = sender.equals(lastSender);
+
+        FileBubblePanel bubble = new FileBubblePanel(file.getName(), file.length(), file, isMine, isContinuation, LocalDateTime.now());
 
         for (Component comp : chatBody.getComponents()) {
             if ("spacer".equals(comp.getName())) {
