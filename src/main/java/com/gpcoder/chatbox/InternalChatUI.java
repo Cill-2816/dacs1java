@@ -62,7 +62,7 @@ public class InternalChatUI extends JFrame {
         setLayout(new BorderLayout());
 
         //set nguoi dung hien tai
-        this.currentuser = "Chauttn";
+        this.currentuser = "Anhtdd";
 
         DefaultListModel<User> model = new DefaultListModel<>();
         model.addElement(new User("Chauttn","Chau", "image/avata.png"));
