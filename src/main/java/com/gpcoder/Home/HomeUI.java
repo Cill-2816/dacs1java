@@ -132,7 +132,7 @@ public class HomeUI extends JFrame {
             // Đẩy profile và logout xuống dưới cùng
             sidebar.add(Box.createVerticalGlue());
 
-            // ===== Profile và Logout =====
+            // ===== Profile, Logout và Chat Button =====
             JPanel profileLogoutPanel = new JPanel();
             profileLogoutPanel.setLayout(new BoxLayout(profileLogoutPanel, BoxLayout.Y_AXIS)); // để 2 nút dọc thẳng hàng
             profileLogoutPanel.setBackground(new Color(30, 32, 34));
@@ -151,7 +151,7 @@ public class HomeUI extends JFrame {
 
             // Set profile icon - Resize đúng size
             ImageIcon profileIcon = new ImageIcon("image/user_icon.png");
-            Image scaledProfile = profileIcon.getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH); // resize = 28x28
+            Image scaledProfile = profileIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH); // resize = 28x28
             profileButton.setIcon(new ImageIcon(scaledProfile));
 
             // Logout Button
@@ -168,10 +168,26 @@ public class HomeUI extends JFrame {
 
             // Set logout icon - Resize giống profile
             ImageIcon logoutIcon = new ImageIcon("image/logout.png");
-            Image scaledLogout = logoutIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH); // resize = 28x28
+            Image scaledLogout = logoutIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH); // resize = 28x28
             logoutButton.setIcon(new ImageIcon(scaledLogout));
 
-            logoutButton.setIcon(new ImageIcon(scaledLogout));
+            // Chat Button
+            JButton chatButton = new JButton("Internal Chat");
+            chatButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            chatButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+            chatButton.setBackground(defaultColor);
+            chatButton.setForeground(Color.WHITE);
+            chatButton.setFont(new Font("Arial", Font.BOLD, 17));
+            chatButton.setBorderPainted(false);
+            chatButton.setFocusPainted(false);
+            chatButton.setHorizontalAlignment(SwingConstants.LEFT);
+            chatButton.setIconTextGap(15);
+
+            // Set chat icon - Resize giống profile
+            ImageIcon chatIcon = new ImageIcon("image/chat.png");
+            Image scaledChat = chatIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH); // resize = 28x28
+            chatButton.setIcon(new ImageIcon(scaledChat));
+            
 
             // Hover effect for Logout
             Color logoutOriginalColor = logoutButton.getBackground();
@@ -184,7 +200,31 @@ public class HomeUI extends JFrame {
                 }
             });
 
+             // Hover effect for Profile
+            Color profileOriginalColor = profileButton.getBackground();
+            profileButton.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    profileButton.setBackground(hoverColor);
+                }
+                public void mouseExited(MouseEvent e) {
+                    profileButton.setBackground(profileOriginalColor);
+                }
+            });
+
+             // Hover effect for Chat
+            Color chatOriginalColor = chatButton.getBackground();
+            chatButton.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) {
+                    chatButton.setBackground(hoverColor);
+                }
+                public void mouseExited(MouseEvent e) {
+                    chatButton.setBackground(chatOriginalColor);
+                }
+            });
+            
+
             // Add Profile + Logout vào panel
+            profileLogoutPanel.add(chatButton);
             profileLogoutPanel.add(profileButton);
             profileLogoutPanel.add(logoutButton);
 
