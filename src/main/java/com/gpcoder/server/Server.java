@@ -74,39 +74,57 @@ class ClientHandler implements Runnable {
     @Override
 public void run() {
     try {
-        // Gửi danh sách historychat cho client ngay sau khi kết nối
-        List<Historychat> historyList = getHistory();
-        System.out.println("Gửi danh sách " + historyList.size() + " tin nhắn cho client");
+        Object obj;
+        while ((obj = in.readObject()) != null) {
+            if (obj instanceof String) {
+                String command = (String) obj;
+                if (command.startsWith("GET_HISTORY:")) {
+                    String username = command.substring("GET_HISTORY:".length());
+                    List<Historychat> historyList = getHistory(username);
+                    out.writeObject(historyList);
+                    out.flush();
+                    System.out.println("Gửi lại danh sách history cho client: " + username);
+                    for (Historychat chat : historyList) {
+                        System.out.println(chat);
+                    }
+                } else {
+                    System.out.println("Lệnh không hợp lệ từ client: " + command);
+                }
+            } else if (obj instanceof Historychat) {
+                Historychat chat = (Historychat) obj;
+                System.out.println("Nhận tin nhắn từ " + chat.getSent_id() + ": " + chat.getMessage());
 
-        out.writeObject(historyList);
-        out.flush();
-
-        System.out.println("Đã gửi xong history.");
-
-        // Bắt đầu nghe các tin nhắn mới
-        Historychat line;
-        while ((line = (Historychat) in.readObject()) != null) {
-            Server.broadcast(line, this);
+                // Gửi tới các client khác (broadcast)
+                Server.broadcast(chat, this);
+            } else {
+                System.out.println("Loại dữ liệu không xác định: " + obj.getClass().getName());
+            }
         }
     } catch (IOException | ClassNotFoundException e) {
-        System.out.println("Đã ngắt kết nối.");
+        System.out.println("Client đã ngắt kết nối hoặc lỗi: " + e.getMessage());
     } finally {
         try {
             client.close();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
 
-    public List<Historychat> getHistory() {
+
+    public List<Historychat> getHistory(String username) {
     try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-        return session.createQuery("from Historychat", Historychat.class).list();
+        List<Historychat> result = session.createQuery(
+            "from Historychat where sent_id = :sender or recieve_id = :sender", Historychat.class)
+            .setParameter("sender", username)
+            .list();
+        return result != null ? result : new ArrayList<>();
+    } catch (Exception e) {
+        System.out.println("Lỗi khi truy vấn history: " + e.getMessage());
+        e.printStackTrace();
+        return new ArrayList<>();
     }
-    // List<Historychat> list = new ArrayList<>();
-    //     Historychat test = new Historychat();
-    //     test.setSent_id("Test");
-    //     test.setMessage("Hello from server!");
-    //     list.add(test);
-    //     return list;
-    }
+}
+
 }

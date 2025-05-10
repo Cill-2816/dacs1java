@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -58,9 +59,9 @@ public class InternalChatUI extends JFrame {
         setLayout(new BorderLayout());
 
         DefaultListModel<User> model = new DefaultListModel<>();
-        model.addElement(new User("Alice", "image/avata.png"));
-        model.addElement(new User("Bob", "image/avata.png"));
-        model.addElement(new User("Charlie", "image/avata.png"));
+        model.addElement(new User("Chau", "image/avata.png"));
+        model.addElement(new User("Danh", "image/avata.png"));
+        model.addElement(new User("Khai", "image/avata.png"));
 
         userList = new JList<>(model);
         userList.setCellRenderer(new UserCellRenderer());
@@ -146,54 +147,82 @@ public class InternalChatUI extends JFrame {
                 User selected = userList.getSelectedValue();
                 if (selected != null) {
                     chatHeader.setUser(selected, true);
+                    chatBody.removeAll();
+                    
+                    // List<Historychat> messages = new ArrayList<>();
+                    // Historychat a = new Historychat("Hello Danh", "text", "Danhtdd", "Chauttn", LocalDateTime.now());
+                    // messages.add(a);
+
+                    // for (Historychat o : messages) {
+                    //     if (o instanceof Historychat) {
+                    //         if (o.getSent_id().equals("Chauttn")) {
+                    //             sendMessage(o.getMessage(), o.getSent_time());
+                    //         } else {
+                    //             receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
+                    //         }
+                    //     }
+                    // }
+
+                    requestHistory("Chauttn");
                 }
             }
         });
-        // JButton mockBob = new JButton("Test Bob");
-        // mockBob.addActionListener(e -> receiveMessage("Bob", "Hey, I'm Bob 👋"));
-        // mockBob.setFocusable(false);
-        // mockBob.setBackground(new Color(70, 130, 180));
-        // mockBob.setForeground(Color.WHITE);
-
-        // getContentPane().add(mockBob, BorderLayout.NORTH); // Đặt nút ở trên để test
 
         setVisible(true);
 
         new Thread(this::runNetworking).start();
     }
 
+    private void requestHistory(String username) {
+        try {
+            if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
+                outStream.writeObject("GET_HISTORY:" + username);
+                outStream.flush();
+            }
+        } catch (IOException e) {
+            System.err.println("Lỗi khi gửi yêu cầu lịch sử: " + e.getMessage());
+        }
+    }
+
+
     private void runNetworking() {
     try {
         this.socket = new Socket("localhost", 12345);
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.inStream = new ObjectInputStream(socket.getInputStream());
-
-
+        
         // Nhận lịch sử
-        List<Historychat> historyList = (List<Historychat>) inStream.readObject();
-        System.out.println("Đã nhận " + historyList.size() + " bản ghi lịch sử.");
-        for (Historychat chat : historyList) {
-        SwingUtilities.invokeLater(() -> {
-            if (chat.getSent_id().equals("Chauttn")) {
-                sendMessage(chat.getMessage(), chat.getSent_time());
-            } else {
-                receiveMessage(chat.getSent_id(), chat.getMessage(), chat.getSent_time());
-            }
-        });
-}
-
-
-        // Nghe tiếp tin mới
         while (true) {
-            Historychat chat = (Historychat) inStream.readObject();
-            SwingUtilities.invokeLater(() ->
-                receiveMessage(chat.getSent_id(), chat.getMessage(), chat.getSent_time())
-            );
+            Object obj = inStream.readObject();
+
+            if (obj != null && obj instanceof Historychat) {
+                Historychat chat = (Historychat) obj;
+                SwingUtilities.invokeLater(() -> 
+                    receiveMessage(chat.getSent_id(), chat.getMessage(), chat.getSent_time())
+                );
+            } else if (obj != null && obj instanceof List<?>) {
+                List<Historychat> list = (List<Historychat>) obj;
+                // Clear chatBody trước khi hiển thị lịch sử mới
+                SwingUtilities.invokeLater(() -> {
+                    chatBody.removeAll();
+                    for (Historychat o : list) {
+                        if (o instanceof Historychat) {
+                            if (o.getSent_id().equals("Chauttn")) {
+                                sendMessage(o.getMessage(), o.getSent_time());
+                            } else {
+                                receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
+                            }
+                        }
+                    }
+                    chatBody.revalidate();
+                    chatBody.repaint();
+                });
+            }
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
 
     private void sendMessage(String message, LocalDateTime timesent) {
         
