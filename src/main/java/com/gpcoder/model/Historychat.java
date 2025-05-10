@@ -4,11 +4,16 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="historychat")
 public class Historychat implements Serializable {
+    @Id
+    @Column(name="id")
+    private int id;
+
     @Column(name="sent_id")
     private String sent_id;
 

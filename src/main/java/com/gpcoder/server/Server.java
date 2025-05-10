@@ -129,7 +129,7 @@ public void run() {
     public List<Historychat> getHistory(String username, String username2) {
     try (Session session = HibernateUtils.getSessionFactory().openSession()) {
         List<Historychat> result = session.createQuery(
-            "from Historychat where (sent_id = :sender and recieve_id = :reciever) or (recieve_id = :sender and sent_id = :reciever) order by sent_time asc", Historychat.class)
+            "from Historychat where (sent_id = :sender and recieve_id = :reciever) or (recieve_id = :sender and sent_id = :reciever) order by id asc", Historychat.class)
             .setParameter("sender", username)
             .setParameter("reciever", username2)
             .list();
