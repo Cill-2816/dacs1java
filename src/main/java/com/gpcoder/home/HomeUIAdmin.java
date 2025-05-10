@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
@@ -354,10 +355,27 @@ public class HomeUIAdmin extends JFrame {
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // ===== Description =====
-        JLabel desc = new JLabel("<html><div style='text-align: center;'>" + item.getDescription() + "</div></html>");
-        desc.setForeground(new Color(180, 180, 180));
-        desc.setFont(new Font("Arial", Font.BOLD, 14));
+        JTextPane desc = new JTextPane();
+        desc.setContentType("text/html");
+        desc.setText(
+            "<html>" +
+                "<div style='" +
+                    "text-align: center;" +
+                    "color: #FF9800;" +
+                    "font-family: Arial;" +
+                    "font-size: 14px;" +
+                    "font-weight: bold;" +
+                "'>" +
+                    item.getDescription() +
+                "</div>" +
+            "</html>"
+        );
+        desc.setEditable(false);
+        desc.setOpaque(false);
+        desc.setBorder(null);
         desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+        desc.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
+
 
         // ===== Price =====
         JLabel price = new JLabel(item.getPrice());
