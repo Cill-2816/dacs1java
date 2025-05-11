@@ -81,7 +81,7 @@ public class BubblePanel extends JPanel {
 
         msgLabel.setEditorKit(new WrapAnywhereKit());
         msgLabel.setText(message);
-        msgLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+        msgLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         msgLabel.setForeground(Color.WHITE);
         msgLabel.setOpaque(false);
         msgLabel.setEditable(false);
@@ -89,10 +89,6 @@ public class BubblePanel extends JPanel {
         msgLabel.setBorder(null);
         bubble.add(msgLabel); 
         
-
-
-
-
         // === Thời gian ===
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         JLabel timeLabel = new JLabel(timesent.format(formatter));

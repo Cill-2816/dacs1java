@@ -33,15 +33,14 @@ import javax.swing.JPanel;
 
 public class FileBubblePanel extends JPanel {
     private final File sourceFile;
+
     public FileBubblePanel(String filename, long fileSizeBytes, File sourceFile, boolean isMine, boolean isContinuation, LocalDateTime timesent) {
         this.sourceFile = sourceFile;
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // Giảm khoảng cách nếu là continuation
         setBorder(BorderFactory.createEmptyBorder(isContinuation ? 2 : 8, 12, 2, 12));
 
-        // === Bubble chính ===
         JPanel bubble = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -52,7 +51,6 @@ public class FileBubblePanel extends JPanel {
                 super.paintComponent(g);
             }
         };
-
         bubble.setLayout(new BoxLayout(bubble, BoxLayout.Y_AXIS));
         bubble.setBackground(new Color(60, 63, 65));
         bubble.setOpaque(false);
@@ -60,54 +58,68 @@ public class FileBubblePanel extends JPanel {
         bubble.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
         bubble.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
 
-        // === Nội dung (có icon) ===
-        ImageIcon icon = new ImageIcon("image/iconfile.jpg");
-        Image scaled = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-        JLabel msgLabel = new JLabel(filename, new ImageIcon(scaled), JLabel.LEFT);
-        msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        msgLabel.setForeground(Color.WHITE);
-        msgLabel.setOpaque(false);
-        bubble.add(msgLabel);
+        // === Tạo panel chứa icon + tên file + kích thước ===
+        ImageIcon icon = new ImageIcon("image/iconfile.png");
+        Image scaled = icon.getImage().getScaledInstance(54, 54, Image.SCALE_SMOOTH);
+        JLabel fileIcon = new JLabel(new ImageIcon(scaled));
+        fileIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
 
-        // === Kích thước ===
+        JLabel nameLabel = new JLabel(filename);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        nameLabel.setForeground(Color.WHITE);
+
         JLabel filesizeLabel = new JLabel(formatSize(fileSizeBytes));
-        filesizeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        filesizeLabel.setForeground(Color.GRAY);
-        filesizeLabel.setOpaque(false);
-        bubble.add(filesizeLabel);
+        filesizeLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        filesizeLabel.setForeground(Color.LIGHT_GRAY);
+        filesizeLabel.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0)); // Cách tên file một đoạn
+
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setOpaque(false);
+        textPanel.add(nameLabel);
+        textPanel.add(filesizeLabel);
+
+        JPanel fileInfoPanel = new JPanel();
+        fileInfoPanel.setLayout(new BoxLayout(fileInfoPanel, BoxLayout.X_AXIS));
+        fileInfoPanel.setOpaque(false);
+        fileInfoPanel.add(fileIcon);
+        fileInfoPanel.add(textPanel);
+
+        bubble.add(fileInfoPanel);
 
         // === Thời gian ===
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         JLabel timeLabel = new JLabel(timesent.format(formatter));
-        timeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        timeLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         timeLabel.setForeground(new Color(200, 200, 200));
         timeLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        bubble.add(Box.createVerticalStrut(4));
-        bubble.add(timeLabel);
 
-        // === Bọc căn trái/phải ===
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        timePanel.setOpaque(false);
+        timePanel.add(timeLabel);
+        bubble.add(Box.createVerticalStrut(4));
+        bubble.add(timePanel);
+
+        // === Căn trái/phải theo người gửi ===
         JPanel wrapper = new JPanel(new FlowLayout(isMine ? FlowLayout.RIGHT : FlowLayout.LEFT, 0, 0));
         wrapper.setOpaque(false);
         wrapper.add(bubble);
 
-        // === Xử lý avatar người khác hoặc placeholder ===
         if (!isMine) {
             JPanel row = new JPanel(new BorderLayout());
             row.setOpaque(false);
 
             if (!isContinuation) {
-                // Avatar thực
                 JLabel avatar = new JLabel(new ImageIcon(
-                    new ImageIcon("image/avata.png").getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
+                        new ImageIcon("image/avata.png").getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH)));
                 avatar.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
 
                 JPanel avatarPanel = new JPanel(new BorderLayout());
                 avatarPanel.setOpaque(false);
                 avatarPanel.add(avatar, BorderLayout.NORTH);
-
                 row.add(avatarPanel, BorderLayout.WEST);
             } else {
-                // Placeholder để căn đều
                 JPanel placeholder = new JPanel();
                 placeholder.setOpaque(false);
                 placeholder.setPreferredSize(new Dimension(40, 1));
@@ -120,7 +132,7 @@ public class FileBubblePanel extends JPanel {
             add(wrapper, BorderLayout.CENTER);
         }
 
-        // 👉 Click để tải file
+        // === Click để tải file ===
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.addMouseListener(new MouseAdapter() {
             @Override
@@ -132,12 +144,12 @@ public class FileBubblePanel extends JPanel {
 
     private void downloadFile() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setSelectedFile(new File(sourceFile.getName())); // gợi ý tên gốc
+        chooser.setSelectedFile(new File(sourceFile.getName()));
         int result = chooser.showSaveDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             File destFile = chooser.getSelectedFile();
             try (InputStream in = new FileInputStream(sourceFile);
-                 OutputStream out = new FileOutputStream(destFile)) {
+                OutputStream out = new FileOutputStream(destFile)) {
 
                 byte[] buffer = new byte[4096];
                 int length;
