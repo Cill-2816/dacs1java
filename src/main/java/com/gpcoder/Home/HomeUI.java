@@ -342,12 +342,12 @@ public class HomeUI extends JFrame {
                     "<html>" +
                         "<div style='" +
                             "text-align: center;" +
-                            "color: #FF9800;" +
+                            "color: #9c9c9c;" +
                             "font-family: Arial;" +
-                            "font-size: 14px;" +
+                            "font-size: 12px;" +
                             "font-weight: bold;" +
                         "'>" +
-                            item.getDescription() +
+                    item.getDescription() +
                         "</div>" +
                     "</html>"
                 );

@@ -15,7 +15,7 @@ public class MenuData {
             new MenuItem("Cơm Tấm Sườn Bì Chả", "Toasted sandwich with tuna and veggies", "$9.85", "image/food8.png"),
             new MenuItem("Phở Chiên Phồng", "A healthy mix of grains, veggies and tofu", "$12.30", "image/food9.png"),
             new MenuItem("Bánh Khoai Mì Sợi", "Creamy Alfredo sauce with fettuccine", "$14.75", "image/food10.png"),
-            new MenuItem("Bánh Đa Cua Hải Phòng", "Toasted sandwich with tuna and veggie.", "$9.85", "image/food11.png"),
+            new MenuItem("Bánh Đa Cua Hải Phòng", "Toasted sandwich with tuna and veggie", "$9.85", "image/food11.png"),
             new MenuItem("Bánh Mì Xá Xíu", "A healthy mix of grains, veggies and tofu", "$12.30", "image/food12.png")
         );
     }

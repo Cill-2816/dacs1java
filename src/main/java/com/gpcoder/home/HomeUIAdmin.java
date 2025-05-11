@@ -1,6 +1,7 @@
 package com.gpcoder.home;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -61,10 +62,10 @@ public class HomeUIAdmin extends JFrame {
             sidebar.add(logo);
 
             // Menu items
-            String[] sidebarItem = {"Menu", "Reservation", "Accounting"};
+            String[] sidebarItem = {"Menu", "Staff (HR)", "Accounting"};
             String[] iconPaths = {
                 "image/menu.png",
-                "image/reservation.png",
+                "image/staffmanagement.png",
                 "image/accounting.png"
             };
 
@@ -231,7 +232,6 @@ public class HomeUIAdmin extends JFrame {
             sidebar.add(profileLogoutPanel);
 
 
-
         // ===== Top Bar =====
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(36, 40, 45));
@@ -243,121 +243,101 @@ public class HomeUIAdmin extends JFrame {
         userInfo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
         topBar.add(userInfo, BorderLayout.EAST);
 
-        // ===== Search Panel =====
-        JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
-        searchPanel.setBackground(new Color(24, 26, 27));
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        // === Search Panel ===
+    JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
+    searchPanel.setBackground(new Color(24, 26, 27));
+    searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        PlaceholderTextField searchField = new PlaceholderTextField("Search a food...");
-        searchField.setPreferredSize(new Dimension(400, 40));
-        searchField.setFont(new Font("Arial", Font.ITALIC, 14));
-        searchField.setBackground(new Color(44, 47, 51));
-        searchField.setForeground(Color.GRAY);
-        searchField.setCaretColor(Color.WHITE);
-        searchField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (searchField.getText().equals("Search a food...")) {
-                    searchField.setText("");
-                    searchField.setForeground(Color.WHITE);
-                }
+    PlaceholderTextField searchField = new PlaceholderTextField("Search a food...");
+    searchField.setPreferredSize(new Dimension(400, 40));
+    searchField.setFont(new Font("Arial", Font.ITALIC, 14));
+    searchField.setBackground(new Color(44, 47, 51));
+    searchField.setForeground(Color.GRAY);
+    searchField.setCaretColor(Color.WHITE);
+    searchField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+    searchField.addFocusListener(new java.awt.event.FocusAdapter() {
+        public void focusGained(java.awt.event.FocusEvent evt) {
+            if (searchField.getText().equals("Search a food...")) {
+                searchField.setText("");
+                searchField.setForeground(Color.WHITE);
             }
-            @Override
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (searchField.getText().trim().isEmpty()) {
-                    searchField.setText("Search a food...");
-                    searchField.setForeground(Color.GRAY);
-                }
+        }
+        public void focusLost(java.awt.event.FocusEvent evt) {
+            if (searchField.getText().trim().isEmpty()) {
+                searchField.setText("Search a food...");
+                searchField.setForeground(Color.GRAY);
             }
-        });
+        }
+    });
 
-        RoundedButton filterButton = new RoundedButton("", 20);
-        filterButton.setPreferredSize(new Dimension(50, 40));
-        filterButton.setBackground(new Color(44, 47, 51));
-        ImageIcon filterIcon = new ImageIcon("image/add.png");
-        Image filterImg = filterIcon.getImage().getScaledInstance(60,60, Image.SCALE_SMOOTH);
-        filterButton.setIcon(new ImageIcon(filterImg));
-        filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
-        // Hiệu ứng hover và nhấn cho filterButton
-        Color defaultFilterColor = new Color(44, 47, 51);
-        Color hoverFilterColor = new Color(60, 63, 65);
-        Color pressedFilterColor = new Color(84, 88, 95);
+    RoundedButton filterButton = new RoundedButton("", 20);
+    filterButton.setPreferredSize(new Dimension(50, 40));
+    filterButton.setBackground(new Color(44, 47, 51));
+    ImageIcon filterIcon = new ImageIcon("image/add.png");
+    Image filterImg = filterIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+    filterButton.setIcon(new ImageIcon(filterImg));
+    filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        filterButton.addMouseListener(new MouseAdapter() {
-            @Override
+    // Hover hiệu ứng cho filterButton
+    Color defaultFilterColor = new Color(44, 47, 51);
+    Color hoverFilterColor = new Color(60, 63, 65);
+    Color pressedFilterColor = new Color(84, 88, 95);
+    filterButton.addMouseListener(new MouseAdapter() {
+        public void mouseEntered(MouseEvent e) {
+            filterButton.setBackground(hoverFilterColor);
+        }
+        public void mouseExited(MouseEvent e) {
+            filterButton.setBackground(defaultFilterColor);
+        }
+        public void mousePressed(MouseEvent e) {
+            filterButton.setBackground(pressedFilterColor);
+        }
+        public void mouseReleased(MouseEvent e) {
+            filterButton.setBackground(filterButton.contains(e.getPoint()) ? hoverFilterColor : defaultFilterColor);
+        }
+    });
+
+    searchPanel.add(searchField, BorderLayout.CENTER);
+    searchPanel.add(filterButton, BorderLayout.EAST);
+
+        // === Filter Panel ===
+    JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 8));
+    filterPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
+    filterPanel.setBackground(new Color(24, 26, 27));
+
+    String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
+    String[] icons = {"dish.png", "breakfast.png", "lunch.png", "dinner.png"};
+    final RoundedButton[] selectedFilterBtn = {null};
+    for (int i = 0; i < filters.length; i++) {
+        String filter = filters[i];
+        String iconPath = icons[i];
+        ImageIcon icon = new ImageIcon("image/" + iconPath);
+        Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(img);
+        RoundedButton filterBtn = new RoundedButton(filter, 30);
+        filterBtn.setPreferredSize(new Dimension(170, 60));
+        filterBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        filterBtn.setIcon(icon);
+        filterBtn.setIconTextGap(10);
+        filterBtn.setBackground(new Color(44, 47, 51));
+        filterBtn.setForeground(Color.WHITE);
+        filterBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        filterBtn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
-                filterButton.setBackground(hoverFilterColor);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                filterButton.setBackground(defaultFilterColor);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                filterButton.setBackground(pressedFilterColor);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (filterButton.contains(e.getPoint())) {
-                    filterButton.setBackground(hoverFilterColor); // vẫn đang ở trong nút
-                } else {
-                    filterButton.setBackground(defaultFilterColor); // rời khỏi nút
-                }
-            }
-        });
-
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(filterButton, BorderLayout.EAST);
-
-        // ===== Filter Panel =====
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 8)); // Cách trái 20px, top-bottom 8px
-        filterPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20)); // Lề trên 10px, lề trái phải 20px
-        filterPanel.setBackground(new Color(24, 26, 27));
-
-        String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
-        String[] icons = {"dish.png", "breakfast.png", "lunch.png", "dinner.png"};
-        final RoundedButton[] selectedFilterBtn = {null};
-
-        for (int i = 0; i < filters.length; i++) {
-            String filter = filters[i];
-            String iconPath = icons[i];
-
-            ImageIcon icon = new ImageIcon("image/" + iconPath);
-            Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Icon vừa phải
-            icon = new ImageIcon(img);
-
-            RoundedButton filterBtn = new RoundedButton(filter, 30);
-            filterBtn.setPreferredSize(new Dimension(170, 60)); // Giữ nguyên chiều rộng bạn đang dùng
-            filterBtn.setHorizontalAlignment(SwingConstants.LEFT);
-            filterBtn.setIcon(icon);
-            filterBtn.setIconTextGap(10);
-            filterBtn.setBackground(new Color(44, 47, 51));
-            filterBtn.setForeground(Color.WHITE);
-            filterBtn.setFont(new Font("Arial", Font.BOLD, 16));
-            filterBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            
-            filterBtn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                if (selectedFilterBtn[0] != filterBtn) {
+                if (selectedFilterBtn[0] != filterBtn)
                     filterBtn.setBackground(new Color(60, 63, 67));
-                }
             }
             public void mouseExited(MouseEvent e) {
-                if (selectedFilterBtn[0] != filterBtn) {
-                    filterBtn.setBackground(new Color(44, 47, 50));
-                }
+                if (selectedFilterBtn[0] != filterBtn)
+                    filterBtn.setBackground(new Color(44, 47, 51));
             }
         });
 
         filterBtn.addActionListener(e -> {
-            if (selectedFilterBtn[0] != null) {
+            if (selectedFilterBtn[0] != null)
                 selectedFilterBtn[0].setBackground(new Color(44, 47, 51));
-            }
             selectedFilterBtn[0] = filterBtn;
             filterBtn.setBackground(new Color(255, 87, 34));
             System.out.println(filter + " selected!");
@@ -401,9 +381,9 @@ public class HomeUIAdmin extends JFrame {
             "<html>" +
                 "<div style='" +
                     "text-align: center;" +
-                    "color: #FF9800;" +
+                    "color: #9c9c9c;" +
                     "font-family: Arial;" +
-                    "font-size: 14px;" +
+                    "font-size: 12px;" +
                     "font-weight: bold;" +
                 "'>" +
                     item.getDescription() +
@@ -603,40 +583,57 @@ public class HomeUIAdmin extends JFrame {
     }
         orderPanel.add(stepsPanel, BorderLayout.CENTER);
 
-                // ===== Gộp các panel lại =====
-        JPanel leftSide = new JPanel(new BorderLayout());
-        leftSide.setBackground(new Color(24, 26, 27));
-        leftSide.add(searchPanel, BorderLayout.NORTH);
+                // === Gộp thành menuPanel (LEFT + RIGHT) ===
+    JPanel menuPanel = new JPanel(new BorderLayout());
+    menuPanel.setBackground(new Color(24, 26, 27));
 
-        // middlePanel chứa filter + scroll content
-        JPanel middlePanel = new JPanel(new BorderLayout());
-        middlePanel.setBackground(new Color(24, 26, 27));
-        middlePanel.add(filterPanel, BorderLayout.NORTH);
-        middlePanel.add(scrollPane, BorderLayout.CENTER); // scrollPane thay cho contentPanel
+    JPanel leftSide = new JPanel(new BorderLayout());
+    leftSide.setBackground(new Color(24, 26, 27));
+    leftSide.add(searchPanel, BorderLayout.NORTH);
 
-        leftSide.add(middlePanel, BorderLayout.CENTER);
+    JPanel middlePanel = new JPanel(new BorderLayout());
+    middlePanel.setBackground(new Color(24, 26, 27));
+    middlePanel.add(filterPanel, BorderLayout.NORTH);
+    middlePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Top bar chứa thông tin người dùng
-        JPanel contentArea = new JPanel(new BorderLayout());
-        contentArea.setBackground(new Color(24, 26, 27));
-        contentArea.add(topBar, BorderLayout.NORTH);
+    leftSide.add(middlePanel, BorderLayout.CENTER);
 
-        // centerArea gồm phần trái (menu/filter/content) và phải (order)
-        JPanel centerArea = new JPanel(new BorderLayout());
-        centerArea.setBackground(new Color(24, 26, 27));
-        centerArea.add(leftSide, BorderLayout.CENTER);
-        centerArea.add(orderPanel, BorderLayout.EAST);
+    menuPanel.add(leftSide, BorderLayout.CENTER);
+    menuPanel.add(orderPanel, BorderLayout.EAST);
 
-        // contentArea gồm topBar + centerArea
-        contentArea.add(centerArea, BorderLayout.CENTER);
+    //PANEL MẪU CHO STAFF VÀ ACCOUNTING
+    JPanel staffPanel = new JPanel();
+    staffPanel.setBackground(new Color(24, 26, 27));
+    staffPanel.add(new JLabel("This is Staff Management", JLabel.CENTER));
 
-        // mainPanel gồm sidebar trái và phần còn lại
-        mainPanel.add(sidebar, BorderLayout.WEST);
-        mainPanel.add(contentArea, BorderLayout.CENTER);
+    JPanel accountingPanel = new JPanel();
+    accountingPanel.setBackground(new Color(24, 26, 27));
+    accountingPanel.add(new JLabel("This is Accounting Panel", JLabel.CENTER));
 
-        // Gán vào cửa sổ chính
-        setContentPane(mainPanel);
 
+    // === CardLayout để chuyển đổi ===
+    CardLayout cardLayout = new CardLayout();
+    JPanel contentSwitcher = new JPanel(cardLayout);
+    contentSwitcher.add(menuPanel, "Menu");
+    contentSwitcher.add(staffPanel, "Staff (HR)");
+    contentSwitcher.add(accountingPanel, "Accounting");
+
+    // === ContentArea gồm top bar và contentSwitcher ===
+    JPanel contentArea = new JPanel(new BorderLayout());
+    contentArea.setBackground(new Color(24, 26, 27));
+    contentArea.add(topBar, BorderLayout.NORTH);
+    contentArea.add(contentSwitcher, BorderLayout.CENTER);
+
+    // === Gộp sidebar và content ===
+    mainPanel.add(sidebar, BorderLayout.WEST);
+    mainPanel.add(contentArea, BorderLayout.CENTER);
+
+    setContentPane(mainPanel);
+    for (JButton btn : buttons) {
+        btn.addActionListener(e -> {
+            cardLayout.show(contentSwitcher, btn.getText());
+        });
+    }
 
     }
 
