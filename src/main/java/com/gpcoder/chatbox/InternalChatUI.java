@@ -147,7 +147,7 @@ public class InternalChatUI extends JFrame {
                 sendMessage(text_message, LocalDateTime.now());
                 outStream.writeObject("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
                 outStream.flush();
-                System.out.println("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
+                // System.out.println("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
             } catch (IOException ex) {
             }
             
