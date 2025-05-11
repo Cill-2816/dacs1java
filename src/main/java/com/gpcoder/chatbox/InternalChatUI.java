@@ -334,47 +334,49 @@ public class InternalChatUI extends JFrame {
     }
 
     private void sendMessage(String message, LocalDateTime timesent) {
-        if (!message.isEmpty()) {
-            String sender = "Me";
-            boolean isMine = true;
-            boolean isContinuation = sender.equals(lastSender);
+    if (!message.isEmpty()) {
+        String sender = "Me";
+        boolean isMine = true;
+        boolean isContinuation = sender.equals(lastSender);
 
-            BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation, timesent);
+        BubblePanel bubble = new BubblePanel(sender, message, isMine, isContinuation, timesent);
 
-            for (Component comp : chatBody.getComponents()) {
-                if ("spacer".equals(comp.getName())) {
-                    chatBody.remove(comp);
-                    break;
-                }
+        for (Component comp : chatBody.getComponents()) {
+            if ("spacer".equals(comp.getName())) {
+                chatBody.remove(comp);
+                break;
             }
-
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = chatBody.getComponentCount();
-            gbc.weightx = 1.0;
-            gbc.anchor = isMine ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            chatBody.add(bubble, gbc);
-
-            GridBagConstraints spacer = new GridBagConstraints();
-            spacer.gridx = 0;
-            spacer.gridy = chatBody.getComponentCount();
-            spacer.weighty = 1.0;
-            spacer.fill = GridBagConstraints.VERTICAL;
-
-            JPanel empty = new JPanel();
-            empty.setOpaque(false);
-            empty.setName("spacer");
-            chatBody.add(empty, spacer);
-
-            chatBody.revalidate();
-            JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
-            vertical.setValue(vertical.getMaximum());
-
-            inputField.setText("");
-            lastSender = sender;
         }
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = chatBody.getComponentCount();
+        gbc.weightx = 1.0;
+        gbc.anchor = isMine ? GridBagConstraints.EAST : GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        chatBody.add(bubble, gbc);
+
+        GridBagConstraints spacer = new GridBagConstraints();
+        spacer.gridx = 0;
+        spacer.gridy = chatBody.getComponentCount();
+        spacer.weighty = 1.0;
+        spacer.fill = GridBagConstraints.VERTICAL;
+
+        JPanel empty = new JPanel();
+        empty.setOpaque(false);
+        empty.setName("spacer");
+        chatBody.add(empty, spacer);
+
+        chatBody.revalidate();
+        chatBody.repaint();
+
+        scrollToBottom(); // <-- Cuộn xuống
+
+        inputField.setText("");
+        lastSender = sender;
     }
+}
+
 
     private void sendFile(File file, LocalDateTime timesent) {
 
@@ -519,7 +521,14 @@ public class InternalChatUI extends JFrame {
                 button.setBackground(button.contains(e.getPoint()) ? hoverColor : defaultColor);
             }
         });
+        
     }
+    private void scrollToBottom() {
+    SwingUtilities.invokeLater(() -> {
+        chatScrollPane.getVerticalScrollBar().setValue(chatScrollPane.getVerticalScrollBar().getMaximum());
+    });
+}
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(InternalChatUI::new);

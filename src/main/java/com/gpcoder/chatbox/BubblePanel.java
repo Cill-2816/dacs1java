@@ -56,7 +56,7 @@ public class BubblePanel extends JPanel {
         //     bubble.add(senderLabel);
         //     bubble.add(Box.createVerticalStrut(4));
         // }
-
+        
         // === Nội dung ===
         JTextPane msgLabel = new JTextPane() {
     @Override
@@ -88,6 +88,7 @@ public class BubblePanel extends JPanel {
         msgLabel.setFocusable(false);
         msgLabel.setBorder(null);
         bubble.add(msgLabel); 
+        
 
 
 
