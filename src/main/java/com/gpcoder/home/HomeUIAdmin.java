@@ -506,9 +506,8 @@ public class HomeUIAdmin extends JFrame {
         scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, new JPanel() {{
             setOpaque(false);           // lấp góc trống, cùng màu nền
         }});
-
-
-
+        SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
+        });
 
         // ===== Order Panel =====
         JPanel orderPanel = new JPanel(new BorderLayout());

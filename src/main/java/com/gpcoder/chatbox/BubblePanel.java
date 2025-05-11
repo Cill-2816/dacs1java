@@ -19,7 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 public class BubblePanel extends JPanel {
     public BubblePanel(String sender, String message, boolean isMine, boolean isContinuation, LocalDateTime timesent) {
@@ -37,16 +37,16 @@ public class BubblePanel extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                super.paintComponent(g);
             }
         };
+        int maxBubbleWidth = 600; // bạn có thể điều chỉnh theo chiều rộng chat (1/2 khoảng 1440px)
 
         bubble.setLayout(new BoxLayout(bubble, BoxLayout.Y_AXIS));
         bubble.setBackground(isMine ? new Color(0, 132, 255) : new Color(60, 63, 65));
-        bubble.setOpaque(false);
+        bubble.setOpaque(true);
         bubble.setForeground(Color.WHITE);
         bubble.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-        bubble.setMaximumSize(new Dimension(400, Integer.MAX_VALUE));
+        bubble.setMaximumSize(new Dimension(maxBubbleWidth + 30, Integer.MAX_VALUE));
 
         // === Tên người gửi (ẩn nếu là continuation hoặc của mình) ===
         // if (!isContinuation && !isMine) {
@@ -58,23 +58,53 @@ public class BubblePanel extends JPanel {
         // }
 
         // === Nội dung ===
-        JTextArea msgLabel = new JTextArea(message);
-        msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JTextPane msgLabel = new JTextPane() {
+    @Override
+    public Dimension getPreferredSize() {
+        setSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
+        Dimension d = super.getPreferredSize();
+
+        if (d.width > maxBubbleWidth) {
+            setSize(new Dimension(maxBubbleWidth, Short.MAX_VALUE));
+            d = super.getPreferredSize();
+            d.width = maxBubbleWidth;
+        }
+
+        return d;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+};
+
+        msgLabel.setEditorKit(new WrapAnywhereKit());
+        msgLabel.setText(message);
+        msgLabel.setFont(new Font("Arial", Font.PLAIN, 17));
         msgLabel.setForeground(Color.WHITE);
         msgLabel.setOpaque(false);
         msgLabel.setEditable(false);
-        msgLabel.setLineWrap(true);
-        msgLabel.setWrapStyleWord(true);
-        bubble.add(msgLabel);
+        msgLabel.setFocusable(false);
+        msgLabel.setBorder(null);
+        bubble.add(msgLabel); 
+
+
+
 
         // === Thời gian ===
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         JLabel timeLabel = new JLabel(timesent.format(formatter));
-        timeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        timeLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         timeLabel.setForeground(new Color(200, 200, 200));
         timeLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        timePanel.setOpaque(false);
+        timePanel.add(timeLabel);
+
         bubble.add(Box.createVerticalStrut(4));
-        bubble.add(timeLabel);
+        bubble.add(timePanel);
+
 
         // === Bọc căn trái/phải ===
         JPanel wrapper = new JPanel(new FlowLayout(isMine ? FlowLayout.RIGHT : FlowLayout.LEFT, 0, 0));

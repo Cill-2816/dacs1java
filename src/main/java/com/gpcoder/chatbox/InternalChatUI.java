@@ -104,8 +104,21 @@ public class InternalChatUI extends JFrame {
         chatScrollPane = new JScrollPane(chatBody);
         chatScrollPane.setBorder(null);
         chatScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        chatPanel.add(chatScrollPane, BorderLayout.CENTER);
+        chatScrollPane.setPreferredSize(new Dimension(0, 600)); // chiều cao đủ 2 hàng
+        chatScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        chatScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        chatScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        chatScrollPane.getVerticalScrollBar().setUnitIncrement(16); // cuộn mượt
 
+                // Custom thanh cuộn
+        chatScrollPane.getVerticalScrollBar().setUI(new DarkScrollBarUI());
+        chatScrollPane.getHorizontalScrollBar().setUI(new DarkScrollBarUI()); // nếu muốn dùng ngang
+        chatScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, new JPanel() {{
+            setOpaque(false);           // lấp góc trống, cùng màu nền
+        }});
+        chatPanel.add(chatScrollPane, BorderLayout.CENTER);
+        
+        
         JPanel inputPanel = new JPanel(new BorderLayout());
         inputPanel.setBackground(panelColor);
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -251,7 +264,7 @@ public class InternalChatUI extends JFrame {
 
     private void runNetworking() {
     try {
-        this.socket = new Socket("26.106.134.18", 12345);
+        this.socket = new Socket("localhost", 12345);
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.inStream = new ObjectInputStream(socket.getInputStream());
         
