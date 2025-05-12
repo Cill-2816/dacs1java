@@ -6,6 +6,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -31,6 +34,9 @@ import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+
+import com.gpcoder.home.MenuData;
+import com.gpcoder.home.MenuItem;
 
 public class AccountingPanel extends JPanel {
     private JTable orderTable;
@@ -87,12 +93,12 @@ public class AccountingPanel extends JPanel {
 
         orderModel = new DefaultTableModel(data, columns);
         orderTable = new JTable(orderModel);
-        orderTable.setFont(new Font("Arial", Font.PLAIN, 13));
-        orderTable.setRowHeight(30);
+        orderTable.setFont(new Font("Arial", Font.PLAIN, 14));
+        orderTable.setRowHeight(35);
         orderTable.setBackground(new Color(28, 30, 35));
         orderTable.setForeground(Color.WHITE);
         orderTable.setGridColor(new Color(60, 64, 70));
-        orderTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+        orderTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16));
         orderTable.getTableHeader().setForeground(Color.WHITE);
         orderTable.getTableHeader().setBackground(new Color(28, 30, 35));
 
@@ -179,14 +185,37 @@ public class AccountingPanel extends JPanel {
     }
 
         private JPanel createPieChart() {
-    // Dataset
-    DefaultPieDataset dataset = new DefaultPieDataset();
-    dataset.setValue("Beef Noodle Soup", 40);
-    dataset.setValue("Banh Mi", 25);
-    dataset.setValue("Coffee", 20);
-    dataset.setValue("Milk Tea", 15);
+    // Lấy danh sách món ăn có sales count
+    List<MenuItem> menu = MenuData.getSampleMenu();
 
-    // Tạo chart KHÔNG có tiêu đề
+    // Sắp xếp menu giảm dần theo số lượng bán
+    menu.sort((a, b) -> Integer.compare(b.getSalesCount(), a.getSalesCount()));
+
+    // Tạo pieData: top 4 món + Others
+    Map<String, Integer> pieData = new LinkedHashMap<>();
+    int others = 0;
+
+    for (int i = 0; i < menu.size(); i++) {
+        MenuItem item = menu.get(i);
+        int count = item.getSalesCount();
+
+        if (i < 4) {
+            pieData.put(item.getName(), count);
+        } else {
+            others += count;
+        }
+    }
+    if (others > 0) {
+        pieData.put("Others", others);
+    }
+
+    // Tạo dataset từ pieData
+    DefaultPieDataset dataset = new DefaultPieDataset();
+    for (Map.Entry<String, Integer> entry : pieData.entrySet()) {
+        dataset.setValue(entry.getKey(), entry.getValue());
+    }
+
+    // Tạo biểu đồ KHÔNG có tiêu đề
     JFreeChart chart = ChartFactory.createPieChart(null, dataset, true, false, false);
     chart.setBackgroundPaint(new Color(28, 30, 35));
 
@@ -202,35 +231,54 @@ public class AccountingPanel extends JPanel {
     plot.setShadowPaint(null);
     plot.setSimpleLabels(true);
 
+    // Gán màu theo vị trí top
+    Color[] colorPalette = new Color[] {
+        Color.decode("#407F3E"),  // Top 1
+        Color.decode("#89B449"),  // Top 2
+        Color.decode("#DBD468"),  // Top 3
+        Color.decode("#E7E0C4"),  // Top 4
+        Color.decode("#CCCCCC")   // Others
+    };
+
+    int index = 0;
+    for (String key : pieData.keySet()) {
+        Color color = index < colorPalette.length ? colorPalette[index] : Color.LIGHT_GRAY;
+        plot.setSectionPaint(key, color);
+        index++;
+    }
+
+    // Chỉnh legend
     LegendTitle legend = chart.getLegend();
     if (legend != null) {
-        legend.setItemFont(new Font("Arial", Font.PLAIN, 12));
+        legend.setItemFont(new Font("Arial", Font.PLAIN, 14));
         legend.setItemPaint(Color.LIGHT_GRAY);
         legend.setFrame(BlockBorder.NONE);
         legend.setBackgroundPaint(new Color(28, 30, 35));
         legend.setPosition(RectangleEdge.BOTTOM);
     }
 
-    // ChartPanel chỉ chứa biểu đồ
+    // Tạo biểu đồ panel
     ChartPanel chartPanel = new ChartPanel(chart);
     chartPanel.setBackground(new Color(28, 30, 35));
     chartPanel.setPreferredSize(new Dimension(350, 260));
     chartPanel.setBorder(BorderFactory.createEmptyBorder());
 
-    // Tiêu đề ở phía trên – nằm ngoài biểu đồ
+    // Tiêu đề bên ngoài
     JLabel titleLabel = new JLabel("Top Selling Items", JLabel.CENTER);
     titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
     titleLabel.setForeground(Color.WHITE);
-    titleLabel.setBorder(new EmptyBorder(0, 0, 10, 0));  // khoảng cách dưới
+    titleLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
-    // Panel bọc bên ngoài
-    JPanel wrapper = new JPanel();
-    wrapper.setLayout(new BorderLayout());
-    wrapper.setBackground(new Color(18, 20, 24)); // nền giống giao diện ngoài
+    // Gói tiêu đề + biểu đồ
+    JPanel wrapper = new JPanel(new BorderLayout());
+    wrapper.setBackground(new Color(18, 20, 24));
     wrapper.add(titleLabel, BorderLayout.NORTH);
     wrapper.add(chartPanel, BorderLayout.CENTER);
 
     return wrapper;
 }
+
+
+
 
     }

@@ -61,7 +61,7 @@ public class InternalChatUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        Color bgColor = new Color(44, 47, 51);
+        Color bgColor = Color.decode("#21211f");
         Color panelColor = bgColor;
         Color textColor = Color.WHITE;
 
@@ -92,6 +92,8 @@ public class InternalChatUI extends JFrame {
         JScrollPane userScrollPane = new JScrollPane(userList);
         userScrollPane.setPreferredSize(new Dimension(180, 0));
         add(userScrollPane, BorderLayout.WEST);
+        userScrollPane.setBorder(BorderFactory.createEmptyBorder());
+
 
         JPanel chatPanel = new JPanel(new BorderLayout());
         chatPanel.setBackground(bgColor);
