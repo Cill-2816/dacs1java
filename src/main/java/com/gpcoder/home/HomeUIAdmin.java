@@ -30,6 +30,8 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import com.gpcoder.accounting.AccountingPanel;
+
 public class HomeUIAdmin extends JFrame {
 
     public HomeUIAdmin() {
@@ -606,10 +608,7 @@ public class HomeUIAdmin extends JFrame {
     staffPanel.setBackground(new Color(24, 26, 27));
     staffPanel.add(new JLabel("This is Staff Management", JLabel.CENTER));
 
-    JPanel accountingPanel = new JPanel();
-    accountingPanel.setBackground(new Color(24, 26, 27));
-    accountingPanel.add(new JLabel("This is Accounting Panel", JLabel.CENTER));
-
+    JPanel accountingPanel = new AccountingPanel();
 
     // === CardLayout để chuyển đổi ===
     CardLayout cardLayout = new CardLayout();
