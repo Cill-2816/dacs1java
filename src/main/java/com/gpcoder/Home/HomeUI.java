@@ -1,6 +1,7 @@
 package com.gpcoder.home;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -461,101 +462,21 @@ public class HomeUI extends JFrame {
         SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
 });
 
+        //=== Order Panel (CÁC PANEL CARDLAYOUT) ===
+        // === CardLayout để chuyển đổi ===
+        CardLayout cardLayout = new CardLayout();
+        JPanel contentSwitcher = new JPanel(cardLayout);
 
+        // Truyền cardLayout và contentSwitcher vào panel con
+        OrderProcessPanel orderPanel = new OrderProcessPanel(cardLayout, contentSwitcher);
+        TypeOfOrderPanel typePanel = new TypeOfOrderPanel(cardLayout, contentSwitcher);
+        CustomerInforPanel customerPanel = new CustomerInforPanel(cardLayout, contentSwitcher);
+        PaymentPanel paymentPanel = new PaymentPanel(cardLayout, contentSwitcher);
 
-        // ===== Order Panel =====
-        JPanel orderPanel = new JPanel(new BorderLayout());
-        orderPanel.setPreferredSize(new Dimension(300, 0));
-        orderPanel.setBackground(new Color(30, 32, 34));
-        orderPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        // Title
-        JLabel orderTitle = new JLabel("Order Process", SwingConstants.CENTER);
-        orderTitle.setForeground(Color.WHITE);
-        orderTitle.setFont(new Font("Arial", Font.BOLD, 18));
-        orderTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-        orderPanel.add(orderTitle, BorderLayout.NORTH);
-
-        // Panel chứa các bước
-        JPanel stepsPanel = new JPanel();
-        stepsPanel.setLayout(new GridLayout(5, 1, 10, 10)); // 5 dòng, 1 cột, cách nhau 10px
-        stepsPanel.setBackground(new Color(30, 32, 34));
-
-        String[] steps = {
-            "Add Food Items",
-            "Type of Order",
-            "Select Table",
-            "Customer Info",
-            "Payment"
-        };
-
-        // Tạo font chung cho dễ chỉnh sửa sau này
-        Font stepFont = new Font("Arial", Font.PLAIN, 16);
-        Font numberFont = new Font("Arial", Font.BOLD, 14);
-
-        int stepNumber = 1;
-    for (String step : steps) {
-        JButton stepButton = new JButton();
-        stepButton.setBackground(new Color(30, 32, 34));
-        stepButton.setFocusPainted(false);
-        stepButton.setBorder(BorderFactory.createLineBorder(new Color(30, 32, 34)));
-        stepButton.setFont(stepFont);
-        stepButton.setOpaque(true);
-
-        // Sắp xếp nội dung dọc
-        stepButton.setLayout(new BoxLayout(stepButton, BoxLayout.Y_AXIS));
-
-        // Số thứ tự
-        JLabel numberLabel = new JLabel(String.valueOf(stepNumber), SwingConstants.CENTER);
-        numberLabel.setForeground(Color.WHITE);
-        numberLabel.setFont(numberFont);
-        numberLabel.setOpaque(true);
-        numberLabel.setBackground(new Color(45, 48, 52));
-        numberLabel.setPreferredSize(new Dimension(30, 30));
-        numberLabel.setMaximumSize(new Dimension(30, 30));
-        numberLabel.setMinimumSize(new Dimension(30, 30));
-        numberLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Nội dung chữ
-        JLabel textLabel = new JLabel(step, SwingConstants.CENTER);
-        textLabel.setForeground(Color.WHITE);
-        textLabel.setFont(stepFont);
-        textLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0)); // Cách số 8px
-        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Thêm vào button
-        stepButton.add(Box.createVerticalGlue());
-        stepButton.add(numberLabel);
-        stepButton.add(Box.createRigidArea(new Dimension(0, 5)));
-        stepButton.add(textLabel);
-        stepButton.add(Box.createVerticalGlue());
-
-        // Quan trọng: ép full chiều ngang
-        stepButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        stepButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        stepButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        stepButton.setPreferredSize(new Dimension(Short.MAX_VALUE, 80));
-
-        // Hiệu ứng hover (thay đổi màu nền)
-        Color defaultBackground = stepButton.getBackground();
-        Color hoverBackground = new Color(60, 63, 65); // màu sáng hơn khi hover
-
-        stepButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                stepButton.setBackground(hoverBackground);
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                stepButton.setBackground(defaultBackground);
-                stepButton.setBorder(BorderFactory.createLineBorder(defaultBackground)); // trở lại như cũ
-            }
-        });
-    stepsPanel.add(stepButton);
-    stepNumber++;
-}
-    orderPanel.add(stepsPanel, BorderLayout.CENTER);
+        contentSwitcher.add(orderPanel, "order");
+        contentSwitcher.add(typePanel, "type");
+        contentSwitcher.add(customerPanel, "customer");
+        contentSwitcher.add(paymentPanel, "payment");
 
         // ===== Gộp các panel lại =====
         JPanel leftSide = new JPanel(new BorderLayout());
@@ -578,7 +499,7 @@ public class HomeUI extends JFrame {
         JPanel centerArea = new JPanel(new BorderLayout());
         centerArea.setBackground(new Color(24, 26, 27));
         centerArea.add(leftSide, BorderLayout.CENTER);
-        centerArea.add(orderPanel, BorderLayout.EAST);
+        centerArea.add(contentSwitcher, BorderLayout.EAST);
         
         // contentArea gồm topBar + centerArea
         contentArea.add(centerArea, BorderLayout.CENTER);

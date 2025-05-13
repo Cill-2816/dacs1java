@@ -60,7 +60,7 @@ public class InternalChatUI extends JFrame {
     public InternalChatUI(String username) {
         setTitle("Internal Chat");
         setSize(1440, 900);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         Color bgColor = Color.decode("#21211f");
