@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,14 +36,15 @@ import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
-import com.gpcoder.home.MenuData;
-import com.gpcoder.home.MenuItem;
+import com.gpcoder.model.MenuItem;
 
 public class AccountingPanel extends JPanel {
     private JTable orderTable;
     private DefaultTableModel orderModel;
+    private List<MenuItem> menu = new ArrayList<MenuItem>();
 
-    public AccountingPanel() {
+    public AccountingPanel(List<MenuItem> menuitem) {
+        this.menu = menuitem;
         setLayout(new BorderLayout(20, 20));
         setBackground(new Color(18, 20, 24));
 
@@ -186,7 +188,6 @@ public class AccountingPanel extends JPanel {
 
         private JPanel createPieChart() {
     // Lấy danh sách món ăn có sales count
-    List<MenuItem> menu = MenuData.getSampleMenu();
 
     // Sắp xếp menu giảm dần theo số lượng bán
     menu.sort((a, b) -> Integer.compare(b.getSalesCount(), a.getSalesCount()));

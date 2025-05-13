@@ -60,7 +60,7 @@ public class InternalChatUI extends JFrame {
     public InternalChatUI(String username) {
         setTitle("Internal Chat");
         setSize(1440, 900);
-        // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         Color bgColor = Color.decode("#21211f");
@@ -225,7 +225,7 @@ public class InternalChatUI extends JFrame {
                         sendImage(copiedFile, LocalDateTime.now());
                         outStream.writeObject("NEW_IMAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_image/"+uniqueName);
                         outStream.flush();
-
+                        selectedImage = null;
                     }
                     else {
                         
@@ -253,6 +253,7 @@ public class InternalChatUI extends JFrame {
                         sendFile(copiedFile, LocalDateTime.now());
                         outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_file/"+uniqueName);
                         outStream.flush();
+                        selectedFile = null;
                     }
                 } catch (IOException ex) {
                 }

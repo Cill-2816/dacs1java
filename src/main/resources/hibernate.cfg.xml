@@ -20,6 +20,7 @@
         <!-- Entity mapping -->
         <mapping class="com.gpcoder.model.Staff" />
         <mapping class="com.gpcoder.model.Historychat" />
+        <mapping class="com.gpcoder.model.MenuItem" />
          
     </session-factory>
 </hibernate-configuration>

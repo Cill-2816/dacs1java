@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -14,6 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,13 +29,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import com.gpcoder.chatbox.InternalChatUI;
+import com.gpcoder.model.MenuItem;
 
 public class HomeUI extends JFrame {
+
+    private Socket socket;
+    private ObjectOutputStream outStream;
+    private ObjectInputStream inStream;
+    private JPanel contentPanel;
+    JScrollPane scrollPane;
 
     public HomeUI(String username) {
         setTitle("Mr. Chefs - Menu");
@@ -324,129 +333,12 @@ public class HomeUI extends JFrame {
         searchPanel.add(filterButton, BorderLayout.EAST);
 
             // ===== Content Panel =====
-            JPanel contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
+            contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
             contentPanel.setBackground(new Color(24, 26, 27));
             contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            
-            List<MenuItem> menuItems = MenuData.getSampleMenu();
-            for (MenuItem item : menuItems) {
-                RoundedPanel itemCard = new RoundedPanel(20);
-                itemCard.setPreferredSize(new Dimension(230, 300));
-                itemCard.setLayout(new BorderLayout());
-                itemCard.setBackground(new Color(36, 40, 45));
-                itemCard.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-                    BorderFactory.createEmptyBorder(25, 10, 10, 10)));
-                itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            
-                // ===== Title =====
-                JLabel title = new JLabel(item.getName());
-                title.setForeground(Color.WHITE);
-                title.setFont(new Font("Arial", Font.BOLD, 18));
-                title.setAlignmentX(Component.CENTER_ALIGNMENT);
-            
-                // ===== Description =====
-                JTextPane desc = new JTextPane();
-                desc.setContentType("text/html");
-                desc.setText(
-                    "<html>" +
-                        "<div style='" +
-                            "text-align: center;" +
-                            "color: #9c9c9c;" +
-                            "font-family: Arial;" +
-                            "font-size: 12px;" +
-                            "font-weight: bold;" +
-                        "'>" +
-                    item.getDescription() +
-                        "</div>" +
-                    "</html>"
-                );
-                desc.setEditable(false);
-                desc.setOpaque(false);
-                desc.setBorder(null);
-                desc.setAlignmentX(Component.CENTER_ALIGNMENT);
-                desc.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
-            
-                // ===== Price =====
-                JLabel price = new JLabel(item.getPrice());
-                price.setForeground(Color.WHITE);
-                price.setFont(new Font("Arial", Font.BOLD, 18));
-                price.setHorizontalAlignment(SwingConstants.CENTER);
-            
-                // ===== Food Image =====
-                ImageIcon foodImage;
-                try {
-                    foodImage = new ImageIcon(item.getImagePath());
-                    Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
-                    foodImage = new ImageIcon(scaledImage);
-                } catch (Exception e) {
-                    foodImage = new ImageIcon(); // fallback
-                }
-                JLabel imageLabel = new JLabel(foodImage);
-                imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            // ===== Panel chứa nút trừ/cộng và số lượng =====
-        JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER, 30,0));
-        control.setBackground(new Color(36, 40, 45));
-
-        // Load icon và scale
-        ImageIcon minusIcon = new ImageIcon("image/minus.png");
-        ImageIcon plusIcon = new ImageIcon("image/plus.png");
-
-        Image scaledMinus = minusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
-        Image scaledPlus = plusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
-
-        minusIcon = new ImageIcon(scaledMinus);
-        plusIcon = new ImageIcon(scaledPlus);
-
-        // ===== Tạo CircleButton cho minus và plus =====
-        CircleButton minus = new CircleButton(minusIcon, new Color(52, 53, 56), 32);
-        minus.setHoverColor(Color.decode("#5A5B5E")); // xám sáng hơn
-
-        CircleButton plus = new CircleButton(plusIcon, new Color(235, 87, 87), 32);
-        plus.setHoverColor(Color.decode("#FF6B6B")); // đỏ sáng hơn
-
-
-        // ===== Số lượng =====
-        JLabel qty = new JLabel("0");
-        qty.setForeground(Color.WHITE);
-        qty.setFont(new Font("Arial", Font.BOLD, 14));
-
-        // ===== Sự kiện tăng/giảm =====
-        minus.addActionListener(e -> {
-            int count = Integer.parseInt(qty.getText());
-            if (count > 0) qty.setText(String.valueOf(count - 1));
-        });
-
-        plus.addActionListener(e -> {
-            int count = Integer.parseInt(qty.getText());
-            qty.setText(String.valueOf(count + 1));
-        });
-
-        // ===== Thêm vào panel =====
-        control.add(minus);
-        control.add(qty);
-        control.add(plus);
-
-            // ===== Panel chứa tất cả thành phần =====
-        JPanel details = new JPanel();
-        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
-        details.setOpaque(false);
-        details.add(Box.createVerticalStrut(10));
-        details.add(imageLabel);
-        details.add(Box.createVerticalStrut(10));
-        details.add(title);
-        details.add(Box.createVerticalStrut(5));
-        details.add(desc);
-        details.add(Box.createVerticalStrut(10));
-        details.add(control);
-
-        itemCard.add(details, BorderLayout.CENTER);
-        contentPanel.add(itemCard);
-    }
 
         // ===== ScrollPane trực tiếp chứa contentPanel =====
-        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane = new JScrollPane(contentPanel);
         scrollPane.setPreferredSize(new Dimension(0, 600)); // chiều cao đủ 2 hàng
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -460,7 +352,9 @@ public class HomeUI extends JFrame {
             setOpaque(false);           // lấp góc trống, cùng màu nền
         }});
         SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
-});
+        });
+
+        new Thread(this::runNetworking).start();
 
         //=== Order Panel (CÁC PANEL CARDLAYOUT) ===
         // === CardLayout để chuyển đổi ===
@@ -510,9 +404,80 @@ public class HomeUI extends JFrame {
         
         // Gán vào cửa sổ chính
         setContentPane(mainPanel);
+    // Listener cho buttons
+        buttons.get(0).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getmenu(true, true, true);
+            }
+        });
+
+        buttons.get(1).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getmenu(true, false, false);
+            }
+        });
+
+        buttons.get(2).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getmenu(false, true, false);
+            }
+        });
+
+        buttons.get(3).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getmenu(false, false, true);
+            }
+        });
+
+    }
+
+    private void getmenu(Boolean breakfast, Boolean lunch, Boolean dinner) {
+        try {
+            if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
+                outStream.writeObject("GET_MENU:" + Boolean.toString(breakfast) + ":" + Boolean.toString(lunch) + ":" + Boolean.toString(dinner));
+                outStream.flush();
+            }
+        } catch (IOException e) {
+            System.err.println("Loi khi gui yeu cau menu: " + e.getMessage());
+        }
+    }
+
+    private void runNetworking() {
+        try {
+            this.socket = new Socket("26.106.134.18", 12345);
+            this.outStream = new ObjectOutputStream(socket.getOutputStream());
+            this.inStream = new ObjectInputStream(socket.getInputStream());
+
+            if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
+                getmenu(true, true, true);
+            }
+
+            while(true) {
+                Object obj = inStream.readObject();
+                List<MenuItem> list = (List<MenuItem>) obj;
+
+                contentPanel.removeAll();
+                for (MenuItem item : list) {
+                    ItemCard itemCard = new ItemCard(item);
+                    contentPanel.add(itemCard);
+                    // System.out.println(item);
+                }
+
+                scrollPane.getVerticalScrollBar().setValue(0);
+                contentPanel.revalidate();
+                contentPanel.repaint();
+
+            }
+        } catch (Exception e) {
+        }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new HomeUI("Chauttn"));
     }
 }
+

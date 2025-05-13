@@ -14,6 +14,7 @@ import org.hibernate.Session;
 
 import com.gpcoder.Utils.HibernateUtils;
 import com.gpcoder.model.Historychat;
+import com.gpcoder.model.MenuItem;
 
 public class Server {
     private static List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
@@ -86,9 +87,9 @@ class ClientHandler implements Runnable {
                     out.writeObject(historyList);
                     out.flush();
                     System.out.println("Gửi lại danh sách history cho client: " + username);
-                    for (Historychat chat : historyList) {
-                        System.out.println(chat);
-                    }
+                    // for (Historychat chat : historyList) {
+                    //     System.out.println(chat);
+                    // }
                 } else if (command.startsWith("NEW_MESSAGE:")) {
                     String[] username = command.split(":",4);
                     try (Session session = HibernateUtils.getSessionFactory().openSession()) {
@@ -125,6 +126,15 @@ class ClientHandler implements Runnable {
                         System.out.println("Loi khi truy van history: " + e.getMessage());
                         e.printStackTrace();
                     }
+                } else if (command.startsWith("GET_MENU:")) {
+                    String[] check = command.split(":",4);
+                    List<MenuItem> menuList = getmenu(Boolean.parseBoolean(check[1]), Boolean.parseBoolean(check[2]), Boolean.parseBoolean(check[3]));
+                    out.writeObject(menuList);
+                    out.flush();
+                    System.out.println("Gui lai danh sach menu cho client: "+ Boolean.parseBoolean(check[1])+ Boolean.parseBoolean(check[2])+ Boolean.parseBoolean(check[3]));
+                    // for (MenuItem chat : menuList) {
+                    //     System.out.println(chat);
+                    // }
                 }
                 else {
                     System.out.println("Lệnh không hợp lệ từ client: " + command);
@@ -147,18 +157,45 @@ class ClientHandler implements Runnable {
 
 
     public List<Historychat> getHistory(String username, String username2) {
-    try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-        List<Historychat> result = session.createQuery(
-            "from Historychat where (sent_id = :sender and recieve_id = :reciever) or (recieve_id = :sender and sent_id = :reciever) order by id asc", Historychat.class)
-            .setParameter("sender", username)
-            .setParameter("reciever", username2)
-            .list();
-        return result != null ? result : new ArrayList<>();
-    } catch (Exception e) {
-        System.out.println("Lỗi khi truy vấn history: " + e.getMessage());
-        e.printStackTrace();
-        return new ArrayList<>();
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            List<Historychat> result = session.createQuery(
+                "from Historychat where (sent_id = :sender and recieve_id = :reciever) or (recieve_id = :sender and sent_id = :reciever) order by id asc", Historychat.class)
+                .setParameter("sender", username)
+                .setParameter("reciever", username2)
+                .list();
+            return result != null ? result : new ArrayList<>();
+        } catch (Exception e) {
+            System.out.println("Lỗi khi truy vấn history: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
-}
 
+    public List<MenuItem> getmenu(Boolean breakfast_check, Boolean lunch_check, Boolean dinner_check) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            List<MenuItem> result = null;
+            if (breakfast_check && !lunch_check && !dinner_check) {
+                result = session.createQuery(
+                "from MenuItem where (breakfast = true) order by id asc", MenuItem.class)
+                .list();
+            } else if (!breakfast_check && lunch_check && !dinner_check) {
+                result = session.createQuery(
+                "from MenuItem where (lunch = true) order by id asc", MenuItem.class)
+                .list();
+            } else if (!breakfast_check && !lunch_check && dinner_check) {
+                result = session.createQuery(
+                "from MenuItem where (dinner = true) order by id asc", MenuItem.class)
+                .list();
+            } else if (breakfast_check && lunch_check && dinner_check) {
+                result = session.createQuery(
+                "from MenuItem order by id asc", MenuItem.class)
+                .list();
+            }
+            return result != null ? result : new ArrayList<>();
+        } catch (Exception e) {
+            System.out.println("Loi khi truy van menu: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 }

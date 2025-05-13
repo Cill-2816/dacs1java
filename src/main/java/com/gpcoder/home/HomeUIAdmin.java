@@ -14,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +36,14 @@ import javax.swing.SwingUtilities;
 import com.gpcoder.accounting.AccountingPanel;
 import com.gpcoder.staffpanel.StaffPanel;
 
+import com.gpcoder.model.MenuItem;
+
 public class HomeUIAdmin extends JFrame {
+
+    private Socket socket;
+    private ObjectOutputStream outStream;
+    private ObjectInputStream inStream;
+    private List<MenuItem> menuItems;
 
     public HomeUIAdmin() {
         setTitle("Mr. Chefs - Menu");
@@ -360,7 +370,6 @@ public class HomeUIAdmin extends JFrame {
     contentPanel.setBackground(new Color(24, 26, 27));
     contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    List<MenuItem> menuItems = MenuData.getSampleMenu();
     for (MenuItem item : menuItems) {
         RoundedPanel itemCard = new RoundedPanel(20);
         itemCard.setPreferredSize(new Dimension(230, 300));
@@ -609,7 +618,7 @@ public class HomeUIAdmin extends JFrame {
     JPanel staffPanel = new StaffPanel();
 
     // GỌI GIAO DIỆN ACCOUNTING PANEL
-    JPanel accountingPanel = new AccountingPanel();
+    JPanel accountingPanel = null;
 
     // === CardLayout để chuyển đổi ===
     CardLayout cardLayout = new CardLayout();
