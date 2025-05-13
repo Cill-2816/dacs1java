@@ -57,7 +57,7 @@ public class InternalChatUI extends JFrame {
     private File selectedFile;
     private File selectedImage;
 
-    public InternalChatUI() {
+    public InternalChatUI(String username) {
         setTitle("Internal Chat");
         setSize(1440, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,7 +70,7 @@ public class InternalChatUI extends JFrame {
         setLayout(new BorderLayout());
 
         //set nguoi dung hien tai
-        this.currentuser = "Chauttn";
+        this.currentuser = username;
 
         DefaultListModel<User> model = new DefaultListModel<>();
         model.addElement(new User("Chauttn","Chau", "image/avata.png"));
@@ -646,6 +646,6 @@ public class InternalChatUI extends JFrame {
 
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(InternalChatUI::new);
+        SwingUtilities.invokeLater(() -> new InternalChatUI("Chauttn"));
     }
 }

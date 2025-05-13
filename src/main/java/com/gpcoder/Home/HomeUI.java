@@ -29,18 +29,20 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import com.gpcoder.chatbox.InternalChatUI;
+
 public class HomeUI extends JFrame {
 
-    public HomeUI() {
+    public HomeUI(String username) {
         setTitle("Mr. Chefs - Menu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1440, 900);
         setLocationRelativeTo(null);
-        UI();
+        UI(username);
         setVisible(true);
     }
 
-    public void UI() {
+    public void UI(String username) {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(new Color(24, 26, 27));
 
@@ -182,6 +184,13 @@ public class HomeUI extends JFrame {
             chatButton.setFocusPainted(false);
             chatButton.setHorizontalAlignment(SwingConstants.LEFT);
             chatButton.setIconTextGap(15);
+
+            chatButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> new InternalChatUI(username));
+            }
+            });
 
             // Set chat icon - Resize giống profile
             ImageIcon chatIcon = new ImageIcon("image/chat.png");
@@ -583,6 +592,6 @@ public class HomeUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(HomeUI::new);
+        SwingUtilities.invokeLater(() -> new HomeUI("Chauttn"));
     }
 }

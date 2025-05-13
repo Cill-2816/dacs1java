@@ -202,7 +202,7 @@ public class RestaurantManagement extends JFrame {
 					            "Login successful!", 
 					            "Successfully", 
 					            JOptionPane.WARNING_MESSAGE);
-                        SwingUtilities.invokeLater(HomeUI::new);
+                        SwingUtilities.invokeLater(() -> new HomeUI(username));
                         dispose();
                     } else {
                         JOptionPane.showMessageDialog(null, 
