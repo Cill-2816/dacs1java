@@ -31,6 +31,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import com.gpcoder.accounting.AccountingPanel;
+import com.gpcoder.staffpanel.StaffPanel;
 
 public class HomeUIAdmin extends JFrame {
 
@@ -604,10 +605,10 @@ public class HomeUIAdmin extends JFrame {
     menuPanel.add(orderPanel, BorderLayout.EAST);
 
     //PANEL MẪU CHO STAFF VÀ ACCOUNTING
-    JPanel staffPanel = new JPanel();
-    staffPanel.setBackground(new Color(24, 26, 27));
-    staffPanel.add(new JLabel("This is Staff Management", JLabel.CENTER));
+    // GỌI GIAO DIỆN ACCOUNTING PANEL
+    JPanel staffPanel = new StaffPanel();
 
+    // GỌI GIAO DIỆN ACCOUNTING PANEL
     JPanel accountingPanel = new AccountingPanel();
 
     // === CardLayout để chuyển đổi ===
