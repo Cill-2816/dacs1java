@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -44,6 +45,12 @@ public class HomeUIAdmin extends JFrame {
     private ObjectOutputStream outStream;
     private ObjectInputStream inStream;
     private List<MenuItem> menuItems;
+    private JPanel staffPanel;
+    private JPanel accountingPanel;
+    private JPanel menuPanel;
+    private JPanel contentPanel;
+    private JScrollPane scrollPane;
+    private JPanel contentSwitcher;
 
     public HomeUIAdmin() {
         setTitle("Mr. Chefs - Menu");
@@ -366,126 +373,12 @@ public class HomeUIAdmin extends JFrame {
 
 
                 // ===== Content Panel (3 cột, xuống hàng tự động) =====
-    JPanel contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
+    contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
     contentPanel.setBackground(new Color(24, 26, 27));
     contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    for (MenuItem item : menuItems) {
-        RoundedPanel itemCard = new RoundedPanel(20);
-        itemCard.setPreferredSize(new Dimension(230, 300));
-        itemCard.setLayout(new BorderLayout());
-        itemCard.setBackground(new Color(36, 40, 45));
-        itemCard.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(50, 54, 58), 1),
-            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-        itemCard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        // ===== Title =====
-        JLabel title = new JLabel(item.getName());
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font("Arial", Font.BOLD, 18));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // ===== Description =====
-        JTextPane desc = new JTextPane();
-        desc.setContentType("text/html");
-        desc.setText(
-            "<html>" +
-                "<div style='" +
-                    "text-align: center;" +
-                    "color: #9c9c9c;" +
-                    "font-family: Arial;" +
-                    "font-size: 12px;" +
-                    "font-weight: bold;" +
-                "'>" +
-                    item.getDescription() +
-                "</div>" +
-            "</html>"
-        );
-        desc.setEditable(false);
-        desc.setOpaque(false);
-        desc.setBorder(null);
-        desc.setAlignmentX(Component.CENTER_ALIGNMENT);
-        desc.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
-
-
-        // ===== Price =====
-        JLabel price = new JLabel(item.getPrice());
-        price.setForeground(Color.WHITE);
-        price.setFont(new Font("Arial", Font.BOLD, 18));
-        price.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // ===== Food Image =====
-        ImageIcon foodImage;
-        try {
-            foodImage = new ImageIcon(item.getImagePath());
-            Image scaledImage = foodImage.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
-            foodImage = new ImageIcon(scaledImage);
-        } catch (Exception e) {
-            foodImage = new ImageIcon(); // fallback
-        }
-        JLabel imageLabel = new JLabel(foodImage);
-        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // ===== Edit/Delete Buttons =====
-        ImageIcon editIcon = new ImageIcon(new ImageIcon("image/edit.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
-        ImageIcon deleteIcon = new ImageIcon(new ImageIcon("image/delete.png").getImage().getScaledInstance(42, 42, Image.SCALE_SMOOTH));
-
-        JButton editButton = new JButton(editIcon);
-        JButton deleteButton = new JButton(deleteIcon);
-
-        Color defaultBtnColor = new Color(36, 40, 45);
-        Color hoverBtnColor = new Color(60, 63, 65);
-        Color pressedBtnColor = new Color(84, 88, 95);
-
-        for (JButton button : new JButton[]{editButton, deleteButton}) {
-            button.setPreferredSize(new Dimension(42, 42));
-            button.setBackground(defaultBtnColor);
-            button.setContentAreaFilled(true);
-            button.setBorderPainted(false);
-            button.setFocusPainted(false);
-            button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-            button.addMouseListener(new MouseAdapter() {
-                public void mouseEntered(MouseEvent e) {
-                    button.setBackground(hoverBtnColor);
-                }
-                public void mouseExited(MouseEvent e) {
-                    button.setBackground(defaultBtnColor);
-                }
-                public void mousePressed(MouseEvent e) {
-                    button.setBackground(pressedBtnColor);
-                }
-                public void mouseReleased(MouseEvent e) {
-                    button.setBackground(button.contains(e.getPoint()) ? hoverBtnColor : defaultBtnColor);
-                }
-            });
-        }
-
-        JPanel priceAndControlPanel = new JPanel(new BorderLayout());
-        priceAndControlPanel.setOpaque(false);
-        priceAndControlPanel.add(price, BorderLayout.CENTER);
-        priceAndControlPanel.add(editButton, BorderLayout.WEST);
-        priceAndControlPanel.add(deleteButton, BorderLayout.EAST);
-
-        JPanel details = new JPanel();
-        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
-        details.setOpaque(false);
-        details.add(Box.createVerticalStrut(10));
-        details.add(imageLabel);
-        details.add(Box.createVerticalStrut(10));
-        details.add(title);
-        details.add(Box.createVerticalStrut(5));
-        details.add(desc);
-        details.add(Box.createVerticalStrut(10));
-        details.add(priceAndControlPanel);
-
-        itemCard.add(details, BorderLayout.CENTER);
-        contentPanel.add(itemCard);
-    }
-
         // ===== ScrollPane trực tiếp chứa contentPanel =====
-        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane = new JScrollPane(contentPanel);
         scrollPane.setPreferredSize(new Dimension(0, 600)); // chiều cao đủ 2 hàng
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -596,7 +489,7 @@ public class HomeUIAdmin extends JFrame {
         orderPanel.add(stepsPanel, BorderLayout.CENTER);
 
                 // === Gộp thành menuPanel (LEFT + RIGHT) ===
-    JPanel menuPanel = new JPanel(new BorderLayout());
+    menuPanel = new JPanel(new BorderLayout());
     menuPanel.setBackground(new Color(24, 26, 27));
 
     JPanel leftSide = new JPanel(new BorderLayout());
@@ -614,15 +507,15 @@ public class HomeUIAdmin extends JFrame {
     menuPanel.add(orderPanel, BorderLayout.EAST);
 
     //PANEL MẪU CHO STAFF VÀ ACCOUNTING
-    // GỌI GIAO DIỆN ACCOUNTING PANEL
-    JPanel staffPanel = new StaffPanel();
 
-    // GỌI GIAO DIỆN ACCOUNTING PANEL
-    JPanel accountingPanel = null;
+    new Thread(this::runNetworking).start();
+
+    staffPanel = new StaffPanel();
+    accountingPanel = new AccountingPanel(menuItems);
 
     // === CardLayout để chuyển đổi ===
     CardLayout cardLayout = new CardLayout();
-    JPanel contentSwitcher = new JPanel(cardLayout);
+    contentSwitcher = new JPanel(cardLayout);
     contentSwitcher.add(menuPanel, "Menu");
     contentSwitcher.add(staffPanel, "Staff (HR)");
     contentSwitcher.add(accountingPanel, "Accounting");
@@ -644,6 +537,43 @@ public class HomeUIAdmin extends JFrame {
         });
     }
 
+    }
+
+    private void getmenu(Boolean breakfast, Boolean lunch, Boolean dinner) {
+        try {
+            if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
+                outStream.writeObject("GET_MENU:" + Boolean.toString(breakfast) + ":" + Boolean.toString(lunch) + ":" + Boolean.toString(dinner));
+                outStream.flush();
+            }
+        } catch (IOException e) {
+            System.err.println("Loi khi gui yeu cau menu: " + e.getMessage());
+        }
+    }
+
+    private void runNetworking() {
+        try {
+            this.socket = new Socket("26.106.134.18", 12345);
+            this.outStream = new ObjectOutputStream(socket.getOutputStream());
+            this.inStream = new ObjectInputStream(socket.getInputStream());
+
+            if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
+                getmenu(true, true, true);
+            }
+
+            while(true) {
+                Object obj = inStream.readObject();
+                List<MenuItem> list = (List<MenuItem>) obj;
+                this.menuItems = list;
+                contentPanel.removeAll();
+                for (MenuItem item : list) {
+                    AdminItemCard itemCard = new AdminItemCard(item);
+                    contentPanel.add(itemCard);
+                }
+                contentPanel.revalidate();
+                contentPanel.repaint();
+            }
+        } catch (Exception e) {
+        }
     }
 
     public static void main(String[] args) {
