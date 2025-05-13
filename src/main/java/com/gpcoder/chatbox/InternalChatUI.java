@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -54,6 +55,7 @@ public class InternalChatUI extends JFrame {
     private ObjectInputStream inStream;
     private String currentuser;
     private File selectedFile;
+    private File selectedImage;
 
     public InternalChatUI() {
         setTitle("Internal Chat");
@@ -144,6 +146,16 @@ public class InternalChatUI extends JFrame {
             }
         });
 
+        imageButton.addActionListener(e -> {
+            JFileChooser chooser = new JFileChooser();
+            int result = chooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                selectedImage = chooser.getSelectedFile();
+                sendButton.setEnabled(true);
+                inputField.setText(selectedImage.getName());
+            }
+        });
+
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         leftPanel.setBackground(panelColor);
         leftPanel.add(attachButton);
@@ -182,19 +194,49 @@ public class InternalChatUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String text_message = inputField.getText().trim();
-                    if (selectedFile == null) {
+                    if (selectedFile == null && selectedImage == null) {
                         sendMessage(text_message, LocalDateTime.now());
                         outStream.writeObject("NEW_MESSAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + text_message);
                         outStream.flush();
+                    } if (selectedImage != null && selectedFile == null) {
+                        
+                        File sentDir = new File("sent_image");
+                        if (!sentDir.exists()) {
+                            sentDir.mkdirs(); // tạo thư mục nếu chưa có
+                        }
+
+                        String originalName = selectedImage.getName();
+                        String uniqueName = UUID.randomUUID().toString() + "_" + originalName;
+                        File copiedFile = new File(sentDir, uniqueName);
+
+                        try (InputStream in = new FileInputStream(selectedImage);
+                            OutputStream out = new FileOutputStream(copiedFile)) {
+
+                            byte[] buffer = new byte[4096];
+                            int length;
+                            while ((length = in.read(buffer)) > 0) {
+                                out.write(buffer, 0, length);
+                            }
+                            System.out.println("thanh cong");
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            System.out.println("that bai");
+                        }
+                        sendImage(copiedFile, LocalDateTime.now());
+                        outStream.writeObject("NEW_IMAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_image/"+uniqueName);
+                        outStream.flush();
+
                     }
                     else {
-                        sendFile(selectedFile, LocalDateTime.now());
+                        
                         File sentDir = new File("sent_file");
                         if (!sentDir.exists()) {
                             sentDir.mkdirs(); // tạo thư mục nếu chưa có
                         }
-                        
-                        File copiedFile = new File(sentDir, selectedFile.getName());
+
+                        String originalName = selectedFile.getName();
+                        String uniqueName = UUID.randomUUID().toString() + "_" + originalName;
+                        File copiedFile = new File(sentDir, uniqueName);
                         try (InputStream in = new FileInputStream(selectedFile);
                             OutputStream out = new FileOutputStream(copiedFile)) {
 
@@ -208,7 +250,8 @@ public class InternalChatUI extends JFrame {
                             ex.printStackTrace();
                             System.out.println("that bai");
                         }
-                        outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_file/"+selectedFile.getName());
+                        sendFile(copiedFile, LocalDateTime.now());
+                        outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_file/"+uniqueName);
                         outStream.flush();
                     }
                 } catch (IOException ex) {
@@ -241,7 +284,6 @@ public class InternalChatUI extends JFrame {
 
                     chatHeader.setUser(selected, true);
                     chatBody.removeAll();
-
                     requestHistory(currentuser,selected.getUsername());
                 }
             }
@@ -250,6 +292,15 @@ public class InternalChatUI extends JFrame {
         setVisible(true);
 
         new Thread(this::runNetworking).start();
+
+        userList.setSelectedIndex(0);
+        User firstselected = userList.getSelectedValue();
+        if (firstselected != null) {
+
+            chatHeader.setUser(firstselected, true);
+            chatBody.removeAll();
+            requestHistory(currentuser,firstselected.getUsername());
+        }
     }
 
     private void requestHistory(String username, String username2) {
@@ -281,17 +332,23 @@ public class InternalChatUI extends JFrame {
                                 if (o.getMessage_type().equals("text")) {
                                     sendMessage(o.getMessage(), o.getSent_time());
                                 }
-                                else {
+                                else if (o.getMessage_type().equals("file")) {
                                     File file = new File(o.getMessage());
                                     sendFile(file, o.getSent_time());
+                                } else {
+                                    File file = new File(o.getMessage());
+                                    sendImage(file, o.getSent_time());
                                 }
                             } else {
                                 if (o.getMessage_type().equals("text")) {
                                     receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
                                 }
-                                else {
+                                else if (o.getMessage_type().equals("file")) {
                                     File file = new File(o.getMessage());
                                     receiveFile(o.getSent_id(),file, o.getSent_time());
+                                } else {
+                                    File file = new File(o.getMessage());
+                                    sendImage(file, o.getSent_time());
                                 }
                                 
                             }
@@ -309,17 +366,23 @@ public class InternalChatUI extends JFrame {
                                 if (o.getMessage_type().equals("text")) {
                                     sendMessage(o.getMessage(), o.getSent_time());
                                 }
-                                else {
+                                else if (o.getMessage_type().equals("file")) {
                                     File file = new File(o.getMessage());
                                     sendFile(file, o.getSent_time());
+                                } else {
+                                    File file = new File(o.getMessage());
+                                    sendImage(file, o.getSent_time());
                                 }
                             } else {
                                 if (o.getMessage_type().equals("text")) {
                                     receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
                                 }
-                                else {
+                                else if (o.getMessage_type().equals("file")) {
                                     File file = new File(o.getMessage());
                                     receiveFile(o.getSent_id(),file, o.getSent_time());
+                                } else {
+                                    File file = new File(o.getMessage());
+                                    sendImage(file, o.getSent_time());
                                 }
                                 
                             }
@@ -387,7 +450,55 @@ public class InternalChatUI extends JFrame {
             boolean isMine = true;
             boolean isContinuation = sender.equals(lastSender);
 
-            FileBubblePanel bubble = new FileBubblePanel(file.getName(), file.length(), file, isMine, isContinuation, LocalDateTime.now());
+            String storedFileName = file.getName();
+            String originalName = storedFileName.substring(storedFileName.indexOf("_") + 1);
+            FileBubblePanel bubble = new FileBubblePanel(originalName, file.length(), file, isMine, isContinuation, LocalDateTime.now());
+
+            for (Component comp : chatBody.getComponents()) {
+                if ("spacer".equals(comp.getName())) {
+                    chatBody.remove(comp);
+                    break;
+                }
+            }
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = chatBody.getComponentCount();
+            gbc.weightx = 1.0;
+            gbc.anchor = isMine ? GridBagConstraints.EAST : GridBagConstraints.WEST;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            chatBody.add(bubble, gbc);
+
+            GridBagConstraints spacer = new GridBagConstraints();
+            spacer.gridx = 0;
+            spacer.gridy = chatBody.getComponentCount();
+            spacer.weighty = 1.0;
+            spacer.fill = GridBagConstraints.VERTICAL;
+
+            JPanel empty = new JPanel();
+            empty.setOpaque(false);
+            empty.setName("spacer");
+            chatBody.add(empty, spacer);
+
+            chatBody.revalidate();
+            JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+
+            inputField.setText("");
+            lastSender = sender;
+        }
+    }
+
+    private void sendImage(File file, LocalDateTime timesent) {
+
+        if (!file.getName().isEmpty()) {
+            String sender = "Me";
+            boolean isMine = true;
+            boolean isContinuation = sender.equals(lastSender);
+
+            String storedFileName = file.getName();
+            String originalName = storedFileName.substring(storedFileName.indexOf("_") + 1);
+            ImageBubblePanel bubble = new ImageBubblePanel(originalName, file.length(), file, isMine, isContinuation, LocalDateTime.now());
 
             for (Component comp : chatBody.getComponents()) {
                 if ("spacer".equals(comp.getName())) {
@@ -468,7 +579,9 @@ public class InternalChatUI extends JFrame {
         boolean isMine = false;
         boolean isContinuation = sender.equals(lastSender);
 
-        FileBubblePanel bubble = new FileBubblePanel(file.getName(), file.length(), file, isMine, isContinuation, LocalDateTime.now());
+        String storedFileName = file.getName();
+        String originalName = storedFileName.substring(storedFileName.indexOf("_") + 1);
+        FileBubblePanel bubble = new FileBubblePanel(originalName, file.length(), file, isMine, isContinuation, LocalDateTime.now());
 
         for (Component comp : chatBody.getComponents()) {
             if ("spacer".equals(comp.getName())) {

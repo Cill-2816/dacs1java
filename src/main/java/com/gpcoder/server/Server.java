@@ -113,6 +113,18 @@ class ClientHandler implements Runnable {
                         System.out.println("Loi khi truy van history: " + e.getMessage());
                         e.printStackTrace();
                     }
+                } else if (command.startsWith("NEW_IMAGE:")){
+                    String[] username = command.split(":",4);
+                    try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+                        session.beginTransaction();
+                        Historychat chat = new Historychat(username[3],"image",username[2],username[1],LocalDateTime.now());
+                        session.save(chat);
+                        session.getTransaction().commit();
+                        Server.broadcast(chat, this);
+                    } catch (Exception e) {
+                        System.out.println("Loi khi truy van history: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
                 else {
                     System.out.println("Lệnh không hợp lệ từ client: " + command);
