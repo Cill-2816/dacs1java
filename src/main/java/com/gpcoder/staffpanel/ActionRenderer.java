@@ -1,8 +1,10 @@
 package com.gpcoder.staffpanel;
 
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -11,9 +13,8 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 public class ActionRenderer extends JPanel implements TableCellRenderer {
-
     public ActionRenderer() {
-        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        setLayout(new GridBagLayout());
         setOpaque(true);
     }
 
@@ -22,21 +23,29 @@ public class ActionRenderer extends JPanel implements TableCellRenderer {
             boolean isSelected, boolean hasFocus, int row, int column) {
         this.removeAll();
 
-        JButton editButton = new JButton(new ImageIcon("image/edit.png"));
-        JButton deleteButton = new JButton(new ImageIcon("image/delete.png"));
+        ImageIcon editIcon = new ImageIcon(new ImageIcon("image/edit.png").getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+        ImageIcon deleteIcon = new ImageIcon(new ImageIcon("image/delete.png").getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+        JButton editButton = new JButton(editIcon);
+        JButton deleteButton = new JButton(deleteIcon);
 
-        editButton.setBorderPainted(false);
-        editButton.setContentAreaFilled(false);
-        editButton.setFocusPainted(false);
+        styleButton(editButton);
+        styleButton(deleteButton);
 
-        deleteButton.setBorderPainted(false);
-        deleteButton.setContentAreaFilled(false);
-        deleteButton.setFocusPainted(false);
+        JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        innerPanel.setOpaque(false);
+        innerPanel.add(editButton);
+        innerPanel.add(deleteButton);
 
-        this.add(editButton);
-        this.add(deleteButton);
+        this.add(innerPanel);
+        this.setBackground(table.getBackground());
 
-        setBackground(new Color(36, 40, 45)); // same as table background
         return this;
+    }
+
+    private void styleButton(JButton button) {
+        button.setPreferredSize(new Dimension(24, 24));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
     }
 }
