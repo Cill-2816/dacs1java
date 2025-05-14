@@ -193,29 +193,41 @@ public class RestaurantManagement extends JFrame {
         loginButton.addActionListener(new ActionListener() {	
             @Override
             public void actionPerformed(ActionEvent e) {
-		        try {
-                    String password = passfield.getActualText();
+                try {
                     String username = userfield.getActualText();
-                    Hashpassword a = new Hashpassword();
-                    if (a.verifyUser(username, password)) {
-                        JOptionPane.showMessageDialog(null, 
-					            "Login successful!", 
-					            "Successfully", 
-					            JOptionPane.WARNING_MESSAGE);
-                        SwingUtilities.invokeLater(() -> new HomeUI(username));
-                        dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(null, 
-					            "Incorrect username or password!", 
-					            "Warning", 
-					            JOptionPane.WARNING_MESSAGE);
+                    String password = passfield.getActualText();
 
+                    Hashpassword hasher = new Hashpassword();
+                    if (hasher.verifyUser(username, password)) {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            "Login successful!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+
+                        SwingUtilities.invokeLater(() -> new HomeUI(username));
+                        dispose(); // Close the login window
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            "Incorrect username or password!",
+                            "Warning",
+                            JOptionPane.WARNING_MESSAGE
+                        );
                     }
-		        } catch (Exception e2) {
-                    System.out.println(e2);
-		        }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "An error occurred during login!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
+
 
         return panel;
     }
