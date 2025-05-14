@@ -318,6 +318,7 @@ public class InternalChatUI extends JFrame {
 
     private void runNetworking() {
     try {
+        // this.socket = new Socket("localhost", 12345);
         this.socket = new Socket("26.106.134.18", 12345);
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.inStream = new ObjectInputStream(socket.getInputStream());
