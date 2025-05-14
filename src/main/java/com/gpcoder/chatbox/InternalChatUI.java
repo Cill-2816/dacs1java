@@ -225,6 +225,19 @@ public class InternalChatUI extends JFrame {
                         sendImage(copiedFile, LocalDateTime.now());
                         outStream.writeObject("NEW_IMAGE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_image/"+uniqueName);
                         outStream.flush();
+
+                        // Sau đó gửi kích thước file trước (giúp server biết khi nào kết thúc)
+                        outStream.writeLong(copiedFile.length());
+
+                        byte[] buffer = new byte[4096];
+                        try (FileInputStream fis = new FileInputStream(copiedFile)) {
+                            int bytesRead;
+                            while ((bytesRead = fis.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                        }
+                        outStream.flush();
+
                         selectedImage = null;
                     }
                     else {
@@ -251,9 +264,21 @@ public class InternalChatUI extends JFrame {
                             System.out.println("that bai");
                         }
                         sendFile(copiedFile, LocalDateTime.now());
-                        outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_file/"+uniqueName);
+                        outStream.writeObject("NEW_FILE:" + currentuser + ":" + userList.getSelectedValue().getUsername() + ":" + "sent_image/"+uniqueName);
                         outStream.flush();
-                        selectedFile = null;
+
+                        // Sau đó gửi kích thước file trước (giúp server biết khi nào kết thúc)
+                        outStream.writeLong(copiedFile.length());
+
+                        byte[] buffer = new byte[4096];
+                        try (FileInputStream fis = new FileInputStream(copiedFile)) {
+                            int bytesRead;
+                            while ((bytesRead = fis.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                        }
+                        outStream.flush();
+
                     }
                 } catch (IOException ex) {
                 }
@@ -318,8 +343,8 @@ public class InternalChatUI extends JFrame {
 
     private void runNetworking() {
     try {
-        // this.socket = new Socket("localhost", 12345);
-        this.socket = new Socket("26.106.134.18", 12345);
+        this.socket = new Socket("localhost", 12345);
+        // this.socket = new Socket("26.106.134.18", 12345);
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.inStream = new ObjectInputStream(socket.getInputStream());
         
@@ -330,32 +355,44 @@ public class InternalChatUI extends JFrame {
             if (obj != null && obj instanceof Historychat) {
                 Historychat o = (Historychat) obj;
                 SwingUtilities.invokeLater(() -> {
-                    if (o.getSent_id().equals(currentuser)) {
-                                if (o.getMessage_type().equals("text")) {
-                                    sendMessage(o.getMessage(), o.getSent_time());
+                    if (o.getRecieve_id().equals(currentuser)) {
+                        if (o.getMessage_type().equals("text")) {
+                            receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
+                        } else if (o.getMessage_type().equals("file")) {
+                            try {
+                                long fileSize = inStream.readLong();
+                                try (FileOutputStream fos = new FileOutputStream(o.getMessage())) {
+                                    byte[] buffer = new byte[4096];
+                                    long remaining = fileSize;
+                                    while (remaining > 0) {
+                                        int read = inStream.read(buffer, 0, (int)Math.min(buffer.length, remaining));
+                                        if (read == -1) break;
+                                        fos.write(buffer, 0, read);
+                                        remaining -= read;
+                                    }
                                 }
-                                else if (o.getMessage_type().equals("file")) {
-                                    File file = new File(o.getMessage());
-                                    sendFile(file, o.getSent_time());
-                                } else {
-                                    File file = new File(o.getMessage());
-                                    sendImage(file, o.getSent_time());
+                                File file = new File(o.getMessage());
+                                receiveFile(o.getSent_id(),file, o.getSent_time());
+                            } catch (Exception e) {}
+                        } else {
+                            try {
+                                long fileSize = inStream.readLong();
+                                try (FileOutputStream fos = new FileOutputStream(o.getMessage())) {
+                                    byte[] buffer = new byte[4096];
+                                    long remaining = fileSize;
+                                    while (remaining > 0) {
+                                        int read = inStream.read(buffer, 0, (int)Math.min(buffer.length, remaining));
+                                        if (read == -1) break;
+                                        fos.write(buffer, 0, read);
+                                        remaining -= read;
+                                    }
                                 }
-                            } else {
-                                if (o.getMessage_type().equals("text")) {
-                                    receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
-                                }
-                                else if (o.getMessage_type().equals("file")) {
-                                    File file = new File(o.getMessage());
-                                    receiveFile(o.getSent_id(),file, o.getSent_time());
-                                } else {
-                                    File file = new File(o.getMessage());
-                                    sendImage(file, o.getSent_time());
-                                }
-                                
-                            }
+                                File file = new File(o.getMessage());
+                                receiveImage(o.getSent_id(),file, o.getSent_time());
+                            } catch (Exception e) {}
                         }
-                );
+                    }
+                });
                 
             } else if (obj != null && obj instanceof List<?>) {
                 List<Historychat> list = (List<Historychat>) obj;
@@ -618,6 +655,47 @@ public class InternalChatUI extends JFrame {
         lastSender = sender;
     }
 
+    private void receiveImage(String sender, File file, LocalDateTime timesent) {
+        boolean isMine = false;
+        boolean isContinuation = sender.equals(lastSender);
+
+        String storedFileName = file.getName();
+        String originalName = storedFileName.substring(storedFileName.indexOf("_") + 1);
+        ImageBubblePanel bubble = new ImageBubblePanel(originalName, file.length(), file, isMine, isContinuation, LocalDateTime.now());
+
+        for (Component comp : chatBody.getComponents()) {
+            if ("spacer".equals(comp.getName())) {
+                chatBody.remove(comp);
+                break;
+            }
+        }
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = chatBody.getComponentCount();
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        chatBody.add(bubble, gbc);
+
+        GridBagConstraints spacer = new GridBagConstraints();
+        spacer.gridx = 0;
+        spacer.gridy = chatBody.getComponentCount();
+        spacer.weighty = 1.0;
+        spacer.fill = GridBagConstraints.VERTICAL;
+
+        JPanel empty = new JPanel();
+        empty.setOpaque(false);
+        empty.setName("spacer");
+        chatBody.add(empty, spacer);
+
+        chatBody.revalidate();
+        JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
+
+        lastSender = sender;
+    }
+
     private void styleFlatButton(JButton button) {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -648,6 +726,6 @@ public class InternalChatUI extends JFrame {
 
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new InternalChatUI("Chauttn"));
+        SwingUtilities.invokeLater(() -> new InternalChatUI("Anhtdd"));
     }
 }

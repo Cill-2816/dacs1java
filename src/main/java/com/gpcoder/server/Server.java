@@ -45,6 +45,51 @@ public class Server {
             }
         }
     }
+
+    public static void broadcastFile(Historychat line, byte[] sendfile, ClientHandler sender) {
+        synchronized (clients) {
+            for (ClientHandler client : clients) {
+                if (client != sender) { // Không gửi lại cho người gửi
+                    client.sendMessage(line);
+                    client.sendFile(sendfile);
+                }
+            }
+        }
+    }
+
+    public static void broadcastFileBlock(Historychat line, long fileSize, ClientHandler sender, ObjectInputStream senderInput) {
+        synchronized (clients) {
+            for (ClientHandler client : clients) {
+                if (client != sender) {
+                    try {
+                        // Gửi message trước
+                        client.sendMessage(line);
+
+                        // Gửi size file
+                        client.sendLong(fileSize);
+
+                        // Gửi từng block
+                        byte[] buffer = new byte[4096];
+                        long remaining = fileSize;
+
+                        while (remaining > 0) {
+                            int read = senderInput.read(buffer, 0, (int) Math.min(buffer.length, remaining));
+                            if (read == -1) break;
+
+                            client.sendRawBytes(buffer, 0, read);
+                            remaining -= read;
+                        }
+
+                        System.out.println("Đã chuyển tiếp file " + line.getMessage() + " từ " + line.getSent_id() + " tới " + line.getRecieve_id());
+                    } catch (IOException e) {
+                        System.err.println("Lỗi khi chuyển tiếp file block: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 class ClientHandler implements Runnable {
@@ -64,6 +109,26 @@ class ClientHandler implements Runnable {
     }
 
     public void sendMessage(Historychat message) {
+        try {
+            out.writeObject(message);
+            out.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void sendRawBytes(byte[] data, int offset, int length) throws IOException {
+        out.write(data, offset, length);
+        out.flush();
+    }
+
+    public void sendLong(long value) throws IOException {
+        out.writeLong(value);
+        out.flush();
+    }
+
+    public void sendFile(byte[] message) {
         try {
             out.writeObject(message);
             out.flush();
@@ -109,7 +174,8 @@ class ClientHandler implements Runnable {
                         Historychat chat = new Historychat(username[3],"file",username[2],username[1],LocalDateTime.now());
                         session.save(chat);
                         session.getTransaction().commit();
-                        Server.broadcast(chat, this);
+                        long fileSize = in.readLong();
+                        Server.broadcastFileBlock(chat, fileSize, this, in);
                     } catch (Exception e) {
                         System.out.println("Loi khi truy van history: " + e.getMessage());
                         e.printStackTrace();
@@ -121,7 +187,8 @@ class ClientHandler implements Runnable {
                         Historychat chat = new Historychat(username[3],"image",username[2],username[1],LocalDateTime.now());
                         session.save(chat);
                         session.getTransaction().commit();
-                        Server.broadcast(chat, this);
+                        long fileSize = in.readLong();
+                        Server.broadcastFileBlock(chat, fileSize, this, in);
                     } catch (Exception e) {
                         System.out.println("Loi khi truy van history: " + e.getMessage());
                         e.printStackTrace();
