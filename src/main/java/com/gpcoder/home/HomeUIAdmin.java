@@ -30,14 +30,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import com.gpcoder.accounting.AccountingPanel;
-import com.gpcoder.staffpanel.StaffPanel;
-
 import com.gpcoder.model.MenuItem;
+import com.gpcoder.staffpanel.StaffPanel;
 
 public class HomeUIAdmin extends JFrame {
 
@@ -508,7 +506,30 @@ public class HomeUIAdmin extends JFrame {
 
     //PANEL MẪU CHO STAFF VÀ ACCOUNTING
 
-    new Thread(this::runNetworking).start();
+    // new Thread(this::runNetworking).start();
+
+    menuItems = new ArrayList<>();
+
+    menuItems.add(new MenuItem("Bánh Bột Lọc", "Tapioca Dumplings", "$17.65", "image/food1.png", 20));
+    menuItems.add(new MenuItem("Mì Quảng", "Quang-Style Noodles", "$13.50", "image/food2.png", 40));
+    menuItems.add(new MenuItem("Bánh Khọt", "Mini Savory Pancakes", "$11.90", "image/food3.png", 100));
+    menuItems.add(new MenuItem("Phở Bò", "Beef Noodle Soup", "$14.75", "image/food4.png", 120));
+    menuItems.add(new MenuItem("Bánh Xèo", "Vietnamese Sizzling Pancake", "$9.85", "image/food5.png", 125));
+    menuItems.add(new MenuItem("Chả Giò", "Fried Spring Rolls", "$12.30", "image/food6.png", 55));
+    menuItems.add(new MenuItem("Bánh Bao Chiên", "Fried Steamed Bun", "$14.75", "image/food7.png", 67));
+    menuItems.add(new MenuItem("Cơm Tấm Sườn Bì Chả", "Broken Rice with Grilled Pork and Egg", "$9.85", "image/food8.png", 344));
+    menuItems.add(new MenuItem("Phở Chiên Phồng", "Crispy Fried Pho Noodles", "$12.30", "image/food9.png", 55));
+    menuItems.add(new MenuItem("Bánh Khoai Mì Sợi", "Shredded Cassava Cake", "$14.75", "image/food10.png", 56));
+    menuItems.add(new MenuItem("Bánh Đa Cua Hải Phòng", "Hai Phong Crab Noodle Soup", "$9.85", "image/food11.png", 77));
+    menuItems.add(new MenuItem("Bánh Mì Xá Xíu", "Char Siu Pork Baguette", "$12.30", "image/food12.png", 87));
+
+    contentPanel.removeAll();
+    for (MenuItem item : menuItems) {
+        AdminItemCard itemCard = new AdminItemCard(item);
+        contentPanel.add(itemCard);
+    }
+    contentPanel.revalidate();
+    contentPanel.repaint();
 
     staffPanel = new StaffPanel();
     accountingPanel = new AccountingPanel(menuItems);
