@@ -391,172 +391,80 @@ public class HomeUIAdmin extends JFrame {
         }});
         SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
         });
+    
+        // === Gộp thành menuPanel (LEFT + RIGHT) ===
+        menuPanel = new JPanel(new BorderLayout());
+        menuPanel.setBackground(new Color(24, 26, 27));
 
-        // ===== Order Panel =====
-        JPanel orderPanel = new JPanel(new BorderLayout());
-        orderPanel.setPreferredSize(new Dimension(300, 0));
-        orderPanel.setBackground(new Color(30, 32, 34));
-        orderPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel leftSide = new JPanel(new BorderLayout());
+        leftSide.setBackground(new Color(24, 26, 27));
+        leftSide.add(searchPanel, BorderLayout.NORTH);
 
-        // Title
-        JLabel orderTitle = new JLabel("Order Process", SwingConstants.CENTER);
-        orderTitle.setForeground(Color.WHITE);
-        orderTitle.setFont(new Font("Arial", Font.BOLD, 18));
-        orderTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-        orderPanel.add(orderTitle, BorderLayout.NORTH);
+        JPanel middlePanel = new JPanel(new BorderLayout());
+        middlePanel.setBackground(new Color(24, 26, 27));
+        middlePanel.add(filterPanel, BorderLayout.NORTH);
+        middlePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Panel chứa các bước
-        JPanel stepsPanel = new JPanel();
-        stepsPanel.setLayout(new GridLayout(5, 1, 10, 10)); // 5 dòng, 1 cột, cách nhau 10px
-        stepsPanel.setBackground(new Color(30, 32, 34));
+        leftSide.add(middlePanel, BorderLayout.CENTER);
 
-        String[] steps = {
-            "Add Food Items",
-            "Type of Order",
-            "Select Table",
-            "Customer Info",
-            "Payment"
-        };
+        menuPanel.add(leftSide, BorderLayout.CENTER);
 
-        // Tạo font chung cho dễ chỉnh sửa sau này
-        Font stepFont = new Font("Arial", Font.PLAIN, 16);
-        Font numberFont = new Font("Arial", Font.BOLD, 14);
+        // new Thread(this::runNetworking).start();
 
-        int stepNumber = 1;
-    for (String step : steps) {
-        JButton stepButton = new JButton();
-        stepButton.setBackground(new Color(30, 32, 34));
-        stepButton.setFocusPainted(false);
-        stepButton.setBorder(BorderFactory.createLineBorder(new Color(30, 32, 34)));
-        stepButton.setFont(stepFont);
-        stepButton.setOpaque(true);
+        menuItems = new ArrayList<>();
 
-        // Sắp xếp nội dung dọc
-        stepButton.setLayout(new BoxLayout(stepButton, BoxLayout.Y_AXIS));
+        menuItems.add(new MenuItem("Bánh Bột Lọc", "Tapioca Dumplings", "$17.65", "image/food1.png", 20));
+        menuItems.add(new MenuItem("Mì Quảng", "Quang-Style Noodles", "$13.50", "image/food2.png", 40));
+        menuItems.add(new MenuItem("Bánh Khọt", "Mini Savory Pancakes", "$11.90", "image/food3.png", 100));
+        menuItems.add(new MenuItem("Phở Bò", "Beef Noodle Soup", "$14.75", "image/food4.png", 120));
+        menuItems.add(new MenuItem("Bánh Xèo", "Vietnamese Sizzling Pancake", "$9.85", "image/food5.png", 125));
+        menuItems.add(new MenuItem("Chả Giò", "Fried Spring Rolls", "$12.30", "image/food6.png", 55));
+        menuItems.add(new MenuItem("Bánh Bao Chiên", "Fried Steamed Bun", "$14.75", "image/food7.png", 67));
+        menuItems.add(new MenuItem("Cơm Tấm Sườn Bì Chả", "Broken Rice with Grilled Pork and Egg", "$9.85", "image/food8.png", 344));
+        menuItems.add(new MenuItem("Phở Chiên Phồng", "Crispy Fried Pho Noodles", "$12.30", "image/food9.png", 55));
+        menuItems.add(new MenuItem("Bánh Khoai Mì Sợi", "Shredded Cassava Cake", "$14.75", "image/food10.png", 56));
+        menuItems.add(new MenuItem("Bánh Đa Cua Hải Phòng", "Hai Phong Crab Noodle Soup", "$9.85", "image/food11.png", 77));
+        menuItems.add(new MenuItem("Bánh Mì Xá Xíu", "Char Siu Pork Baguette", "$12.30", "image/food12.png", 87));
 
-        // Số thứ tự
-        JLabel numberLabel = new JLabel(String.valueOf(stepNumber), SwingConstants.CENTER);
-        numberLabel.setForeground(Color.WHITE);
-        numberLabel.setFont(numberFont);
-        numberLabel.setOpaque(true);
-        numberLabel.setBackground(new Color(45, 48, 52));
-        numberLabel.setPreferredSize(new Dimension(30, 30));
-        numberLabel.setMaximumSize(new Dimension(30, 30));
-        numberLabel.setMinimumSize(new Dimension(30, 30));
-        numberLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.removeAll();
+        for (MenuItem item : menuItems) {
+            AdminItemCard itemCard = new AdminItemCard(item);
+            contentPanel.add(itemCard);
+        }
+        contentPanel.revalidate();
+        contentPanel.repaint();
 
-        // Nội dung chữ
-        JLabel textLabel = new JLabel(step, SwingConstants.CENTER);
-        textLabel.setForeground(Color.WHITE);
-        textLabel.setFont(stepFont);
-        textLabel.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0)); // Cách số 8px
-        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Thêm vào button
-        stepButton.add(Box.createVerticalGlue());
-        stepButton.add(numberLabel);
-        stepButton.add(Box.createRigidArea(new Dimension(0, 5)));
-        stepButton.add(textLabel);
-        stepButton.add(Box.createVerticalGlue());
-
-        // Quan trọng: ép full chiều ngang
-        stepButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        stepButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        stepButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        stepButton.setPreferredSize(new Dimension(Short.MAX_VALUE, 80));
-
-        // Hiệu ứng hover (thay đổi màu nền)
-        Color defaultBackground = stepButton.getBackground();
-        Color hoverBackground = new Color(60, 63, 65); // màu sáng hơn khi hover
-
-        stepButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                stepButton.setBackground(hoverBackground);
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                stepButton.setBackground(defaultBackground);
-                stepButton.setBorder(BorderFactory.createLineBorder(defaultBackground)); // trở lại như cũ
-            }
+        //ĐƯA SCROLLPANE LÊN ĐẦU TIÊN
+        SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
         });
-        stepsPanel.add(stepButton);
-        stepNumber++;
-    }
-        orderPanel.add(stepsPanel, BorderLayout.CENTER);
 
-                // === Gộp thành menuPanel (LEFT + RIGHT) ===
-    menuPanel = new JPanel(new BorderLayout());
-    menuPanel.setBackground(new Color(24, 26, 27));
+        //PANEL MẪU CHO STAFF VÀ ACCOUNTING
+        staffPanel = new StaffPanel();
+        accountingPanel = new AccountingPanel(menuItems);
 
-    JPanel leftSide = new JPanel(new BorderLayout());
-    leftSide.setBackground(new Color(24, 26, 27));
-    leftSide.add(searchPanel, BorderLayout.NORTH);
+        // === CardLayout để chuyển đổi ===
+        CardLayout cardLayout = new CardLayout();
+        contentSwitcher = new JPanel(cardLayout);
+        contentSwitcher.add(menuPanel, "Menu");
+        contentSwitcher.add(staffPanel, "Staff (HR)");
+        contentSwitcher.add(accountingPanel, "Accounting");
 
-    JPanel middlePanel = new JPanel(new BorderLayout());
-    middlePanel.setBackground(new Color(24, 26, 27));
-    middlePanel.add(filterPanel, BorderLayout.NORTH);
-    middlePanel.add(scrollPane, BorderLayout.CENTER);
+        // === ContentArea gồm top bar và contentSwitcher ===
+        JPanel contentArea = new JPanel(new BorderLayout());
+        contentArea.setBackground(new Color(24, 26, 27));
+        contentArea.add(topBar, BorderLayout.NORTH);
+        contentArea.add(contentSwitcher, BorderLayout.CENTER);
 
-    leftSide.add(middlePanel, BorderLayout.CENTER);
+        // === Gộp sidebar và content ===
+        mainPanel.add(sidebar, BorderLayout.WEST);
+        mainPanel.add(contentArea, BorderLayout.CENTER);
 
-    menuPanel.add(leftSide, BorderLayout.CENTER);
-    menuPanel.add(orderPanel, BorderLayout.EAST);
-
-    //PANEL MẪU CHO STAFF VÀ ACCOUNTING
-
-    // new Thread(this::runNetworking).start();
-
-    menuItems = new ArrayList<>();
-
-    menuItems.add(new MenuItem("Bánh Bột Lọc", "Tapioca Dumplings", "$17.65", "image/food1.png", 20));
-    menuItems.add(new MenuItem("Mì Quảng", "Quang-Style Noodles", "$13.50", "image/food2.png", 40));
-    menuItems.add(new MenuItem("Bánh Khọt", "Mini Savory Pancakes", "$11.90", "image/food3.png", 100));
-    menuItems.add(new MenuItem("Phở Bò", "Beef Noodle Soup", "$14.75", "image/food4.png", 120));
-    menuItems.add(new MenuItem("Bánh Xèo", "Vietnamese Sizzling Pancake", "$9.85", "image/food5.png", 125));
-    menuItems.add(new MenuItem("Chả Giò", "Fried Spring Rolls", "$12.30", "image/food6.png", 55));
-    menuItems.add(new MenuItem("Bánh Bao Chiên", "Fried Steamed Bun", "$14.75", "image/food7.png", 67));
-    menuItems.add(new MenuItem("Cơm Tấm Sườn Bì Chả", "Broken Rice with Grilled Pork and Egg", "$9.85", "image/food8.png", 344));
-    menuItems.add(new MenuItem("Phở Chiên Phồng", "Crispy Fried Pho Noodles", "$12.30", "image/food9.png", 55));
-    menuItems.add(new MenuItem("Bánh Khoai Mì Sợi", "Shredded Cassava Cake", "$14.75", "image/food10.png", 56));
-    menuItems.add(new MenuItem("Bánh Đa Cua Hải Phòng", "Hai Phong Crab Noodle Soup", "$9.85", "image/food11.png", 77));
-    menuItems.add(new MenuItem("Bánh Mì Xá Xíu", "Char Siu Pork Baguette", "$12.30", "image/food12.png", 87));
-
-    contentPanel.removeAll();
-    for (MenuItem item : menuItems) {
-        AdminItemCard itemCard = new AdminItemCard(item);
-        contentPanel.add(itemCard);
-    }
-    contentPanel.revalidate();
-    contentPanel.repaint();
-
-    staffPanel = new StaffPanel();
-    accountingPanel = new AccountingPanel(menuItems);
-
-    // === CardLayout để chuyển đổi ===
-    CardLayout cardLayout = new CardLayout();
-    contentSwitcher = new JPanel(cardLayout);
-    contentSwitcher.add(menuPanel, "Menu");
-    contentSwitcher.add(staffPanel, "Staff (HR)");
-    contentSwitcher.add(accountingPanel, "Accounting");
-
-    // === ContentArea gồm top bar và contentSwitcher ===
-    JPanel contentArea = new JPanel(new BorderLayout());
-    contentArea.setBackground(new Color(24, 26, 27));
-    contentArea.add(topBar, BorderLayout.NORTH);
-    contentArea.add(contentSwitcher, BorderLayout.CENTER);
-
-    // === Gộp sidebar và content ===
-    mainPanel.add(sidebar, BorderLayout.WEST);
-    mainPanel.add(contentArea, BorderLayout.CENTER);
-
-    setContentPane(mainPanel);
-    for (JButton btn : buttons) {
-        btn.addActionListener(e -> {
-            cardLayout.show(contentSwitcher, btn.getText());
-        });
-    }
+        setContentPane(mainPanel);
+        for (JButton btn : buttons) {
+            btn.addActionListener(e -> {
+                cardLayout.show(contentSwitcher, btn.getText());
+            });
+        }
 
     }
 
