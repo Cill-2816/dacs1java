@@ -186,100 +186,96 @@ public class AccountingPanel extends JPanel {
         return chartPanel;
     }
 
-        private JPanel createPieChart() {
-    // Lấy danh sách món ăn có sales count
+    private JPanel createPieChart() {
+        // Lấy danh sách món ăn có sales count
 
-    // Sắp xếp menu giảm dần theo số lượng bán
-    menu.sort((a, b) -> Integer.compare(b.getSalesCount(), a.getSalesCount()));
+        // Sắp xếp menu giảm dần theo số lượng bán
+        menu.sort((a, b) -> Integer.compare(b.getSalesCount(), a.getSalesCount()));
 
-    // Tạo pieData: top 4 món + Others
-    Map<String, Integer> pieData = new LinkedHashMap<>();
-    int others = 0;
+        // Tạo pieData: top 4 món + Others
+        Map<String, Integer> pieData = new LinkedHashMap<>();
+        int others = 0;
 
-    for (int i = 0; i < menu.size(); i++) {
-        MenuItem item = menu.get(i);
-        int count = item.getSalesCount();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.get(i);
+            int count = item.getSalesCount();
 
-        if (i < 4) {
-            pieData.put(item.getName(), count);
-        } else {
-            others += count;
+            if (i < 4) {
+                pieData.put(item.getName(), count);
+            } else {
+                others += count;
+            }
         }
+        if (others > 0) {
+            pieData.put("Others", others);
+        }
+
+        // Tạo dataset từ pieData
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        for (Map.Entry<String, Integer> entry : pieData.entrySet()) {
+            dataset.setValue(entry.getKey(), entry.getValue());
+        }
+
+        // Tạo biểu đồ KHÔNG có tiêu đề
+        JFreeChart chart = ChartFactory.createPieChart(null, dataset, true, false, false);
+        chart.setBackgroundPaint(new Color(28, 30, 35));
+
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setBackgroundPaint(new Color(28, 30, 35));
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{2}"));
+        plot.setLabelFont(new Font("Arial", Font.BOLD, 13));
+        plot.setLabelPaint(Color.BLACK);
+        plot.setLabelBackgroundPaint(Color.WHITE);
+        plot.setLabelOutlinePaint(Color.GRAY);
+        plot.setLabelShadowPaint(null);
+        plot.setOutlineVisible(false);
+        plot.setShadowPaint(null);
+        plot.setSimpleLabels(true);
+
+        // Gán màu theo vị trí top
+        Color[] colorPalette = new Color[] {
+            Color.decode("#407F3E"),  // Top 1
+            Color.decode("#89B449"),  // Top 2
+            Color.decode("#DBD468"),  // Top 3
+            Color.decode("#E7E0C4"),  // Top 4
+            Color.decode("#CCCCCC")   // Others
+        };
+
+        int index = 0;
+        for (String key : pieData.keySet()) {
+            Color color = index < colorPalette.length ? colorPalette[index] : Color.LIGHT_GRAY;
+            plot.setSectionPaint(key, color);
+            index++;
+        }
+
+        // Chỉnh legend
+        LegendTitle legend = chart.getLegend();
+        if (legend != null) {
+            legend.setItemFont(new Font("Arial", Font.PLAIN, 14));
+            legend.setItemPaint(Color.LIGHT_GRAY);
+            legend.setFrame(BlockBorder.NONE);
+            legend.setBackgroundPaint(new Color(28, 30, 35));
+            legend.setPosition(RectangleEdge.BOTTOM);
+        }
+
+        // Tạo biểu đồ panel
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setBackground(new Color(28, 30, 35));
+        chartPanel.setPreferredSize(new Dimension(350, 260));
+        chartPanel.setBorder(BorderFactory.createEmptyBorder());
+
+        // Tiêu đề bên ngoài
+        JLabel titleLabel = new JLabel("Top Selling Items", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
+
+        // Gói tiêu đề + biểu đồ
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(new Color(18, 20, 24));
+        wrapper.add(titleLabel, BorderLayout.NORTH);
+        wrapper.add(chartPanel, BorderLayout.CENTER);
+
+        return wrapper;
     }
-    if (others > 0) {
-        pieData.put("Others", others);
-    }
-
-    // Tạo dataset từ pieData
-    DefaultPieDataset dataset = new DefaultPieDataset();
-    for (Map.Entry<String, Integer> entry : pieData.entrySet()) {
-        dataset.setValue(entry.getKey(), entry.getValue());
-    }
-
-    // Tạo biểu đồ KHÔNG có tiêu đề
-    JFreeChart chart = ChartFactory.createPieChart(null, dataset, true, false, false);
-    chart.setBackgroundPaint(new Color(28, 30, 35));
-
-    PiePlot plot = (PiePlot) chart.getPlot();
-    plot.setBackgroundPaint(new Color(28, 30, 35));
-    plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{2}"));
-    plot.setLabelFont(new Font("Arial", Font.BOLD, 13));
-    plot.setLabelPaint(Color.BLACK);
-    plot.setLabelBackgroundPaint(Color.WHITE);
-    plot.setLabelOutlinePaint(Color.GRAY);
-    plot.setLabelShadowPaint(null);
-    plot.setOutlineVisible(false);
-    plot.setShadowPaint(null);
-    plot.setSimpleLabels(true);
-
-    // Gán màu theo vị trí top
-    Color[] colorPalette = new Color[] {
-        Color.decode("#407F3E"),  // Top 1
-        Color.decode("#89B449"),  // Top 2
-        Color.decode("#DBD468"),  // Top 3
-        Color.decode("#E7E0C4"),  // Top 4
-        Color.decode("#CCCCCC")   // Others
-    };
-
-    int index = 0;
-    for (String key : pieData.keySet()) {
-        Color color = index < colorPalette.length ? colorPalette[index] : Color.LIGHT_GRAY;
-        plot.setSectionPaint(key, color);
-        index++;
-    }
-
-    // Chỉnh legend
-    LegendTitle legend = chart.getLegend();
-    if (legend != null) {
-        legend.setItemFont(new Font("Arial", Font.PLAIN, 14));
-        legend.setItemPaint(Color.LIGHT_GRAY);
-        legend.setFrame(BlockBorder.NONE);
-        legend.setBackgroundPaint(new Color(28, 30, 35));
-        legend.setPosition(RectangleEdge.BOTTOM);
-    }
-
-    // Tạo biểu đồ panel
-    ChartPanel chartPanel = new ChartPanel(chart);
-    chartPanel.setBackground(new Color(28, 30, 35));
-    chartPanel.setPreferredSize(new Dimension(350, 260));
-    chartPanel.setBorder(BorderFactory.createEmptyBorder());
-
-    // Tiêu đề bên ngoài
-    JLabel titleLabel = new JLabel("Top Selling Items", JLabel.CENTER);
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-    titleLabel.setForeground(Color.WHITE);
-    titleLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
-
-    // Gói tiêu đề + biểu đồ
-    JPanel wrapper = new JPanel(new BorderLayout());
-    wrapper.setBackground(new Color(18, 20, 24));
-    wrapper.add(titleLabel, BorderLayout.NORTH);
-    wrapper.add(chartPanel, BorderLayout.CENTER);
-
-    return wrapper;
 }
-
-
-
-
-    }

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <users>
+    <user>
+    <username>admin</username>
+    <password>50271ae3e11cc8886b2d98fcdb6e1a5cefe4672359f56d2db07b069a8a846356</password>
+    <position>1</position>
+    </user>
 <user>
-<username>admin</username>
-<password>50271ae3e11cc8886b2d98fcdb6e1a5cefe4672359f56d2db07b069a8a846356</password>
-<position>1</position>
-</user>
+    <username>Anhtdd</username>
+    <password>f2cd14334da4dc2e19cd7f8fa897e76c117e98bb384d5bbabea8e3aa6ddd12f0</password>
+    <position>2</position>
+    </user>
 <user>
-<username>Anhtdd</username>
-<password>f2cd14334da4dc2e19cd7f8fa897e76c117e98bb384d5bbabea8e3aa6ddd12f0</password>
-<position>2</position>
-</user>
+    <username>Chauttn</username>
+    <password>1887da9ee956777bef2773f1b1c11138c8fcd1cfc68e3b196540c418164d3cf7</password>
+    <position>2</position>
+    </user>
 <user>
-<username>Chauttn</username>
-<password>1887da9ee956777bef2773f1b1c11138c8fcd1cfc68e3b196540c418164d3cf7</password>
-<position>2</position>
-</user>
-<user>
-<username>Khaipm</username>
-<password>4cafbda137171d9ac546c406099285f67419792a1a57a8f4ecb12b792891ccf6</password>
-<position>2</position>
-</user>
+    <username>Khaipm</username>
+    <password>4cafbda137171d9ac546c406099285f67419792a1a57a8f4ecb12b792891ccf6</password>
+    <position>2</position>
+    </user>
 </users>
