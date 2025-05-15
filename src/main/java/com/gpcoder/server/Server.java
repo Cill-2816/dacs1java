@@ -166,7 +166,23 @@ public class Server {
         HibernateDAO.saveAll(historychats.getHistorychat());
         HibernateDAO.saveAll(customers.getDetailInvoice());
         HibernateDAO.saveAll(detailInvoices.getDetailInvoice());
-    } 
+
+        // Khởi tạo List rỗng
+        StaffList staffList = new StaffList();
+        MenuItemList menuItemList = new MenuItemList();
+        InvoiceList invoiceList = new InvoiceList();
+        HistorychatList historychatList = new HistorychatList();
+        CustomerList customerList = new CustomerList();
+        DetailInvoiceList detailInvoiceList = new DetailInvoiceList();
+
+        // Ghi ra file XML để clear XML
+        XMLUtil.saveToXml(new File("data/staff.xml"), staffList);
+        XMLUtil.saveToXml(new File("data/menuitem.xml"), menuItemList);
+        XMLUtil.saveToXml(new File("data/invoice.xml"), invoiceList);
+        XMLUtil.saveToXml(new File("data/historychat.xml"), historychatList);
+        XMLUtil.saveToXml(new File("data/customer.xml"), customerList);
+        XMLUtil.saveToXml(new File("data/detailInvoice.xml"), detailInvoiceList);
+    }
 
 }
 
