@@ -122,8 +122,6 @@ public class TypeOfOrderPanel extends JPanel {
         nextButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         nextButton.addActionListener(e -> {
-            String type = dineInButton.getBackground().equals(selectedColor) ? "dinein" : "takeout";
-            System.out.println("Selected order type: " + type);
             cardLayout.show(parentPanel, "customer");
         });
 
@@ -131,6 +129,7 @@ public class TypeOfOrderPanel extends JPanel {
         buttonPanel.setOpaque(false);
         buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
         buttonPanel.add(backButton);
+        buttonPanel.add(Box.createHorizontalStrut(20)); // khoảng cách giữa 2 nút
         buttonPanel.add(nextButton);
 
         add(buttonPanel, BorderLayout.SOUTH);

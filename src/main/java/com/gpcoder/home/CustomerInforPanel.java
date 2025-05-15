@@ -36,7 +36,7 @@ public class CustomerInforPanel extends JPanel {
         setBackground(new Color(30, 32, 34));
         setBorder(new EmptyBorder(25, 25, 25, 25));
 
-        JLabel title = new JLabel("Customer Information", SwingConstants.LEFT);
+        JLabel title = new JLabel("Customer Information", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
         title.setForeground(Color.WHITE);
         add(title, BorderLayout.NORTH);
@@ -57,29 +57,31 @@ public class CustomerInforPanel extends JPanel {
 
         add(formPanel, BorderLayout.CENTER);
 
-        // --- BUTTONS ---
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        buttonPanel.setBackground(getBackground());
-        buttonPanel.setBorder(new EmptyBorder(30, 0, 0, 0));
-
+// ===== Button Panel =====
         RoundedButton backButton = new RoundedButton("Back", 20);
-        backButton.setPreferredSize(new Dimension(120, 42));
-        backButton.setBackground(getBackground());
-        backButton.setForeground(Color.WHITE);
-        backButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
-        backButton.setFont(new Font("Arial", Font.BOLD, 16));
+        backButton.setPreferredSize(new Dimension(95, 40));
+        backButton.setBackground(Color.WHITE);
+        backButton.setForeground(Color.BLACK);
+        backButton.setFont(new Font("Arial", Font.BOLD, 14));
         backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        backButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
         backButton.addActionListener(e -> cardLayout.show(parentPanel, "type"));
 
         RoundedButton nextButton = new RoundedButton("Next", 20);
-        nextButton.setPreferredSize(new Dimension(120, 42));
+        nextButton.setPreferredSize(new Dimension(95, 40));
         nextButton.setBackground(new Color(255, 87, 34));
         nextButton.setForeground(Color.WHITE);
-        nextButton.setFont(new Font("Arial", Font.BOLD, 16));
+        nextButton.setFont(new Font("Arial", Font.BOLD, 14));
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        nextButton.addActionListener(e -> cardLayout.show(parentPanel, "payment"));
+        nextButton.addActionListener(e -> {
+            cardLayout.show(parentPanel, "payment");
+        });
 
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
         buttonPanel.add(backButton);
+        buttonPanel.add(Box.createHorizontalStrut(20)); // khoảng cách giữa 2 nút
         buttonPanel.add(nextButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
