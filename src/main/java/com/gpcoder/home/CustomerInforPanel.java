@@ -37,7 +37,7 @@ public class CustomerInforPanel extends JPanel {
         setBorder(new EmptyBorder(25, 25, 25, 25));
 
         JLabel title = new JLabel("Customer Information", SwingConstants.LEFT);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setFont(new Font("Arial", Font.BOLD, 20));
         title.setForeground(Color.WHITE);
         add(title, BorderLayout.NORTH);
 
@@ -67,7 +67,7 @@ public class CustomerInforPanel extends JPanel {
         backButton.setBackground(getBackground());
         backButton.setForeground(Color.WHITE);
         backButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
-        backButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        backButton.setFont(new Font("Arial", Font.BOLD, 16));
         backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         backButton.addActionListener(e -> cardLayout.show(parentPanel, "type"));
 
@@ -75,7 +75,7 @@ public class CustomerInforPanel extends JPanel {
         nextButton.setPreferredSize(new Dimension(120, 42));
         nextButton.setBackground(new Color(255, 87, 34));
         nextButton.setForeground(Color.WHITE);
-        nextButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        nextButton.setFont(new Font("Arial", Font.BOLD, 16));
         nextButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         nextButton.addActionListener(e -> cardLayout.show(parentPanel, "payment"));
 
@@ -95,7 +95,7 @@ public class CustomerInforPanel extends JPanel {
 
         JLabel lbl = new JLabel(label);
         lbl.setForeground(Color.LIGHT_GRAY);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lbl.setFont(new Font("Arial", Font.PLAIN, 15));
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         RoundedPanel fieldPanel = new RoundedPanel(18);
@@ -108,7 +108,7 @@ public class CustomerInforPanel extends JPanel {
         field.setBorder(null);
         field.setBackground(new Color(44, 47, 51));
         field.setForeground(Color.WHITE);
-        field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        field.setFont(new Font("Arial", Font.PLAIN, 16));
         field.setCaretColor(Color.WHITE);
         field.setPreferredSize(new Dimension(220, 26));
         field.setMaximumSize(new Dimension(220, 26));
@@ -131,7 +131,7 @@ public class CustomerInforPanel extends JPanel {
 
         JLabel lbl = new JLabel(label);
         lbl.setForeground(Color.LIGHT_GRAY);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lbl.setFont(new Font("Arial", Font.PLAIN, 15));
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         RoundedPanel fieldPanel = new RoundedPanel(18);
@@ -145,7 +145,7 @@ public class CustomerInforPanel extends JPanel {
         datePicker.setBackground(new Color(44, 47, 51));
         datePicker.getComponentDateTextField().setBackground(new Color(44, 47, 51));
         datePicker.getComponentDateTextField().setForeground(Color.WHITE);
-        datePicker.getComponentDateTextField().setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        datePicker.getComponentDateTextField().setFont(new Font("Arial", Font.PLAIN, 16));
         datePicker.getComponentDateTextField().setCaretColor(Color.WHITE);
         datePicker.getComponentDateTextField().setBorder(null);
         datePicker.setPreferredSize(new Dimension(150, 28));
@@ -154,7 +154,7 @@ public class CustomerInforPanel extends JPanel {
         // ---- Set custom icon cho nút lịch ----
         try {
             // Thay đường dẫn này thành đúng tên icon của bạn
-            ImageIcon calendarIcon = new ImageIcon(getClass().getResource("/icons/calendar.png"));
+            ImageIcon calendarIcon = new ImageIcon("image/calendar.png");
             Image imgCal = calendarIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
             calendarIcon = new ImageIcon(imgCal);
 
@@ -188,7 +188,7 @@ public class CustomerInforPanel extends JPanel {
 
         JLabel lbl = new JLabel(label);
         lbl.setForeground(Color.LIGHT_GRAY);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lbl.setFont(new Font("Arial", Font.PLAIN, 15));
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         RoundedPanel fieldPanel = new RoundedPanel(18);
@@ -202,7 +202,7 @@ public class CustomerInforPanel extends JPanel {
         timePicker.setBackground(new Color(44, 47, 51));
         timePicker.getComponentTimeTextField().setBackground(new Color(44, 47, 51));
         timePicker.getComponentTimeTextField().setForeground(Color.WHITE);
-        timePicker.getComponentTimeTextField().setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        timePicker.getComponentTimeTextField().setFont(new Font("Arial", Font.PLAIN, 16));
         timePicker.getComponentTimeTextField().setCaretColor(Color.WHITE);
         timePicker.getComponentTimeTextField().setBorder(null);
         timePicker.setPreferredSize(new Dimension(100, 28));
@@ -211,7 +211,7 @@ public class CustomerInforPanel extends JPanel {
         // ---- Set custom icon cho nút giờ ----
         try {
             // Thay đường dẫn này thành đúng tên icon của bạn
-            ImageIcon clockIcon = new ImageIcon(getClass().getResource("/icons/clock.png"));
+            ImageIcon clockIcon = new ImageIcon("image/clock.png");
             Image imgClock = clockIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
             clockIcon = new ImageIcon(imgClock);
 
@@ -244,7 +244,7 @@ public class CustomerInforPanel extends JPanel {
 
         JLabel lbl = new JLabel("Number of Guest");
         lbl.setForeground(Color.LIGHT_GRAY);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lbl.setFont(new Font("Arial", Font.PLAIN, 15));
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         RoundedPanel selector = new RoundedPanel(18);
@@ -255,7 +255,7 @@ public class CustomerInforPanel extends JPanel {
         JButton plus = createCircleButton("+");
         guestLabel = new JLabel("4");
         guestLabel.setForeground(Color.WHITE);
-        guestLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        guestLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         minus.addActionListener(e -> {
             int val = Integer.parseInt(guestLabel.getText());
@@ -279,7 +279,7 @@ public class CustomerInforPanel extends JPanel {
     private JButton createCircleButton(String text) {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(40, 40));
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btn.setFont(new Font("Arial", Font.BOLD, 20));
         btn.setBackground(new Color(255, 87, 34));
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
