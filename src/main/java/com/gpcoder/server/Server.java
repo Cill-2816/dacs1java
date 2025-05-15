@@ -311,6 +311,9 @@ class ClientHandler implements Runnable {
                     List<MenuItem> menuList = getmenu(Boolean.parseBoolean(check[1]), Boolean.parseBoolean(check[2]), Boolean.parseBoolean(check[3]));
                     out.writeObject(menuList);
                     out.flush();
+                    for(MenuItem a : menuList) {
+                        System.out.println(a);
+                    }
                     System.out.println("Gui lai danh sach menu cho client: "+ Boolean.parseBoolean(check[1])+ Boolean.parseBoolean(check[2])+ Boolean.parseBoolean(check[3]));
                     // for (MenuItem chat : menuList) {
                     //     System.out.println(chat);
@@ -368,7 +371,7 @@ class ClientHandler implements Runnable {
     public List<MenuItem> getmenu(Boolean breakfast_check, Boolean lunch_check, Boolean dinner_check) {
         try {
             // 1. Load danh sách từ file XML
-            File xmlFile = new File("data/mennuitem.xml");
+            File xmlFile = new File("data/menuitem.xml");
             MenuItemList menuListWrapper = XMLUtil.loadFromXml(xmlFile, MenuItemList.class);
             List<MenuItem> allItems = menuListWrapper.getMenuItem();
 
