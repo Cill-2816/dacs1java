@@ -11,7 +11,6 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.gpcoder.adapter.LocalDateTimeAdapter;
@@ -23,7 +22,7 @@ import com.gpcoder.adapter.LocalDateTimeAdapter;
 public class Historychat implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @XmlTransient            
+    // @XmlTransient            
     private Integer id;    
 
     @Column(name="sent_id")
