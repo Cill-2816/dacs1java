@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<historychats>
+    <historychat>
+        <id>59</id>
+        <sent_id>Chauttn</sent_id>
+        <recieve_id>Anhtdd</recieve_id>
+        <message_type>text</message_type>
+        <message>Hello Danh</message>
+        <sent_time/>
+    </historychat>
+    <historychat>
+        <id>60</id>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>text</message_type>
+        <message>Hello</message>
+        <sent_time/>
+    </historychat>
+    <historychat>
+        <id>61</id>
+        <sent_id>Chauttn</sent_id>
+        <recieve_id>Anhtdd</recieve_id>
+        <message_type>file</message_type>
+        <message>sent_image/5182dffe-0025-4ad6-8317-6e7a272b687e_a.txt</message>
+        <sent_time/>
+    </historychat>
+    <historychat>
+        <id>62</id>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>image</message_type>
+        <message>sent_image/d30e1398-c457-4749-a635-a1afb7edf820_CopyFile.png</message>
+        <sent_time/>
+    </historychat>
+    <historychat>
+        <id>63</id>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>image</message_type>
+        <message>sent_image/f25c97c3-0e86-41b6-8121-cbff4e2bbe47_CopyFile.png</message>
+        <sent_time/>
+    </historychat>
+</historychats>

@@ -1,9 +1,11 @@
-package com.gpcoder.staffpanel;
+package com.gpcoder.model_xml;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import com.gpcoder.model.*;
+
+import com.gpcoder.model.Staff;
 
 @XmlRootElement(name = "staffs")
 public class StaffList {

@@ -21,6 +21,9 @@
         <mapping class="com.gpcoder.model.Staff" />
         <mapping class="com.gpcoder.model.Historychat" />
         <mapping class="com.gpcoder.model.MenuItem" />
+        <mapping class="com.gpcoder.model.Customer"/>
+        <mapping class="com.gpcoder.model.DetailInvoice"/>
+        <mapping class="com.gpcoder.model.Invoice"/>
          
     </session-factory>
 </hibernate-configuration>

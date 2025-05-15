@@ -1,5 +1,6 @@
 package com.gpcoder.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,21 +9,45 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.hibernate.Session;
+import javax.xml.bind.JAXBException;
 
-import com.gpcoder.Utils.HibernateUtils;
+import com.gpcoder.Utils.XMLUtil;
+import com.gpcoder.model.Customer;
+import com.gpcoder.model.DetailInvoice;
 import com.gpcoder.model.Historychat;
+import com.gpcoder.model.Invoice;
 import com.gpcoder.model.MenuItem;
+import com.gpcoder.model.Staff;
+import com.gpcoder.model_xml.CustomerList;
+import com.gpcoder.model_xml.DetailInvoiceList;
+import com.gpcoder.model_xml.HistorychatList;
+import com.gpcoder.model_xml.InvoiceList;
+import com.gpcoder.model_xml.MenuItemList;
+import com.gpcoder.model_xml.StaffList;
 
 public class Server {
     private static List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
     private static int clientId = 1;
     
-    public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(12345);
-        System.out.println("Server đang chạy...");
+    public static void main(String[] args) throws IOException, JAXBException {
+            ServerSocket serverSocket = new ServerSocket(12345);
+            System.out.println("Server đang chạy...");
+
+            getAllDB();
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                System.out.println("🔁 Server đang tắt... Lưu dữ liệu vào database.");
+                try {
+                    saveAllDB();
+                    System.out.println("✅ Dữ liệu đã được lưu thành công.");
+                } catch (JAXBException e) {
+                    System.err.println("❌ Lỗi khi lưu dữ liệu: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }));
 
         while (true) {
             Socket clientSocket = serverSocket.accept();
@@ -34,6 +59,8 @@ public class Server {
 
             System.out.println(clientName + " đã kết nối.");
         }
+
+        
     }
 
     public static void broadcast(Historychat line, ClientHandler sender) {
@@ -90,6 +117,61 @@ public class Server {
         }
     }
 
+    public static void getAllDB() throws JAXBException {
+        // Lấy dữ liệu từ DB bằng Hibernate
+        List<Staff> staffs = HibernateDAO.getAll(Staff.class);
+        List<MenuItem> menuItems = HibernateDAO.getAll(MenuItem.class);
+        List<Invoice> invoices = HibernateDAO.getAll(Invoice.class);
+        List<Historychat> historychats = HibernateDAO.getAll(Historychat.class);
+        List<Customer> customers = HibernateDAO.getAll(Customer.class);
+        List<DetailInvoice> detailInvoices = HibernateDAO.getAll(DetailInvoice.class);
+
+        // Bọc các danh sách vào wrapper có @XmlRootElement
+        StaffList staffList = new StaffList();
+        staffList.setStaff(staffs);
+
+        MenuItemList menuItemList = new MenuItemList();
+        menuItemList.setMenuItem(menuItems);
+
+        InvoiceList invoiceList = new InvoiceList();
+        invoiceList.setInvoices(invoices);
+
+        HistorychatList historychatList = new HistorychatList();
+        historychatList.setHistorychat(historychats);
+
+        CustomerList customerList = new CustomerList();
+        customerList.setDetailInvoice(customers);
+
+        DetailInvoiceList detailInvoiceList = new DetailInvoiceList();
+        detailInvoiceList.setDetailInvoice(detailInvoices);
+
+        // Ghi ra file XML
+        XMLUtil.saveToXml(new File("data/staff.xml"), staffList);
+        XMLUtil.saveToXml(new File("data/mennuitem.xml"), menuItemList);
+        XMLUtil.saveToXml(new File("data/invoice.xml"), invoiceList);
+        XMLUtil.saveToXml(new File("data/historychat.xml"), historychatList);
+        XMLUtil.saveToXml(new File("data/customer.xml"), customerList);
+        XMLUtil.saveToXml(new File("data/detailInvoice.xml"), detailInvoiceList);
+    }
+
+
+    public static void saveAllDB() throws JAXBException {
+        
+        StaffList staffs = XMLUtil.loadFromXml(new File("data/staff.xml"), StaffList.class);
+        MenuItemList mennuitems = XMLUtil.loadFromXml(new File("data/mennuitem.xml"), MenuItemList.class);
+        InvoiceList invoices = XMLUtil.loadFromXml(new File("data/invoice.xml"), InvoiceList.class);
+        HistorychatList historychats = XMLUtil.loadFromXml(new File("data/historychat.xml"), HistorychatList.class);
+        CustomerList customers = XMLUtil.loadFromXml(new File("data/customer.xml"), CustomerList.class);
+        DetailInvoiceList detailInvoices = XMLUtil.loadFromXml(new File("data/detailInvoice.xml"), DetailInvoiceList.class);
+
+        HibernateDAO.saveAll(staffs.getStaff());
+        HibernateDAO.saveAll(mennuitems.getMenuItem());
+        HibernateDAO.saveAll(invoices.getInvoices());
+        HibernateDAO.saveAll(historychats.getHistorychat());
+        HibernateDAO.saveAll(customers.getDetailInvoice());
+        HibernateDAO.saveAll(detailInvoices.getDetailInvoice());
+    } 
+
 }
 
 class ClientHandler implements Runnable {
@@ -128,6 +210,20 @@ class ClientHandler implements Runnable {
         out.flush();
     }
 
+    public static void appendHistorychatToXml(Historychat chat) throws JAXBException {
+        File xmlFile = new File("data/historychat.xml");
+        xmlFile.getParentFile().mkdirs();
+        HistorychatList historyList;
+        if (!xmlFile.exists()) {
+            historyList = new HistorychatList();
+        } else {
+            historyList = XMLUtil.loadFromXml(xmlFile, HistorychatList.class);
+        }
+
+        historyList.getHistorychat().add(chat);
+        XMLUtil.saveToXml(xmlFile, historyList);
+    }
+
     public void sendFile(byte[] message) {
         try {
             out.writeObject(message);
@@ -157,42 +253,61 @@ class ClientHandler implements Runnable {
                     // }
                 } else if (command.startsWith("NEW_MESSAGE:")) {
                     String[] username = command.split(":",4);
-                    try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-                        session.beginTransaction();
-                        Historychat chat = new Historychat(username[3],"text",username[2],username[1],LocalDateTime.now());
-                        session.save(chat);
-                        session.getTransaction().commit();
+                    try {
+                        // 1. Tạo tin nhắn mới
+                        Historychat chat = new Historychat(
+                            username[3], "text", username[2], username[1], LocalDateTime.now()
+                        );
+
+                        // 2. Lưu vào xml
+                        appendHistorychatToXml(chat);   
+
+                        // 3. Gửi message đến các client khác
                         Server.broadcast(chat, this);
+
                     } catch (Exception e) {
-                        System.out.println("Loi khi truy van history: " + e.getMessage());
+                        System.out.println("❌ Lỗi khi xử lý message 'text': " + e.getMessage());
                         e.printStackTrace();
                     }
+
                 } else if (command.startsWith("NEW_FILE:")) {
                     String[] username = command.split(":",4);
-                    try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-                        session.beginTransaction();
-                        Historychat chat = new Historychat(username[3],"file",username[2],username[1],LocalDateTime.now());
-                        session.save(chat);
-                        session.getTransaction().commit();
+                    try {
+                        // 1. Tạo message mới
+                        Historychat chat = new Historychat(
+                            username[3], "file", username[2], username[1], LocalDateTime.now()
+                        );
+
+                        // 2. Lưu vào xml
+                        appendHistorychatToXml(chat);   
+
+                        // 3. Gửi đến các client khác
                         long fileSize = in.readLong();
                         Server.broadcastFileBlock(chat, fileSize, this, in);
+
                     } catch (Exception e) {
-                        System.out.println("Loi khi truy van history: " + e.getMessage());
+                        System.out.println("❌ Lỗi khi ghi history vào file XML: " + e.getMessage());
                         e.printStackTrace();
                     }
+
                 } else if (command.startsWith("NEW_IMAGE:")){
                     String[] username = command.split(":",4);
-                    try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-                        session.beginTransaction();
-                        Historychat chat = new Historychat(username[3],"image",username[2],username[1],LocalDateTime.now());
-                        session.save(chat);
-                        session.getTransaction().commit();
+                    try {
+                        // 1. Tạo message
+                        Historychat chat = new Historychat(username[3], "image", username[2], username[1], LocalDateTime.now());
+
+                        // 2. Lưu vào xml
+                        appendHistorychatToXml(chat);   
+
+                        // 3. Gửi đến các client khác
                         long fileSize = in.readLong();
                         Server.broadcastFileBlock(chat, fileSize, this, in);
+
                     } catch (Exception e) {
-                        System.out.println("Loi khi truy van history: " + e.getMessage());
+                        System.out.println("❌ Lỗi khi ghi lịch sử vào file XML: " + e.getMessage());
                         e.printStackTrace();
                     }
+
                 } else if (command.startsWith("GET_MENU:")) {
                     String[] check = command.split(":",4);
                     List<MenuItem> menuList = getmenu(Boolean.parseBoolean(check[1]), Boolean.parseBoolean(check[2]), Boolean.parseBoolean(check[3]));
@@ -224,45 +339,74 @@ class ClientHandler implements Runnable {
 
 
     public List<Historychat> getHistory(String username, String username2) {
-        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            List<Historychat> result = session.createQuery(
-                "from Historychat where (sent_id = :sender and recieve_id = :reciever) or (recieve_id = :sender and sent_id = :reciever) order by id asc", Historychat.class)
-                .setParameter("sender", username)
-                .setParameter("reciever", username2)
-                .list();
-            return result != null ? result : new ArrayList<>();
+        try {
+            // 1. Load toàn bộ history từ file XML
+            File xmlFile = new File("data/historychat.xml");
+            HistorychatList historyListWrapper = XMLUtil.loadFromXml(xmlFile, HistorychatList.class);
+            List<Historychat> allChats = historyListWrapper.getHistorychat();
+
+            // 2. Lọc theo 2 username
+            List<Historychat> filtered = new ArrayList<>();
+            for (Historychat chat : allChats) {
+                boolean match1 = chat.getSent_id().equals(username) && chat.getRecieve_id().equals(username2);
+                boolean match2 = chat.getSent_id().equals(username2) && chat.getRecieve_id().equals(username);
+                if (match1 || match2) {
+                    filtered.add(chat);
+                }
+            }
+
+            // 3. Sắp xếp theo ID tăng dần (nếu cần)
+            filtered.sort(Comparator.comparingInt(Historychat::getId)); // nếu có getId()
+            return filtered;
+
         } catch (Exception e) {
-            System.out.println("Lỗi khi truy vấn history: " + e.getMessage());
+            System.out.println("❌ Lỗi khi đọc lịch sử từ file XML: " + e.getMessage());
             e.printStackTrace();
             return new ArrayList<>();
         }
     }
 
+
     public List<MenuItem> getmenu(Boolean breakfast_check, Boolean lunch_check, Boolean dinner_check) {
-        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            List<MenuItem> result = null;
-            if (breakfast_check && !lunch_check && !dinner_check) {
-                result = session.createQuery(
-                "from MenuItem where (breakfast = true) order by id asc", MenuItem.class)
-                .list();
-            } else if (!breakfast_check && lunch_check && !dinner_check) {
-                result = session.createQuery(
-                "from MenuItem where (lunch = true) order by id asc", MenuItem.class)
-                .list();
-            } else if (!breakfast_check && !lunch_check && dinner_check) {
-                result = session.createQuery(
-                "from MenuItem where (dinner = true) order by id asc", MenuItem.class)
-                .list();
-            } else if (breakfast_check && lunch_check && dinner_check) {
-                result = session.createQuery(
-                "from MenuItem order by id asc", MenuItem.class)
-                .list();
+        try {
+            // 1. Load danh sách từ file XML
+            File xmlFile = new File("data/mennuitem.xml");
+            MenuItemList menuListWrapper = XMLUtil.loadFromXml(xmlFile, MenuItemList.class);
+            List<MenuItem> allItems = menuListWrapper.getMenuItem();
+
+            // 2. Lọc theo điều kiện
+            List<MenuItem> filtered = new ArrayList<>();
+
+            for (MenuItem item : allItems) {
+                boolean include = false;
+
+                if (breakfast_check && Boolean.TRUE.equals(item.isBreakfast())) {
+                    include = true;
+                }
+                if (lunch_check && Boolean.TRUE.equals(item.isLunch())) {
+                    include = true;
+                }
+                if (dinner_check && Boolean.TRUE.equals(item.isDinner())) {
+                    include = true;
+                }
+
+                if (include) {
+                    filtered.add(item);
+                }
             }
-            return result != null ? result : new ArrayList<>();
+
+            // 3. Sắp xếp nếu muốn
+            filtered.sort(Comparator.comparingInt(MenuItem::getId)); // nếu có getId()
+
+            return filtered;
+
         } catch (Exception e) {
-            System.out.println("Loi khi truy van menu: " + e.getMessage());
+            System.out.println("❌ Lỗi khi đọc menu từ file XML: " + e.getMessage());
             e.printStackTrace();
             return new ArrayList<>();
         }
     }
+
+
+    
 }

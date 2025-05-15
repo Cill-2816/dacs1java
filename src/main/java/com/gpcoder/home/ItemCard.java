@@ -54,7 +54,7 @@ public class ItemCard extends RoundedPanel {
         desc.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
 
         // ===== Price =====
-        JLabel price = new JLabel(item.getPrice());
+        JLabel price = new JLabel(Double.toString(item.getPrice()));
         price.setForeground(Color.WHITE);
         price.setFont(new Font("Arial", Font.BOLD, 18));
         price.setHorizontalAlignment(SwingConstants.CENTER);

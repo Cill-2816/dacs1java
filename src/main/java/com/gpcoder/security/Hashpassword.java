@@ -19,7 +19,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Hashpassword {
-    static final String FILE_NAME = "users.xml";
+    static final String FILE_NAME = "data/users.xml";
     public static void initXML() throws Exception {
         File file = new File(FILE_NAME);
         if (!file.exists()) {

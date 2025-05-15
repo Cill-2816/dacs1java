@@ -1,10 +1,24 @@
 package com.gpcoder.home;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import com.gpcoder.model.MenuItem;
 
@@ -39,7 +53,7 @@ public class AdminItemCard extends RoundedPanel {
         desc.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
 
         // ===== Price =====
-        JLabel price = new JLabel(item.getPrice());
+        JLabel price = new JLabel(Double.toString(item.getPrice()));
         price.setForeground(Color.WHITE);
         price.setFont(new Font("Arial", Font.BOLD, 18));
         price.setHorizontalAlignment(SwingConstants.CENTER);

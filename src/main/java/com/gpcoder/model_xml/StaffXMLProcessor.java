@@ -1,15 +1,18 @@
-package com.gpcoder.staffpanel;
+package com.gpcoder.model_xml;
 import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import javax.xml.bind.*;
-import com.gpcoder.security.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
+import com.gpcoder.security.AESUtil;
 
 public class StaffXMLProcessor {
-    private static final String XML_FILE = "staffs.xml";
+    private static final String XML_FILE = "data/staffs.xml";
 
     public static StaffList readStaffs() {
         try {

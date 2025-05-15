@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<customers>
+    <customer>
+        <phoneNumber>0901234567</phoneNumber>
+        <fullName>Le Minh Tuan</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0903567890</phoneNumber>
+        <fullName>Trinh Cong Son</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0909876543</phoneNumber>
+        <fullName>Tran Quoc Bao</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0912345678</phoneNumber>
+        <fullName>Nguyen Van An</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0918234567</phoneNumber>
+        <fullName>Nguyen Thi Mai</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0923456789</phoneNumber>
+        <fullName>Vu Thi Thanh Hang</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0934567890</phoneNumber>
+        <fullName>Tran Thi Bich Ngoc</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0938765432</phoneNumber>
+        <fullName>Ly Minh Khoa</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0943210987</phoneNumber>
+        <fullName>Duong Thi Yen Nhi</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0945678901</phoneNumber>
+        <fullName>Bui Van Khanh</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0956789123</phoneNumber>
+        <fullName>Mai Van Binh</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0963789012</phoneNumber>
+        <fullName>Ho Thi Thu Trang</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0971345678</phoneNumber>
+        <fullName>Ta Thi Kim Anh</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0978123456</phoneNumber>
+        <fullName>Do Quang Huy</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+    <customer>
+        <phoneNumber>0987654321</phoneNumber>
+        <fullName>Pham Thi Hong Nhung</fullName>
+        <rewardPoints>0</rewardPoints>
+    </customer>
+</customers>
