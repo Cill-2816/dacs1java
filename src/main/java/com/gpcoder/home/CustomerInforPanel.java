@@ -8,10 +8,12 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Image;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,12 +21,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.TimePicker;
+
 public class CustomerInforPanel extends JPanel {
 
     private JTextField nameField;
-    private JTextField dateField;
-    private JTextField timeField;
     private JLabel guestLabel;
+    private DatePicker datePicker;
+    private TimePicker timePicker;
 
     public CustomerInforPanel(CardLayout cardLayout, JPanel parentPanel) {
         setLayout(new BorderLayout());
@@ -46,9 +51,9 @@ public class CustomerInforPanel extends JPanel {
         formPanel.add(Box.createVerticalStrut(16));
         formPanel.add(createGuestSelector());
         formPanel.add(Box.createVerticalStrut(16));
-        formPanel.add(createInputFieldWithIcon("Date", dateField = new JTextField("06/04/2024"), "\uD83D\uDCC5")); // 📅
+        formPanel.add(createDatePickerField("Date"));
         formPanel.add(Box.createVerticalStrut(16));
-        formPanel.add(createInputFieldWithIcon("Time", timeField = new JTextField("10:00 PM"), "\u23F0")); // ⏰
+        formPanel.add(createTimePickerField("Time"));
 
         add(formPanel, BorderLayout.CENTER);
 
@@ -80,92 +85,155 @@ public class CustomerInforPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    // Field: Name (hoặc field nhập bất kỳ)
+    // Field: Name
     private JPanel createInputField(String label, JTextField field) {
-    JPanel container = new JPanel();
-    container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-    container.setBackground(getBackground());
-    container.setOpaque(true);
-    container.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.setBackground(getBackground());
+        container.setOpaque(true);
+        container.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    JLabel lbl = new JLabel(label);
-    lbl.setForeground(Color.LIGHT_GRAY);
-    lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-    lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel lbl = new JLabel(label);
+        lbl.setForeground(Color.LIGHT_GRAY);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    // Rounded field
-    RoundedPanel fieldPanel = new RoundedPanel(18);
-    fieldPanel.setLayout(new BorderLayout());
-    fieldPanel.setBackground(new Color(44, 47, 51));
-    fieldPanel.setBorder(new EmptyBorder(10, 16, 10, 16));
-    fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    // Sửa max width cho fieldPanel
-    fieldPanel.setMaximumSize(new Dimension(320, 48)); // Giới hạn chiều rộng
+        RoundedPanel fieldPanel = new RoundedPanel(18);
+        fieldPanel.setLayout(new BorderLayout());
+        fieldPanel.setBackground(new Color(44, 47, 51));
+        fieldPanel.setBorder(new EmptyBorder(10, 16, 10, 16));
+        fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        fieldPanel.setMaximumSize(new Dimension(320, 48));
 
-    field.setBorder(null);
-    field.setBackground(new Color(44, 47, 51));
-    field.setForeground(Color.WHITE);
-    field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-    field.setCaretColor(Color.WHITE);
-    field.setPreferredSize(new Dimension(220, 26));
-    field.setMaximumSize(new Dimension(220, 26)); // Giới hạn chiều rộng thực tế
+        field.setBorder(null);
+        field.setBackground(new Color(44, 47, 51));
+        field.setForeground(Color.WHITE);
+        field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        field.setCaretColor(Color.WHITE);
+        field.setPreferredSize(new Dimension(220, 26));
+        field.setMaximumSize(new Dimension(220, 26));
 
-    fieldPanel.add(field, BorderLayout.CENTER);
+        fieldPanel.add(field, BorderLayout.CENTER);
 
-    container.add(lbl);
-    container.add(Box.createVerticalStrut(7));
-    container.add(fieldPanel);
-    // Giới hạn luôn chiều rộng container
-    container.setMaximumSize(new Dimension(350, 60));
-    return container;
-}
+        container.add(lbl);
+        container.add(Box.createVerticalStrut(7));
+        container.add(fieldPanel);
+        container.setMaximumSize(new Dimension(350, 60));
+        return container;
+    }
 
+    // Field: DatePicker với custom icon
+    private JPanel createDatePickerField(String label) {
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.setBackground(getBackground());
+        container.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    // Field có icon (Date, Time)
-    private JPanel createInputFieldWithIcon(String label, JTextField field, String iconText) {
-    JPanel container = new JPanel();
-    container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-    container.setBackground(getBackground());
-    container.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel lbl = new JLabel(label);
+        lbl.setForeground(Color.LIGHT_GRAY);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    JLabel lbl = new JLabel(label);
-    lbl.setForeground(Color.LIGHT_GRAY);
-    lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-    lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        RoundedPanel fieldPanel = new RoundedPanel(18);
+        fieldPanel.setLayout(new BorderLayout());
+        fieldPanel.setBackground(new Color(44, 47, 51));
+        fieldPanel.setBorder(new EmptyBorder(6, 10, 6, 10));
+        fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        fieldPanel.setMaximumSize(new Dimension(320, 48));
 
-    RoundedPanel fieldPanel = new RoundedPanel(18);
-    fieldPanel.setLayout(new BorderLayout());
-    fieldPanel.setBackground(new Color(44, 47, 51));
-    fieldPanel.setBorder(new EmptyBorder(10, 16, 10, 16));
-    fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    // Giới hạn chiều rộng
-    fieldPanel.setMaximumSize(new Dimension(320, 48));
+        datePicker = new DatePicker();
+        datePicker.setBackground(new Color(44, 47, 51));
+        datePicker.getComponentDateTextField().setBackground(new Color(44, 47, 51));
+        datePicker.getComponentDateTextField().setForeground(Color.WHITE);
+        datePicker.getComponentDateTextField().setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        datePicker.getComponentDateTextField().setCaretColor(Color.WHITE);
+        datePicker.getComponentDateTextField().setBorder(null);
+        datePicker.setPreferredSize(new Dimension(150, 28));
+        datePicker.setMaximumSize(new Dimension(200, 28));
 
-    field.setBorder(null);
-    field.setBackground(new Color(44, 47, 51));
-    field.setForeground(Color.WHITE);
-    field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-    field.setCaretColor(Color.WHITE);
-    field.setPreferredSize(new Dimension(120, 26));
-    field.setMaximumSize(new Dimension(120, 26));
+        // ---- Set custom icon cho nút lịch ----
+        try {
+            // Thay đường dẫn này thành đúng tên icon của bạn
+            ImageIcon calendarIcon = new ImageIcon(getClass().getResource("/icons/calendar.png"));
+            Image imgCal = calendarIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            calendarIcon = new ImageIcon(imgCal);
 
-    JLabel icon = new JLabel(iconText);
-    icon.setForeground(new Color(200, 200, 200));
-    icon.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 18));
-    icon.setHorizontalAlignment(SwingConstants.RIGHT);
-    icon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    icon.setBorder(new EmptyBorder(0, 8, 0, 0));
+            JButton calendarButton = datePicker.getComponentToggleCalendarButton();
+            calendarButton.setIcon(calendarIcon);
+            calendarButton.setText(""); // Ẩn text "..."
+            calendarButton.setBorderPainted(false);
+            calendarButton.setFocusPainted(false);
+            calendarButton.setContentAreaFilled(false);
+        } catch (Exception e) {
+            // Nếu không tìm thấy icon sẽ không bị lỗi giao diện
+            System.out.println("Không tìm thấy icon calendar.png");
+        }
+        // ---- End custom icon ----
 
-    fieldPanel.add(field, BorderLayout.CENTER);
-    fieldPanel.add(icon, BorderLayout.EAST);
+        fieldPanel.add(datePicker, BorderLayout.CENTER);
 
-    container.add(lbl);
-    container.add(Box.createVerticalStrut(7));
-    container.add(fieldPanel);
-    container.setMaximumSize(new Dimension(350, 60));
-    return container;
-}
+        container.add(lbl);
+        container.add(Box.createVerticalStrut(7));
+        container.add(fieldPanel);
+        container.setMaximumSize(new Dimension(350, 60));
+        return container;
+    }
 
+    // Field: TimePicker với custom icon
+    private JPanel createTimePickerField(String label) {
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.setBackground(getBackground());
+        container.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel lbl = new JLabel(label);
+        lbl.setForeground(Color.LIGHT_GRAY);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        RoundedPanel fieldPanel = new RoundedPanel(18);
+        fieldPanel.setLayout(new BorderLayout());
+        fieldPanel.setBackground(new Color(44, 47, 51));
+        fieldPanel.setBorder(new EmptyBorder(6, 10, 6, 10));
+        fieldPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        fieldPanel.setMaximumSize(new Dimension(320, 48));
+
+        timePicker = new TimePicker();
+        timePicker.setBackground(new Color(44, 47, 51));
+        timePicker.getComponentTimeTextField().setBackground(new Color(44, 47, 51));
+        timePicker.getComponentTimeTextField().setForeground(Color.WHITE);
+        timePicker.getComponentTimeTextField().setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        timePicker.getComponentTimeTextField().setCaretColor(Color.WHITE);
+        timePicker.getComponentTimeTextField().setBorder(null);
+        timePicker.setPreferredSize(new Dimension(100, 28));
+        timePicker.setMaximumSize(new Dimension(200, 28));
+
+        // ---- Set custom icon cho nút giờ ----
+        try {
+            // Thay đường dẫn này thành đúng tên icon của bạn
+            ImageIcon clockIcon = new ImageIcon(getClass().getResource("/icons/clock.png"));
+            Image imgClock = clockIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            clockIcon = new ImageIcon(imgClock);
+
+            JButton timeButton = timePicker.getComponentToggleTimeMenuButton();
+            timeButton.setIcon(clockIcon);
+            timeButton.setText(""); // Ẩn text "▼"
+            timeButton.setBorderPainted(false);
+            timeButton.setFocusPainted(false);
+            timeButton.setContentAreaFilled(false);
+        } catch (Exception e) {
+            System.out.println("Không tìm thấy icon clock.png");
+        }
+        // ---- End custom icon ----
+
+        fieldPanel.add(timePicker, BorderLayout.CENTER);
+
+        container.add(lbl);
+        container.add(Box.createVerticalStrut(7));
+        container.add(fieldPanel);
+        container.setMaximumSize(new Dimension(350, 60));
+        return container;
+    }
 
     // Guest selector
     private JPanel createGuestSelector() {
