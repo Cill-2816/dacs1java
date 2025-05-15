@@ -33,8 +33,8 @@ public class Server {
     private static int clientId = 1;
     
     public static void main(String[] args) throws IOException, JAXBException {
-            ServerSocket serverSocket = new ServerSocket(12345);
-            System.out.println("Server đang chạy...");
+        ServerSocket serverSocket = new ServerSocket(12345);
+        System.out.println("Server đang chạy...");
 
             getAllDB();
 
@@ -84,38 +84,34 @@ public class Server {
         }
     }
 
-    public static void broadcastFileBlock(Historychat line, long fileSize, ClientHandler sender, ObjectInputStream senderInput) {
-        synchronized (clients) {
-            for (ClientHandler client : clients) {
-                if (client != sender) {
-                    try {
-                        // Gửi message trước
-                        client.sendMessage(line);
+    public static void broadcastFileBlock(
+        Historychat meta,
+        long fileSize,
+        ClientHandler sender,
+        ObjectInputStream senderIn) {
 
-                        // Gửi size file
-                        client.sendLong(fileSize);
+        try {
+            // đọc toàn bộ file một lần
+            byte[] allBytes = new byte[(int) fileSize];
+            senderIn.readFully(allBytes);     // dùng DataInputStream wrapper nếu muốn readFully()
 
-                        // Gửi từng block
-                        byte[] buffer = new byte[4096];
-                        long remaining = fileSize;
+            synchronized (clients) {
+                for (ClientHandler c : clients) {
+                    if (c == sender) continue;
 
-                        while (remaining > 0) {
-                            int read = senderInput.read(buffer, 0, (int) Math.min(buffer.length, remaining));
-                            if (read == -1) break;
-
-                            client.sendRawBytes(buffer, 0, read);
-                            remaining -= read;
-                        }
-
-                        System.out.println("Đã chuyển tiếp file " + line.getMessage() + " từ " + line.getSent_id() + " tới " + line.getRecieve_id());
-                    } catch (IOException e) {
-                        System.err.println("Lỗi khi chuyển tiếp file block: " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                    c.sendMessage(meta);          // 1. meta
+                    c.sendLong(fileSize);         // 2. size
+                    c.sendRawBytes(allBytes, 0, allBytes.length); // 3. data
                 }
             }
+            System.out.printf("Đã chuyển tiếp file %s tới %d client%n",
+                            meta.getMessage(), clients.size()-1);
+
+        } catch (IOException ex) {
+            System.err.println("Lỗi chuyển tiếp file: " + ex);
         }
     }
+
 
     public static void getAllDB() throws JAXBException {
         // Lấy dữ liệu từ DB bằng Hibernate
@@ -147,7 +143,7 @@ public class Server {
 
         // Ghi ra file XML
         XMLUtil.saveToXml(new File("data/staff.xml"), staffList);
-        XMLUtil.saveToXml(new File("data/mennuitem.xml"), menuItemList);
+        XMLUtil.saveToXml(new File("data/menuitem.xml"), menuItemList);
         XMLUtil.saveToXml(new File("data/invoice.xml"), invoiceList);
         XMLUtil.saveToXml(new File("data/historychat.xml"), historychatList);
         XMLUtil.saveToXml(new File("data/customer.xml"), customerList);
@@ -158,7 +154,7 @@ public class Server {
     public static void saveAllDB() throws JAXBException {
         
         StaffList staffs = XMLUtil.loadFromXml(new File("data/staff.xml"), StaffList.class);
-        MenuItemList mennuitems = XMLUtil.loadFromXml(new File("data/mennuitem.xml"), MenuItemList.class);
+        MenuItemList mennuitems = XMLUtil.loadFromXml(new File("data/menuitem.xml"), MenuItemList.class);
         InvoiceList invoices = XMLUtil.loadFromXml(new File("data/invoice.xml"), InvoiceList.class);
         HistorychatList historychats = XMLUtil.loadFromXml(new File("data/historychat.xml"), HistorychatList.class);
         CustomerList customers = XMLUtil.loadFromXml(new File("data/customer.xml"), CustomerList.class);
@@ -284,6 +280,7 @@ class ClientHandler implements Runnable {
                         // 3. Gửi đến các client khác
                         long fileSize = in.readLong();
                         Server.broadcastFileBlock(chat, fileSize, this, in);
+                        out.flush();
 
                     } catch (Exception e) {
                         System.out.println("❌ Lỗi khi ghi history vào file XML: " + e.getMessage());
@@ -302,6 +299,7 @@ class ClientHandler implements Runnable {
                         // 3. Gửi đến các client khác
                         long fileSize = in.readLong();
                         Server.broadcastFileBlock(chat, fileSize, this, in);
+                        out.flush();
 
                     } catch (Exception e) {
                         System.out.println("❌ Lỗi khi ghi lịch sử vào file XML: " + e.getMessage());
@@ -356,7 +354,7 @@ class ClientHandler implements Runnable {
             }
 
             // 3. Sắp xếp theo ID tăng dần (nếu cần)
-            filtered.sort(Comparator.comparingInt(Historychat::getId)); // nếu có getId()
+            filtered.sort(Comparator.comparing(Historychat::getSent_time));
             return filtered;
 
         } catch (Exception e) {

@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -320,13 +321,14 @@ public class InternalChatUI extends JFrame {
         new Thread(this::runNetworking).start();
 
         userList.setSelectedIndex(0);
-        User firstselected = userList.getSelectedValue();
-        if (firstselected != null) {
 
-            chatHeader.setUser(firstselected, true);
+        if (userList.getSelectedValue() != null) {
+
+            chatHeader.setUser(userList.getSelectedValue(), true);
             chatBody.removeAll();
-            requestHistory(currentuser,firstselected.getUsername());
+            requestHistory(currentuser,userList.getSelectedValue().getUsername());
         }
+
     }
 
     private void requestHistory(String username, String username2) {
@@ -350,7 +352,13 @@ public class InternalChatUI extends JFrame {
         
         // Nhận lịch sử
         while (true) {
-            Object obj = inStream.readObject();
+            Object obj;
+            try {
+                obj = inStream.readObject();
+            } catch (EOFException eof) {
+                System.err.println("Server đã đóng kết nối.");
+                break; 
+            }
 
             if (obj != null && obj instanceof Historychat) {
                 Historychat o = (Historychat) obj;

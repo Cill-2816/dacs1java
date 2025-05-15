@@ -4,11 +4,17 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.gpcoder.adapter.LocalDateTimeAdapter;
 
 @Entity
 @Table(name="historychat")
@@ -16,8 +22,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Historychat implements Serializable {
     @Id
-    @Column(name="id")
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @XmlTransient            
+    private Integer id;    
 
     @Column(name="sent_id")
     private String sent_id;
@@ -31,6 +38,7 @@ public class Historychat implements Serializable {
     @Column(name="message")
     private String message;
 
+    @XmlJavaTypeAdapter(LocalDateTimeAdapter.class)
     @Column(name="sent_time")
     private LocalDateTime sent_time;
 

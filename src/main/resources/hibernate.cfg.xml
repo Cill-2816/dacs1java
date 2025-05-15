@@ -4,7 +4,7 @@
 <hibernate-configuration>
     <session-factory>
         <!-- Database setting -->
-        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="hibernate.connection.url">
             jdbc:mysql://localhost:3306/RestaurantManagement?useSSL=false&amp;serverTimezone=UTC
         </property>
