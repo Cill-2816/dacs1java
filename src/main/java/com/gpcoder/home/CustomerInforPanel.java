@@ -48,7 +48,7 @@ public class CustomerInforPanel extends JPanel {
         formPanel.setBackground(getBackground());
 
         formPanel.add(Box.createVerticalStrut(16));
-        formPanel.add(createInputField("Name", nameField = new JTextField("Kamalesh Roy")));
+        formPanel.add(createInputField("Name", nameField = new JTextField()));
         formPanel.add(Box.createVerticalStrut(16));
         formPanel.add(createGuestSelector());
         formPanel.add(Box.createVerticalStrut(16));
@@ -158,7 +158,7 @@ public class CustomerInforPanel extends JPanel {
         // ---- Set custom icon cho nút lịch ----
         try {
             ImageIcon calendarIcon = new ImageIcon("image/calendar.png");
-            Image imgCal = calendarIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            Image imgCal = calendarIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             calendarIcon = new ImageIcon(imgCal);
 
             JButton calendarButton = datePicker.getComponentToggleCalendarButton();
@@ -213,7 +213,7 @@ public class CustomerInforPanel extends JPanel {
         // ---- Set custom icon cho nút giờ ----
         try {
             ImageIcon clockIcon = new ImageIcon("image/clock.png");
-            Image imgClock = clockIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            Image imgClock = clockIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             clockIcon = new ImageIcon(imgClock);
 
             JButton timeButton = timePicker.getComponentToggleTimeMenuButton();
@@ -238,45 +238,61 @@ public class CustomerInforPanel extends JPanel {
 
     // Guest selector
     private JPanel createGuestSelector() {
-        JPanel container = new JPanel();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        container.setBackground(getBackground());
-        container.setAlignmentX(Component.LEFT_ALIGNMENT);
+    JPanel container = new JPanel();
+    container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+    container.setBackground(getBackground());
+    container.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lbl = new JLabel("Number of Guest");
-        lbl.setForeground(Color.LIGHT_GRAY);
-        lbl.setFont(new Font("Arial", Font.PLAIN, 15));
-        lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+    JLabel lbl = new JLabel("Number of Guest");
+    lbl.setForeground(Color.LIGHT_GRAY);
+    lbl.setFont(new Font("Arial", Font.PLAIN, 15));
+    lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        RoundedPanel selector = new RoundedPanel(18);
-        selector.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 25, 6));
-        selector.setBackground(new Color(44, 47, 51));
+    RoundedPanel selector = new RoundedPanel(18);
+    selector.setLayout(new BorderLayout());
+    selector.setBackground(new Color(44, 47, 51));
+    selector.setMaximumSize(new Dimension(350, 50));
 
-        JButton minus = createCircleButton("-");
-        JButton plus = createCircleButton("+");
-        guestLabel = new JLabel("4");
-        guestLabel.setForeground(Color.WHITE);
-        guestLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    // Sử dụng icon có sẵn
+    ImageIcon minusIcon = new ImageIcon("image/minus.png");
+    ImageIcon plusIcon = new ImageIcon("image/plus.png");
 
-        minus.addActionListener(e -> {
-            int val = Integer.parseInt(guestLabel.getText());
-            if (val > 1) guestLabel.setText(String.valueOf(val - 1));
-        });
-        plus.addActionListener(e -> {
-            int val = Integer.parseInt(guestLabel.getText());
-            guestLabel.setText(String.valueOf(val + 1));
-        });
+    // Resize icon cho vừa nút nếu cần
+    int iconSize = 30;
+    Image minusImg = minusIcon.getImage().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH);
+    Image plusImg = plusIcon.getImage().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH);
+    minusIcon = new ImageIcon(minusImg);
+    plusIcon = new ImageIcon(plusImg);
 
-        selector.add(minus);
-        selector.add(guestLabel);
-        selector.add(plus);
+    CircleButton minus = new CircleButton(minusIcon, new Color(255, 87, 34), 40);
+    CircleButton plus = new CircleButton(plusIcon, new Color(255, 87, 34), 40);
 
-        container.add(lbl);
-        container.add(Box.createVerticalStrut(7));
-        container.add(selector);
-        container.setMaximumSize(new Dimension(350, 60));
-        return container;
-    }
+    guestLabel = new JLabel("0", SwingConstants.CENTER);
+    guestLabel.setForeground(Color.WHITE);
+    guestLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    guestLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+    minus.addActionListener(e -> {
+        int val = Integer.parseInt(guestLabel.getText());
+        if (val > 0) guestLabel.setText(String.valueOf(val - 1));
+    });
+    plus.addActionListener(e -> {
+        int val = Integer.parseInt(guestLabel.getText());
+        guestLabel.setText(String.valueOf(val + 1));
+    });
+
+    selector.add(minus, BorderLayout.WEST);
+    selector.add(guestLabel, BorderLayout.CENTER);
+    selector.add(plus, BorderLayout.EAST);
+
+    container.add(lbl);
+    container.add(Box.createVerticalStrut(7));
+    container.add(selector);
+    container.setMaximumSize(new Dimension(350, 60));
+    return container;
+}
+
+
 
     private JButton createCircleButton(String text) {
         JButton btn = new JButton(text);
