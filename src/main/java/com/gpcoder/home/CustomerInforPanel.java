@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
 
@@ -33,12 +32,14 @@ public class CustomerInforPanel extends JPanel {
 
     public CustomerInforPanel(CardLayout cardLayout, JPanel parentPanel) {
         setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(300, 0)); // giống TypeOfOrderPanel
         setBackground(new Color(30, 32, 34));
-        setBorder(new EmptyBorder(25, 25, 25, 25));
+        setBorder(new EmptyBorder(20, 20, 20, 20)); // giống TypeOfOrderPanel
 
         JLabel title = new JLabel("Customer Information", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setFont(new Font("Arial", Font.BOLD, 22));
         title.setForeground(Color.WHITE);
+        title.setBorder(new EmptyBorder(10, 0, 15, 0)); // giống TypeOfOrderPanel
         add(title, BorderLayout.NORTH);
 
         // --- FORM ---
@@ -54,10 +55,11 @@ public class CustomerInforPanel extends JPanel {
         formPanel.add(createDatePickerField("Date"));
         formPanel.add(Box.createVerticalStrut(16));
         formPanel.add(createTimePickerField("Time"));
+        formPanel.add(Box.createVerticalGlue()); // Đẩy panel nút xuống sát cạnh dưới
 
         add(formPanel, BorderLayout.CENTER);
 
-// ===== Button Panel =====
+        // ===== Button Panel =====
         RoundedButton backButton = new RoundedButton("Back", 20);
         backButton.setPreferredSize(new Dimension(95, 40));
         backButton.setBackground(Color.WHITE);
@@ -79,7 +81,7 @@ public class CustomerInforPanel extends JPanel {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
+        buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0)); // giống TypeOfOrderPanel
         buttonPanel.add(backButton);
         buttonPanel.add(Box.createHorizontalStrut(20)); // khoảng cách giữa 2 nút
         buttonPanel.add(nextButton);
@@ -155,7 +157,6 @@ public class CustomerInforPanel extends JPanel {
 
         // ---- Set custom icon cho nút lịch ----
         try {
-            // Thay đường dẫn này thành đúng tên icon của bạn
             ImageIcon calendarIcon = new ImageIcon("image/calendar.png");
             Image imgCal = calendarIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
             calendarIcon = new ImageIcon(imgCal);
@@ -167,7 +168,6 @@ public class CustomerInforPanel extends JPanel {
             calendarButton.setFocusPainted(false);
             calendarButton.setContentAreaFilled(false);
         } catch (Exception e) {
-            // Nếu không tìm thấy icon sẽ không bị lỗi giao diện
             System.out.println("Không tìm thấy icon calendar.png");
         }
         // ---- End custom icon ----
@@ -212,7 +212,6 @@ public class CustomerInforPanel extends JPanel {
 
         // ---- Set custom icon cho nút giờ ----
         try {
-            // Thay đường dẫn này thành đúng tên icon của bạn
             ImageIcon clockIcon = new ImageIcon("image/clock.png");
             Image imgClock = clockIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
             clockIcon = new ImageIcon(imgClock);
@@ -250,7 +249,7 @@ public class CustomerInforPanel extends JPanel {
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         RoundedPanel selector = new RoundedPanel(18);
-        selector.setLayout(new FlowLayout(FlowLayout.CENTER, 25, 6));
+        selector.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 25, 6));
         selector.setBackground(new Color(44, 47, 51));
 
         JButton minus = createCircleButton("-");
@@ -275,6 +274,7 @@ public class CustomerInforPanel extends JPanel {
         container.add(lbl);
         container.add(Box.createVerticalStrut(7));
         container.add(selector);
+        container.setMaximumSize(new Dimension(350, 60));
         return container;
     }
 
