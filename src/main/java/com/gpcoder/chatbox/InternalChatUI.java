@@ -238,7 +238,7 @@ public class InternalChatUI extends JFrame {
                             }
                         }
                         outStream.flush();
-
+                        inputField.setText("");
                         selectedImage = null;
                     }
                     else {
@@ -279,7 +279,8 @@ public class InternalChatUI extends JFrame {
                             }
                         }
                         outStream.flush();
-
+                        inputField.setText("");
+                        selectedFile = null;
                     }
                 } catch (IOException ex) {
                 }
@@ -345,8 +346,8 @@ public class InternalChatUI extends JFrame {
 
     private void runNetworking() {
     try {
-        this.socket = new Socket("localhost", 12345);
-        // this.socket = new Socket("26.106.134.18", 12345);
+        // this.socket = new Socket("localhost", 12344);
+        this.socket = new Socket("26.106.134.18", 12344);
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.inStream = new ObjectInputStream(socket.getInputStream());
         
@@ -734,6 +735,6 @@ public class InternalChatUI extends JFrame {
 
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new InternalChatUI("Anhtdd"));
+        SwingUtilities.invokeLater(() -> new InternalChatUI("Chauttn"));
     }
 }

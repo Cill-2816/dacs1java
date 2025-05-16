@@ -33,7 +33,7 @@ public class Server {
     private static int clientId = 1;
     
     public static void main(String[] args) throws IOException, JAXBException {
-        ServerSocket serverSocket = new ServerSocket(12345);
+        ServerSocket serverSocket = new ServerSocket(12344);
         System.out.println("Server đang chạy...");
 
             getAllDB();
