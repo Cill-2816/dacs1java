@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -35,6 +36,7 @@ import javax.swing.SwingUtilities;
 
 import com.gpcoder.accounting.AccountingPanel;
 import com.gpcoder.model.MenuItem;
+import com.gpcoder.model.Staff;
 import com.gpcoder.staffpanel.StaffPanel;
 
 public class HomeUIAdmin extends JFrame {
@@ -42,13 +44,14 @@ public class HomeUIAdmin extends JFrame {
     private Socket socket;
     private ObjectOutputStream outStream;
     private ObjectInputStream inStream;
-    private List<MenuItem> menuItems;
-    private JPanel staffPanel;
+    private StaffPanel staffPanel;
     private JPanel accountingPanel;
     private JPanel menuPanel;
     private JPanel contentPanel;
     private JScrollPane scrollPane;
     private JPanel contentSwitcher;
+    private CardLayout mainCardLayout;
+    private List<MenuItem> menuitem;
 
     public HomeUIAdmin() {
         setTitle("Mr. Chefs - Menu");
@@ -255,7 +258,7 @@ public class HomeUIAdmin extends JFrame {
         topBar.setBackground(new Color(36, 40, 45));
         topBar.setPreferredSize(new Dimension(getWidth(), 60));
 
-        JLabel userInfo = new JLabel("👤 Kristin Watson (Waiter)  ");
+        JLabel userInfo = new JLabel("Admin");
         userInfo.setForeground(Color.WHITE);
         userInfo.setFont(new Font("Arial", Font.PLAIN, 14));
         userInfo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
@@ -325,6 +328,7 @@ public class HomeUIAdmin extends JFrame {
 
     String[] filters = {"All", "Breakfast", "Lunch", "Dinner"};
     String[] icons = {"dish.png", "breakfast.png", "lunch.png", "dinner.png"};
+    List<JButton> filterbuttons = new ArrayList<>();
     final RoundedButton[] selectedFilterBtn = {null};
     for (int i = 0; i < filters.length; i++) {
         String filter = filters[i];
@@ -367,13 +371,14 @@ public class HomeUIAdmin extends JFrame {
         }
 
         filterPanel.add(filterBtn);
+        filterbuttons.add(filterBtn);
     }
 
 
                 // ===== Content Panel (3 cột, xuống hàng tự động) =====
-    contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
-    contentPanel.setBackground(new Color(24, 26, 27));
-    contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
+        contentPanel.setBackground(new Color(24, 26, 27));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // ===== ScrollPane trực tiếp chứa contentPanel =====
         scrollPane = new JScrollPane(contentPanel);
@@ -409,32 +414,12 @@ public class HomeUIAdmin extends JFrame {
 
         menuPanel.add(leftSide, BorderLayout.CENTER);
 
-        // new Thread(this::runNetworking).start();
-
-        menuItems = new ArrayList<>();
-
-        contentPanel.removeAll();
-        for (MenuItem item : menuItems) {
-            AdminItemCard itemCard = new AdminItemCard(item);
-            contentPanel.add(itemCard);
-        }
-        contentPanel.revalidate();
-        contentPanel.repaint();
-
-        //ĐƯA SCROLLPANE LÊN ĐẦU TIÊN
-        SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
-        });
-
-        //PANEL MẪU CHO STAFF VÀ ACCOUNTING
-        staffPanel = new StaffPanel();
-        accountingPanel = new AccountingPanel(menuItems);
-
+        new Thread(this::runNetworking).start();
+        
         // === CardLayout để chuyển đổi ===
-        CardLayout cardLayout = new CardLayout();
-        contentSwitcher = new JPanel(cardLayout);
+        mainCardLayout = new CardLayout();
+        contentSwitcher = new JPanel(mainCardLayout);
         contentSwitcher.add(menuPanel, "Menu");
-        contentSwitcher.add(staffPanel, "Staff (HR)");
-        contentSwitcher.add(accountingPanel, "Accounting");
 
         // === ContentArea gồm top bar và contentSwitcher ===
         JPanel contentArea = new JPanel(new BorderLayout());
@@ -449,9 +434,38 @@ public class HomeUIAdmin extends JFrame {
         setContentPane(mainPanel);
         for (JButton btn : buttons) {
             btn.addActionListener(e -> {
-                cardLayout.show(contentSwitcher, btn.getText());
+                mainCardLayout.show(contentSwitcher, btn.getText());
             });
         }
+
+        // === Xử lí nút ===
+        filterbuttons.get(0).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMenu(true, true, true);
+            }
+        });
+
+        filterbuttons.get(1).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMenu(true, false, false);
+            }
+        });
+
+        filterbuttons.get(2).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMenu(false, true, false);
+            }
+        });
+
+        filterbuttons.get(3).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMenu(false, false, true);
+            }
+        });
 
     }
 
@@ -466,30 +480,108 @@ public class HomeUIAdmin extends JFrame {
         }
     }
 
+    private void requestStaff() throws IOException {
+        outStream.writeObject("GET_STAFF");
+        outStream.flush();
+    }
+
+    
+
+    private void showMenu(List<MenuItem> list) {
+        contentPanel.removeAll();
+        for (MenuItem i : list) contentPanel.add(new AdminItemCard(i));
+        contentPanel.revalidate(); contentPanel.repaint();
+        SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
+        });
+
+    }
+
+    private void showMenu(boolean breakfast, boolean lunch, boolean dinner) {
+        if (menuitem == null) return;
+
+        List<MenuItem> filtered = new ArrayList<>();
+        for (MenuItem item : menuitem) {
+            boolean include = false;
+
+            if (breakfast && Boolean.TRUE.equals(item.isBreakfast())) include = true;
+            if (lunch && Boolean.TRUE.equals(item.isLunch())) include = true;
+            if (dinner && Boolean.TRUE.equals(item.isDinner())) include = true;
+
+            if (include) filtered.add(item);
+        }
+
+        showMenu(filtered);
+    }
+
+
     private void runNetworking() {
         try {
-            this.socket = new Socket("26.106.134.18", 12345);
+            // this.socket = new Socket("26.106.134.18", 12345);
+            this.socket = new Socket("localhost", 12345);
             this.outStream = new ObjectOutputStream(socket.getOutputStream());
             this.inStream = new ObjectInputStream(socket.getInputStream());
 
             if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
                 getmenu(true, true, true);
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        requestStaff();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
 
             while(true) {
-                Object obj = inStream.readObject();
-                List<MenuItem> list = (List<MenuItem>) obj;
-                this.menuItems = list;
-                contentPanel.removeAll();
-                for (MenuItem item : list) {
-                    AdminItemCard itemCard = new AdminItemCard(item);
-                    contentPanel.add(itemCard);
+                Object obj;
+                try {
+                    obj = inStream.readObject();
+                } catch (EOFException eof) {
+                    System.err.println("Server đã đóng kết nối.");
+                    break; 
                 }
-                contentPanel.revalidate();
-                contentPanel.repaint();
+                if (obj!=null && obj instanceof List<?>) {
+                    List<?> list = (List<?>) obj;
+
+                    if (list.isEmpty()) {
+                        System.out.println("List rỗng – không biết kiểu gì, bỏ qua");
+                        return;
+                    }
+                    Object first = list.get(0);
+                    if (first instanceof MenuItem) {
+                        List<MenuItem> menu = (List<MenuItem>) list;
+                        this.menuitem = menu;
+                        SwingUtilities.invokeLater(() -> {
+                            showMenu(menu);
+                            initAccountingPanel(menu);
+                        });
+                        System.out.println("Menu");
+                    } else if (first instanceof Staff) {
+                        List<Staff> staffList = (List<Staff>) list;
+                        SwingUtilities.invokeLater(() -> initStaffPanel(staffList));  
+                        System.out.println("Staff");
+                    }
+                }
             }
         } catch (Exception e) {
         }
+    }
+
+    private void initStaffPanel(List<Staff> data) {
+        if (staffPanel == null) {               
+            staffPanel = new StaffPanel(data);
+            contentSwitcher.add(staffPanel, "Staff (HR)");
+        } else {
+            staffPanel.updateData(data);        
+        }
+        contentSwitcher.revalidate();         
+        contentSwitcher.repaint();
+    }
+
+
+    private void initAccountingPanel(List<MenuItem> data) {
+        accountingPanel = new AccountingPanel(data);          
+        contentSwitcher.add(accountingPanel, "Accounting");
     }
 
     public static void main(String[] args) {

@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,9 +32,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.xml.bind.JAXBException;
 
+import com.gpcoder.Utils.XMLUtil;
 import com.gpcoder.chatbox.InternalChatUI;
 import com.gpcoder.model.MenuItem;
+import com.gpcoder.model.Staff;
+import com.gpcoder.model_xml.StaffList;
 
 public class HomeUI extends JFrame {
 
@@ -42,6 +47,7 @@ public class HomeUI extends JFrame {
     private ObjectInputStream inStream;
     private JPanel contentPanel;
     JScrollPane scrollPane;
+    private List<MenuItem> menuitem;
 
     public HomeUI(String username) {
         setTitle("Mr. Chefs - Menu");
@@ -255,7 +261,23 @@ public class HomeUI extends JFrame {
         topBar.setBackground(new Color(36, 40, 45));
         topBar.setPreferredSize(new Dimension(getWidth(), 60));
 
-        JLabel userInfo = new JLabel("👤 Kristin Watson (Waiter)  ");
+        // Tên người dùng
+        String staffname = "";
+        try {
+            StaffList staffs = XMLUtil.loadFromXml(new File("data/staff.xml"), StaffList.class);
+            List <Staff> st = staffs.getStaff();
+            for (Staff a : st) if (a.getId().equals(username)) staffname = a.getFirstname() + " " + a.getLastname();
+        } catch (JAXBException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        ImageIcon icon = new ImageIcon("image/avata.png"); 
+        Image scaledImage = icon.getImage().getScaledInstance(35, 35, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(scaledImage);
+        JLabel userInfo = new JLabel(staffname);
+        userInfo.setIcon(icon);
+        userInfo.setHorizontalTextPosition(SwingConstants.RIGHT); // Text bên phải icon
+        userInfo.setVerticalTextPosition(SwingConstants.CENTER);
         userInfo.setForeground(Color.WHITE);
         userInfo.setFont(new Font("Arial", Font.PLAIN, 14));
         userInfo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
@@ -288,6 +310,15 @@ public class HomeUI extends JFrame {
                     searchField.setForeground(Color.GRAY);
                 }
             }
+        });
+        searchField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<MenuItem> matched = searchByName(menuitem, searchField.getText());
+                showMenu(matched); 
+
+            }
+                        
         });
 
         RoundedButton filterButton = new RoundedButton("", 20);
@@ -351,11 +382,11 @@ public class HomeUI extends JFrame {
         scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, new JPanel() {{
             setOpaque(false);           // lấp góc trống, cùng màu nền
         }});
-        SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
-        });
+        
 
         new Thread(this::runNetworking).start();
-
+        SwingUtilities.invokeLater(() -> { scrollPane.getVerticalScrollBar().setValue(0);  // Đưa về đầu
+        });
         //=== Order Panel (CÁC PANEL CARDLAYOUT) ===
         // === CardLayout để chuyển đổi ===
         CardLayout cardLayout = new CardLayout();
@@ -435,6 +466,19 @@ public class HomeUI extends JFrame {
 
     }
 
+    public List<MenuItem> searchByName(List<MenuItem> items, String keyword) {
+        String lowerKeyword = keyword.toLowerCase();
+        List<MenuItem> result = new ArrayList<>();
+
+        for (MenuItem item : items) {
+            if (item.getName() != null && item.getName().toLowerCase().contains(lowerKeyword)) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+
     private void getmenu(Boolean breakfast, Boolean lunch, Boolean dinner) {
         try {
             if (socket != null && socket.isConnected() && !socket.isOutputShutdown()) {
@@ -461,21 +505,25 @@ public class HomeUI extends JFrame {
             while(true) {
                 Object obj = inStream.readObject();
                 List<MenuItem> list = (List<MenuItem>) obj;
-
-                contentPanel.removeAll();
-                for (MenuItem item : list) {
-                    ItemCard itemCard = new ItemCard(item);
-                    contentPanel.add(itemCard);
-                    // System.out.println(item);
+                if (this.menuitem == null || this.menuitem.isEmpty()) {
+                    this.menuitem = list;
                 }
-
-                scrollPane.getVerticalScrollBar().setValue(0);
-                contentPanel.revalidate();
-                contentPanel.repaint();
-
+                showMenu(list);
             }
         } catch (Exception e) {
         }
+    }
+
+    private void showMenu(List<MenuItem> list) {
+        contentPanel.removeAll();
+        for (MenuItem item : list) {
+            ItemCard itemCard = new ItemCard(item);
+            contentPanel.add(itemCard);
+        }
+
+        scrollPane.getVerticalScrollBar().setValue(0);
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
     public static void main(String[] args) {

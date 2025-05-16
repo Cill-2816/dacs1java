@@ -1,8 +1,8 @@
 package com.gpcoder.model;
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,9 +13,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name="staff")
 @XmlRootElement(name = "staff")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Staff {
+public class Staff implements Serializable{
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id")
     private String id;
 
@@ -34,16 +33,20 @@ public class Staff {
     @Column(name="address")
     private String address;
 
+    @Column(name="position")
+    private String position;
+
     public Staff() {
     }
 
-    public Staff(String id, String firstname, String lastname, boolean gender, String phonenb, String address) {
+    public Staff(String id, String firstname, String lastname, boolean gender, String phonenb, String address, String position) {
         this.address = address;
         this.firstname = firstname;
         this.gender = gender;
         this.id = id;
         this.lastname = lastname;
         this.phonenb = phonenb;
+        this.position = position;
     }
 
     public String getId() {
@@ -106,6 +109,14 @@ public class Staff {
         sb.append(", address=").append(address);
         sb.append('}');
         return sb.toString();
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
 

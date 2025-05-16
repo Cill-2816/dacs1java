@@ -9,7 +9,10 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -27,10 +30,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.xml.bind.JAXBException;
+
+import com.gpcoder.Utils.XMLUtil;
+import com.gpcoder.model.Staff;
+import com.gpcoder.model_xml.StaffList;
 
 public class StaffPanel extends JPanel {
 
-    public StaffPanel() {
+    private List<Staff> stafflist;
+    public StaffPanel() {}
+
+    public StaffPanel(List<Staff> list) {
+        this.stafflist = list;
         setLayout(new BorderLayout(20, 20));
         setBackground(new Color(24, 26, 27));
 
@@ -77,23 +89,18 @@ public class StaffPanel extends JPanel {
         filterPanel.add(statusFilter);
 
         // Table data
-        String[] columns = {"Staff ID", "First Name", "Last Name", "Gender", "Phone Number", "Address", "Position", "Status", "Actions"};
-        Object[][] data = {
-                {"001", "Trần", "Văn A", "Nam", "0909899414", "Đà Nẵng", "Chef", "Active", null},
-                {"002", "Nguyễn", "Thị B", "Nữ", "0938221335", "Huế", "Cashier", "Active", null},
-                {"003", "Lê", "Văn C", "Nam", "0123988773", "Hà Nội", "Waiter", "Inactive", null},
-                {"004", "Phạm", "Thị D", "Nữ", "0987112551", "Sài Gòn", "Manager", "Active", null}
-        };
+        String[] columns = {"Staff ID", "First Name", "Last Name", "Gender", "Phone Number", "Address", "Position", "Actions"};
+        Object[][] data = convertStaffListToData(stafflist);
 
         Set<Integer> editableRows = new HashSet<>();
 
         DefaultTableModel model = new DefaultTableModel(data, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
-            // cột Actions (8) luôn editable;
-            // các cột khác chỉ editable khi đã bấm Edit
-            return column == 8 || editableRows.contains(row);
-        }
+                // cột Actions (8) luôn editable;
+                // các cột khác chỉ editable khi đã bấm Edit
+                return column == 7 || editableRows.contains(row);
+            }
         };
 
         JTable table = new JTable(model);
@@ -115,81 +122,134 @@ public class StaffPanel extends JPanel {
 
         // --- MouseListener ---
         table.addMouseListener(new MouseAdapter() {
-        @Override
-            public void mousePressed(MouseEvent e) {
-            Point p = e.getPoint();
-            int viewRow    = table.rowAtPoint(p);
-            int viewColumn = table.columnAtPoint(p);
+            @Override
+                public void mousePressed(MouseEvent e) {
+                Point p = e.getPoint();
+                int viewRow    = table.rowAtPoint(p);
+                int viewColumn = table.columnAtPoint(p);
 
-            // chuyển sang chỉ số model tránh lỗi khi người dùng kéo–thả cột
-            int modelColumn = table.convertColumnIndexToModel(viewColumn);
+                // chuyển sang chỉ số model tránh lỗi khi người dùng kéo–thả cột
+                int modelColumn = table.convertColumnIndexToModel(viewColumn);
 
-            if (modelColumn == 8) {          // cột Actions
-                table.editCellAt(viewRow, viewColumn);     // khởi tạo editor
-                Component editor = table.getEditorComponent();
-                if (editor != null) {
-                    MouseEvent evt = SwingUtilities.convertMouseEvent(table, e, editor);
-                    editor.dispatchEvent(evt);             // chuyển sự kiện click xuống nút
+                if (modelColumn == 8) {          // cột Actions
+                    table.editCellAt(viewRow, viewColumn);     // khởi tạo editor
+                    Component editor = table.getEditorComponent();
+                    if (editor != null) {
+                        MouseEvent evt = SwingUtilities.convertMouseEvent(table, e, editor);
+                        editor.dispatchEvent(evt);             // chuyển sự kiện click xuống nút
+                    }
                 }
             }
-        }
-});
+        });
 
 
         // Hiện thông báo sau khi Enter để lưu
         // 1️⃣  Khai báo một biến cục bộ để giữ giá trị cũ
-final Object[] oldValue = {null};
-final int[]    oldRow   = {-1};
-final int[]    oldCol   = {-1};
+        final Object[] oldValue = {null};
+        final int[]    oldRow   = {-1};
+        final int[]    oldCol   = {-1};
 
-// 2️⃣  Lấy editor mặc định (JTextField) cho mọi ô kiểu Object
-DefaultCellEditor textEditor =
-        (DefaultCellEditor) table.getDefaultEditor(Object.class);
+        // 2️⃣  Lấy editor mặc định (JTextField) cho mọi ô kiểu Object
+        DefaultCellEditor textEditor =
+                (DefaultCellEditor) table.getDefaultEditor(Object.class);
 
-// 3️⃣  Ghi đè getTableCellEditorComponent để nhớ giá trị gốc
-textEditor = new DefaultCellEditor(new javax.swing.JTextField()) {
-    @Override
-    public Component getTableCellEditorComponent(JTable tbl, Object value,
-            boolean isSelected, int row, int column) {
-        oldValue[0] = value;                 // ⭐ giá trị trước khi sửa
-        oldRow[0]   = row;
-        oldCol[0]   = column;
-        return super.getTableCellEditorComponent(tbl, value, isSelected, row, column);
+        // 3️⃣  Ghi đè getTableCellEditorComponent để nhớ giá trị gốc
+        textEditor = new DefaultCellEditor(new javax.swing.JTextField()) {
+            @Override
+            public Component getTableCellEditorComponent(JTable tbl, Object value,
+                    boolean isSelected, int row, int column) {
+                        oldValue[0] = value;                 // ⭐ giá trị trước khi sửa
+                        oldRow[0]   = row;
+                        oldCol[0]   = column;
+                        return super.getTableCellEditorComponent(tbl, value, isSelected, row, column);
+                    }
+        };
+
+        // 4️⃣  Khi editor dừng, so sánh giá trị mới–cũ
+        textEditor.addCellEditorListener(new javax.swing.event.CellEditorListener() {
+            @Override
+            public void editingStopped(javax.swing.event.ChangeEvent e) {
+                if (oldCol[0] == 8 || !editableRows.contains(table.convertRowIndexToModel(oldRow[0]))) {
+                    return;
+                }
+
+                Object newValue = model.getValueAt(oldRow[0], oldCol[0]);
+                if (!java.util.Objects.equals(oldValue[0], newValue)) {
+                    JOptionPane.showMessageDialog(table, "Sửa thành công dòng " + (table.convertRowIndexToView(oldRow[0]) + 1));
+
+                    // ✅ Lấy lại toàn bộ dữ liệu từ bảng
+                    Object[][] newTableData = new Object[model.getRowCount()][model.getColumnCount()];
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        for (int j = 0; j < model.getColumnCount(); j++) {
+                            newTableData[i][j] = model.getValueAt(i, j);
+                        }
+                    }
+
+                    // ✅ Chuyển thành List<Staff> và lưu XML
+                    try {
+                        List<Staff> updatedStaffList = convertDataToStaffList(newTableData);
+                        StaffList stafflist = new StaffList();
+                        stafflist.setStaff(updatedStaffList);
+                        XMLUtil.saveToXml(new File("data/staff.xml"), stafflist);
+                    } catch (JAXBException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                }
+            }
+            @Override public void editingCanceled(javax.swing.event.ChangeEvent e) {}
+        });
+
+
+            table.setDefaultEditor(Object.class, textEditor);
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.getViewport().setBackground(new Color(36, 40, 45));
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+            JPanel center = new JPanel(new BorderLayout());
+            center.setBackground(new Color(24, 26, 27));
+            center.setBorder(new EmptyBorder(10, 0, 10, 0));
+            center.add(filterPanel, BorderLayout.NORTH);
+            center.add(scrollPane, BorderLayout.CENTER);
+
+            add(center, BorderLayout.CENTER);
     }
-};
 
-// 4️⃣  Khi editor dừng, so sánh giá trị mới–cũ
-textEditor.addCellEditorListener(new javax.swing.event.CellEditorListener() {
-    @Override
-    public void editingStopped(javax.swing.event.ChangeEvent e) {
-        // Bỏ qua cột Actions (8) hoặc nếu hàng chưa được cấp quyền sửa
-        if (oldCol[0] == 8 || !editableRows.contains(table.convertRowIndexToModel(oldRow[0]))) {
-            return;
+    public Object[][] convertStaffListToData(List<Staff> staffList) {
+        Object[][] data = new Object[staffList.size()][8]; 
+        for (int i = 0; i < staffList.size(); i++) {
+            Staff s = staffList.get(i);
+            data[i][0] = s.getId();
+            data[i][1] = s.getFirstname();
+            data[i][2] = s.getLastname();
+            data[i][3] = s.isGender();
+            data[i][4] = s.getPhonenb();
+            data[i][5] = s.getAddress();
+            data[i][6] = s.getPosition();
+            data[i][7] = null;
         }
-
-        Object newValue = model.getValueAt(oldRow[0], oldCol[0]);
-        if (!java.util.Objects.equals(oldValue[0], newValue)) {        // ✅ thực sự đổi
-            JOptionPane.showMessageDialog(table,
-                "Sửa thành công dòng " + (table.convertRowIndexToView(oldRow[0]) + 1));
-        }
+        return data;
     }
-    @Override public void editingCanceled(javax.swing.event.ChangeEvent e) { }
-});
 
-table.setDefaultEditor(Object.class, textEditor);
+    public List<Staff> convertDataToStaffList(Object[][] data) {
+        List<Staff> staffList = new ArrayList<>();
+        for (Object[] row : data) {
+            Staff s = new Staff();
+            s.setId(row[0] != null ? row[0].toString() : null);
+            s.setFirstname(row[1] != null ? row[1].toString() : null);
+            s.setLastname(row[2] != null ? row[2].toString() : null);
+            s.setGender(row[3] instanceof Boolean ? (Boolean) row[3] : Boolean.parseBoolean(row[3].toString()));
+            s.setPhonenb(row[4] != null ? row[4].toString() : null);
+            s.setAddress(row[5] != null ? row[5].toString() : null);
+            s.setPosition(row[6] != null ? row[6].toString() : null);
+            // row[7] is assumed to be for action buttons/icons – ignore it
+            staffList.add(s);
+        }
+        return staffList;
+    }
 
 
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.getViewport().setBackground(new Color(36, 40, 45));
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-
-        JPanel center = new JPanel(new BorderLayout());
-        center.setBackground(new Color(24, 26, 27));
-        center.setBorder(new EmptyBorder(10, 0, 10, 0));
-        center.add(filterPanel, BorderLayout.NORTH);
-        center.add(scrollPane, BorderLayout.CENTER);
-
-        add(center, BorderLayout.CENTER);
+    public void updateData(List<Staff> newData) {
+        this.stafflist = newData; 
     }
 }

@@ -250,7 +250,8 @@ class ClientHandler implements Runnable {
     public void run() {
     try {
         Object obj;
-        while ((obj = in.readObject()) != null) {
+        while (true) {
+            obj = in.readObject();
             if (obj instanceof String) {
                 String command = (String) obj;
                 
@@ -331,6 +332,17 @@ class ClientHandler implements Runnable {
                         System.out.println(a);
                     }
                     System.out.println("Gui lai danh sach menu cho client: "+ Boolean.parseBoolean(check[1])+ Boolean.parseBoolean(check[2])+ Boolean.parseBoolean(check[3]));
+                    // for (MenuItem chat : menuList) {
+                    //     System.out.println(chat);
+                    // }
+                } else if (command.startsWith("GET_STAFF")) {
+                    List<Staff> staffs = getStaff();
+                    out.writeObject(staffs);
+                    out.flush();
+                    for(Staff a : staffs) {
+                        System.out.println(a);
+                    }
+                    System.out.println("Gui lai danh sach staff cho client!");
                     // for (MenuItem chat : menuList) {
                     //     System.out.println(chat);
                     // }
@@ -419,6 +431,19 @@ class ClientHandler implements Runnable {
 
         } catch (Exception e) {
             System.out.println("❌ Lỗi khi đọc menu từ file XML: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Staff> getStaff() {
+        try {
+            File xmlFile = new File("data/staff.xml");
+            StaffList staffListWrapper = XMLUtil.loadFromXml(xmlFile, StaffList.class);
+            List<Staff> allStaffs = staffListWrapper.getStaff();
+            return allStaffs;
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi khi đọc lịch sử từ file XML: " + e.getMessage());
             e.printStackTrace();
             return new ArrayList<>();
         }
