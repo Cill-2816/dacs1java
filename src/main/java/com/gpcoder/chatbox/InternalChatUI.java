@@ -36,7 +36,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -279,6 +278,8 @@ public class InternalChatUI extends JFrame {
                             }
                         }
                         outStream.flush();
+                        selectedFile = null;
+                        selectedImage = null;
 
                     }
                 } catch (IOException ex) {
@@ -345,12 +346,12 @@ public class InternalChatUI extends JFrame {
 
     private void runNetworking() {
     try {
-        // this.socket = new Socket("localhost", 12344);
-        this.socket = new Socket("26.106.134.18", 12344);
+        this.socket = new Socket("localhost", 12344);
+        // this.socket = new Socket("26.106.134.18", 12344);
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.inStream = new ObjectInputStream(socket.getInputStream());
         
-        // Nhận lịch sử
+        // Nhận dữ liệu từ server
         while (true) {
             Object obj;
             try {
@@ -380,9 +381,11 @@ public class InternalChatUI extends JFrame {
                                     }
                                 }
                                 File file = new File(o.getMessage());
-                                receiveFile(o.getSent_id(),file, o.getSent_time());
-                            } catch (Exception e) {}
-                        } else {
+                                receiveFile(o.getSent_id(), file, o.getSent_time());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else if (o.getMessage_type().equals("image")) {
                             try {
                                 long fileSize = inStream.readLong();
                                 try (FileOutputStream fos = new FileOutputStream(o.getMessage())) {
@@ -396,42 +399,42 @@ public class InternalChatUI extends JFrame {
                                     }
                                 }
                                 File file = new File(o.getMessage());
-                                receiveImage(o.getSent_id(),file, o.getSent_time());
-                            } catch (Exception e) {}
+                                receiveImage(o.getSent_id(), file, o.getSent_time());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
-                
             } else if (obj != null && obj instanceof List<?>) {
                 List<Historychat> list = (List<Historychat>) obj;
                 // Clear chatBody trước khi hiển thị lịch sử mới
                 SwingUtilities.invokeLater(() -> {
                     chatBody.removeAll();
                     for (Historychat o : list) {
-                        if (o instanceof Historychat) {
-                            if (o.getSent_id().equals(currentuser)) {
-                                if (o.getMessage_type().equals("text")) {
-                                    sendMessage(o.getMessage(), o.getSent_time());
-                                }
-                                else if (o.getMessage_type().equals("file")) {
-                                    File file = new File(o.getMessage());
-                                    sendFile(file, o.getSent_time());
-                                } else {
-                                    File file = new File(o.getMessage());
-                                    sendImage(file, o.getSent_time());
-                                }
-                            } else {
-                                if (o.getMessage_type().equals("text")) {
-                                    receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
-                                }
-                                else if (o.getMessage_type().equals("file")) {
-                                    File file = new File(o.getMessage());
-                                    receiveFile(o.getSent_id(),file, o.getSent_time());
-                                } else {
-                                    File file = new File(o.getMessage());
-                                    sendImage(file, o.getSent_time());
-                                }
-                                
+                        if (o.getSent_id().equals(currentuser)) {
+                            // Tin mình gửi
+                            if (o.getMessage_type().equals("text")) {
+                                sendMessage(o.getMessage(), o.getSent_time());
+                            }
+                            else if (o.getMessage_type().equals("file")) {
+                                File file = new File(o.getMessage());
+                                sendFile(file, o.getSent_time());
+                            } else if (o.getMessage_type().equals("image")) {
+                                File file = new File(o.getMessage());
+                                sendImage(file, o.getSent_time());
+                            }
+                        } else {
+                            // Tin người khác gửi cho mình
+                            if (o.getMessage_type().equals("text")) {
+                                receiveMessage(o.getSent_id(), o.getMessage(), o.getSent_time());
+                            }
+                            else if (o.getMessage_type().equals("file")) {
+                                File file = new File(o.getMessage());
+                                receiveFile(o.getSent_id(), file, o.getSent_time());
+                            } else if (o.getMessage_type().equals("image")) {
+                                File file = new File(o.getMessage());
+                                receiveImage(o.getSent_id(), file, o.getSent_time());
                             }
                         }
                     }
@@ -440,10 +443,11 @@ public class InternalChatUI extends JFrame {
                 });
             }
         }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
+
 
     private void sendMessage(String message, LocalDateTime timesent) {
     if (!message.isEmpty()) {
@@ -527,9 +531,12 @@ public class InternalChatUI extends JFrame {
             empty.setName("spacer");
             chatBody.add(empty, spacer);
 
+            scrollToBottom(); // <-- Cuộn xuống
+
+
             chatBody.revalidate();
-            JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
-            vertical.setValue(vertical.getMaximum());
+            // JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
+            // vertical.setValue(vertical.getMaximum());
 
             inputField.setText("");
             lastSender = sender;
@@ -573,9 +580,12 @@ public class InternalChatUI extends JFrame {
             empty.setName("spacer");
             chatBody.add(empty, spacer);
 
+            scrollToBottom(); // <-- Cuộn xuống
+
+
             chatBody.revalidate();
-            JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
-            vertical.setValue(vertical.getMaximum());
+            // JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
+            // vertical.setValue(vertical.getMaximum());
 
             inputField.setText("");
             lastSender = sender;
@@ -616,8 +626,8 @@ public class InternalChatUI extends JFrame {
         chatBody.add(empty, spacer);
 
         chatBody.revalidate();
-        JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
-        vertical.setValue(vertical.getMaximum());
+        
+        scrollToBottom(); // <-- Cuộn xuống
 
         lastSender = sender;
     }
@@ -657,9 +667,8 @@ public class InternalChatUI extends JFrame {
         chatBody.add(empty, spacer);
 
         chatBody.revalidate();
-        JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
-        vertical.setValue(vertical.getMaximum());
-
+        
+        scrollToBottom(); // <-- Cuộn xuống
         lastSender = sender;
     }
 
@@ -698,8 +707,8 @@ public class InternalChatUI extends JFrame {
         chatBody.add(empty, spacer);
 
         chatBody.revalidate();
-        JScrollBar vertical = chatScrollPane.getVerticalScrollBar();
-        vertical.setValue(vertical.getMaximum());
+        
+        scrollToBottom(); // <-- Cuộn xuống
 
         lastSender = sender;
     }
@@ -729,8 +738,12 @@ public class InternalChatUI extends JFrame {
     private void scrollToBottom() {
     SwingUtilities.invokeLater(() -> {
         chatScrollPane.getVerticalScrollBar().setValue(chatScrollPane.getVerticalScrollBar().getMaximum());
+        SwingUtilities.invokeLater(() -> {
+            chatScrollPane.getVerticalScrollBar().setValue(chatScrollPane.getVerticalScrollBar().getMaximum());
+        });
     });
 }
+
 
 
     public static void main(String[] args) {
