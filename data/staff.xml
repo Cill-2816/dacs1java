@@ -1,2 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<staffs/>
+<staffs>
+    <staff>
+        <id>Anhtdd</id>
+        <firstname>Tran Duy Duc</firstname>
+        <lastname>Anh</lastname>
+        <gender>true</gender>
+        <phonenb>0834516565</phonenb>
+        <address>231 Tran Dai Nghia, Ngu Hanh Son, Da Nang</address>
+    </staff>
+    <staff>
+        <id>Chauttn</id>
+        <firstname>Tran Thi Ngoc</firstname>
+        <lastname>Chau</lastname>
+        <gender>false</gender>
+        <phonenb>0817510779</phonenb>
+        <address>220 Luu Quang Vu, Ngu Hanh Son, Da Nang</address>
+    </staff>
+    <staff>
+        <id>Khaipm</id>
+        <firstname>Phan Minh</firstname>
+        <lastname>Khai</lastname>
+        <gender>true</gender>
+        <phonenb>0814948812</phonenb>
+        <address>C08, Dien Ngoc, Quang Nam</address>
+    </staff>
+</staffs>

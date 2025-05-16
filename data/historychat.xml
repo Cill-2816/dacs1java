@@ -1,2 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<historychats/>
+<historychats>
+    <historychat>
+        <id>75</id>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>text</message_type>
+        <message>hi</message>
+        <sent_time>2025-05-15T21:52:37</sent_time>
+    </historychat>
+    <historychat>
+        <id>76</id>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>text</message_type>
+        <message>trời ơi</message>
+        <sent_time>2025-05-15T21:52:39</sent_time>
+    </historychat>
+    <historychat>
+        <id>77</id>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>text</message_type>
+        <message>quá là mệt mỏi</message>
+        <sent_time>2025-05-15T21:52:43</sent_time>
+    </historychat>
+    <historychat>
+        <id>78</id>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>image</message_type>
+        <message>sent_image/cdc30ce0-eb30-45ef-a98f-00aeb8c1a3ae_CopyFile.png</message>
+        <sent_time>2025-05-15T21:53:21</sent_time>
+    </historychat>
+    <historychat>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Khaipm</recieve_id>
+        <message_type>file</message_type>
+        <message>sent_image/9d69571b-3ad0-40a0-a92e-62141be0af76_a.txt</message>
+        <sent_time>2025-05-16T16:08:25.066</sent_time>
+    </historychat>
+    <historychat>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Khaipm</recieve_id>
+        <message_type>image</message_type>
+        <message>sent_image/711fc8c3-b835-4f50-b1dc-b7e4282f3586_CopyFile2.png</message>
+        <sent_time>2025-05-16T16:08:41.289</sent_time>
+    </historychat>
+    <historychat>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Khaipm</recieve_id>
+        <message_type>text</message_type>
+        <message></message>
+        <sent_time>2025-05-16T16:08:43.696</sent_time>
+    </historychat>
+    <historychat>
+        <sent_id>Anhtdd</sent_id>
+        <recieve_id>Chauttn</recieve_id>
+        <message_type>file</message_type>
+        <message>sent_image/0ef96ce2-839e-4a14-afe9-b075ce1aaf05_a.txt</message>
+        <sent_time>2025-05-16T16:08:58.134</sent_time>
+    </historychat>
+</historychats>
