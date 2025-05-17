@@ -39,6 +39,7 @@ import com.gpcoder.chatbox.InternalChatUI;
 import com.gpcoder.model.MenuItem;
 import com.gpcoder.model.Staff;
 import com.gpcoder.model_xml.StaffList;
+import com.gpcoder.restaurantmanagement.RestaurantManagement;
 
 public class HomeUI extends JFrame {
 
@@ -46,8 +47,9 @@ public class HomeUI extends JFrame {
     private ObjectOutputStream outStream;
     private ObjectInputStream inStream;
     private JPanel contentPanel;
-    JScrollPane scrollPane;
+    private JScrollPane scrollPane;
     private List<MenuItem> menuitem;
+    private int x;
 
     public HomeUI(String username) {
         setTitle("Mr. Chefs - Menu");
@@ -188,6 +190,14 @@ public class HomeUI extends JFrame {
             ImageIcon logoutIcon = new ImageIcon("image/logout.png");
             Image scaledLogout = logoutIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH); // resize = 28x28
             logoutButton.setIcon(new ImageIcon(scaledLogout));
+            logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                SwingUtilities.invokeLater(RestaurantManagement::new);
+                dispose();
+            }
+            });
 
             // Chat Button
             JButton chatButton = new JButton("Internal Chat");
@@ -314,7 +324,7 @@ public class HomeUI extends JFrame {
         searchField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<MenuItem> matched = searchByName(menuitem, searchField.getText());
+                List<MenuItem> matched = searchByName(searchField.getText(), x);
                 showMenu(matched); 
 
             }
@@ -357,6 +367,15 @@ public class HomeUI extends JFrame {
                     filterButton.setBackground(defaultFilterColor); // rời khỏi nút
                 }
             }
+        });
+        filterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<MenuItem> matched = searchByName(searchField.getText(),x);
+                showMenu(matched); 
+
+            }
+                        
         });
 
 
@@ -439,6 +458,7 @@ public class HomeUI extends JFrame {
         buttons.get(0).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                x = 0;
                 getmenu(true, true, true);
             }
         });
@@ -446,6 +466,7 @@ public class HomeUI extends JFrame {
         buttons.get(1).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                x = 1;
                 getmenu(true, false, false);
             }
         });
@@ -453,6 +474,7 @@ public class HomeUI extends JFrame {
         buttons.get(2).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                x = 2;
                 getmenu(false, true, false);
             }
         });
@@ -460,17 +482,55 @@ public class HomeUI extends JFrame {
         buttons.get(3).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                x = 3;
                 getmenu(false, false, true);
             }
         });
 
     }
 
-    public List<MenuItem> searchByName(List<MenuItem> items, String keyword) {
+    private List<MenuItem> searchMenu(boolean breakfast, boolean lunch, boolean dinner) {
+        if (menuitem == null) return null;
+
+        List<MenuItem> filtered = new ArrayList<>();
+        for (MenuItem item : menuitem) {
+            boolean include = false;
+
+            if (breakfast && Boolean.TRUE.equals(item.isBreakfast())) include = true;
+            if (lunch && Boolean.TRUE.equals(item.isLunch())) include = true;
+            if (dinner && Boolean.TRUE.equals(item.isDinner())) include = true;
+
+            if (include) filtered.add(item);
+        }
+
+        return filtered;
+    }
+
+    public List<MenuItem> searchByName(String keyword, int i) {
+        List<MenuItem> mainitem = null;
+        switch (i) {
+            case 0: {
+                mainitem = searchMenu(true, true, true);
+                break; 
+            }
+            case 1: {
+                mainitem = searchMenu(true, false, false);
+                break; 
+            }
+            case 2: {
+                mainitem = searchMenu(false, true, false);
+                break; 
+            }
+            case 3: {
+                mainitem = searchMenu(false, false, true);
+                break; 
+            }
+            default: break;
+        }
         String lowerKeyword = keyword.toLowerCase();
         List<MenuItem> result = new ArrayList<>();
 
-        for (MenuItem item : items) {
+        for (MenuItem item : mainitem) {
             if (item.getName() != null && item.getName().toLowerCase().contains(lowerKeyword)) {
                 result.add(item);
             }
@@ -492,7 +552,7 @@ public class HomeUI extends JFrame {
 
     private void runNetworking() {
         try {
-            this.socket = new Socket("localhost", 12345);
+            this.socket = new Socket("localhost", 12344);
             // this.socket = new Socket("26.106.134.18", 12345);
 
             this.outStream = new ObjectOutputStream(socket.getOutputStream());
@@ -527,7 +587,7 @@ public class HomeUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new HomeUI("Chauttn"));
+        SwingUtilities.invokeLater(() -> new HomeUI("Anhtdd"));
     }
 }
 
