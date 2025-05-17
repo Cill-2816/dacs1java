@@ -9,6 +9,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -30,6 +32,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
@@ -42,6 +46,13 @@ import com.gpcoder.model_xml.StaffList;
 import com.gpcoder.restaurantmanagement.RestaurantManagement;
 
 public class HomeUI extends JFrame {
+
+    /* ---------- 1. HẰNG SỐ KÍCH THƯỚC THẺ ---------- */
+    private static final int CARD_W = 240;      // rộng ItemCard
+    private static final int CARD_H = 300;      // cao ItemCard
+    private static final int HGAP   = 20;       // khoảng cách ngang
+    private static final int VGAP   = 20;       // khoảng cách dọc
+    private static final int COLS   = 3;        // luôn 3 cột
 
     private Socket socket;
     private ObjectOutputStream outStream;
@@ -331,69 +342,72 @@ public class HomeUI extends JFrame {
                         
         });
 
-        RoundedButton filterButton = new RoundedButton("", 20);
-        filterButton.setPreferredSize(new Dimension(50, 40));
-        filterButton.setBackground(new Color(44, 47, 51));
+        RoundedButton searchButton = new RoundedButton("", 20);
+        searchButton.setPreferredSize(new Dimension(50, 40));
+        searchButton.setBackground(new Color(44, 47, 51));
         ImageIcon filterIcon = new ImageIcon("image/setting.png");
         Image filterImg = filterIcon.getImage().getScaledInstance(64,64, Image.SCALE_SMOOTH);
-        filterButton.setIcon(new ImageIcon(filterImg));
-        filterButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        // Hiệu ứng hover và nhấn cho filterButton
+        searchButton.setIcon(new ImageIcon(filterImg));
+        searchButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Hiệu ứng hover và nhấn cho searchButton
         Color defaultFilterColor = new Color(44, 47, 51);
         Color hoverFilterColor = new Color(60, 63, 65);
         Color pressedFilterColor = new Color(84, 88, 95);
 
-        filterButton.addMouseListener(new MouseAdapter() {
+        searchButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                filterButton.setBackground(hoverFilterColor);
+                searchButton.setBackground(hoverFilterColor);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                filterButton.setBackground(defaultFilterColor);
+                searchButton.setBackground(defaultFilterColor);
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                filterButton.setBackground(pressedFilterColor);
+                searchButton.setBackground(pressedFilterColor);
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (filterButton.contains(e.getPoint())) {
-                    filterButton.setBackground(hoverFilterColor); // vẫn đang ở trong nút
+                if (searchButton.contains(e.getPoint())) {
+                    searchButton.setBackground(hoverFilterColor); // vẫn đang ở trong nút
                 } else {
-                    filterButton.setBackground(defaultFilterColor); // rời khỏi nút
+                    searchButton.setBackground(defaultFilterColor); // rời khỏi nút
                 }
             }
         });
-        filterButton.addActionListener(new ActionListener() {
+        searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 List<MenuItem> matched = searchByName(searchField.getText(),x);
                 showMenu(matched); 
 
             }
-                        
         });
 
 
         searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(filterButton, BorderLayout.EAST);
+        searchPanel.add(searchButton, BorderLayout.EAST);
 
-            // ===== Content Panel =====
-            contentPanel = new JPanel(new GridLayout(0, 3, 20, 20));
-            contentPanel.setBackground(new Color(24, 26, 27));
-            contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            /* ===== CONTENT PANEL ===== */
+        contentPanel = new GridScrollablePanel();      // thay cho createContentPanel()
+        contentPanel.setBackground(new Color(24, 26, 27));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // ===== ScrollPane trực tiếp chứa contentPanel =====
+        /* ===== SCROLL PANE ===== */
         scrollPane = new JScrollPane(contentPanel);
-        scrollPane.setPreferredSize(new Dimension(0, 600)); // chiều cao đủ 2 hàng
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // cuộn mượt
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        scrollPane.setOpaque(false);                               // nền chính của scrollPane
+        scrollPane.getViewport().setOpaque(false);                 // nền viewport trong suốt
+        scrollPane.getViewport().setBackground(new Color(24,26,27)); // hoặc tô đúng màu nền
 
                 // Custom thanh cuộn
         scrollPane.getVerticalScrollBar().setUI(new DarkScrollBarUI());
@@ -454,6 +468,7 @@ public class HomeUI extends JFrame {
         
         // Gán vào cửa sổ chính
         setContentPane(mainPanel);
+
     // Listener cho buttons
         buttons.get(0).addActionListener(new ActionListener() {
             @Override
@@ -553,7 +568,7 @@ public class HomeUI extends JFrame {
     private void runNetworking() {
         try {
             this.socket = new Socket("localhost", 12344);
-            // this.socket = new Socket("26.106.134.18", 12345);
+            // this.socket = new Socket("26.106.134.18", 12344);
 
             this.outStream = new ObjectOutputStream(socket.getOutputStream());
             this.inStream = new ObjectInputStream(socket.getInputStream());
@@ -575,12 +590,29 @@ public class HomeUI extends JFrame {
     }
 
     private void showMenu(List<MenuItem> list) {
+        if (list == null) return;
+
         contentPanel.removeAll();
+
+        // Thêm từng ItemCard
         for (MenuItem item : list) {
-            ItemCard itemCard = new ItemCard(item);
-            contentPanel.add(itemCard);
+            ItemCard card = new ItemCard(item);
+            card.setPreferredSize(new Dimension(CARD_W, CARD_H));
+            contentPanel.add(card);
         }
 
+        /* -------- TÍNH LẠI KÍCH THƯỚC PANEL -------- */
+        int rows = (int) Math.ceil(list.size() / (double) COLS);
+        int prefWidth  = COLS * (CARD_W + HGAP) - HGAP;
+        int prefHeight = rows * (CARD_H + VGAP) - VGAP;
+
+        Insets pad = contentPanel.getInsets();   // Padding 20px xung quanh
+        prefWidth  += pad.left + pad.right;
+        prefHeight += pad.top  + pad.bottom;
+
+        contentPanel.setPreferredSize(new Dimension(prefWidth, prefHeight));
+
+        /* -------- VẼ LẠI -------- */
         scrollPane.getVerticalScrollBar().setValue(0);
         contentPanel.revalidate();
         contentPanel.repaint();
@@ -589,5 +621,27 @@ public class HomeUI extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new HomeUI("Anhtdd"));
     }
+
+    /** Panel lưới 3-cột cuộn theo chiều cao thật, không kéo giãn. */
+private static class GridScrollablePanel extends JPanel implements Scrollable {
+
+    GridScrollablePanel() {
+        super(new GridLayout(0, COLS, HGAP, VGAP));
+        setBackground(new Color(24, 26, 27));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    }
+
+    @Override public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+    @Override public int getScrollableUnitIncrement(Rectangle r, int o, int d) {
+        return 16;
+    }
+    @Override public int getScrollableBlockIncrement(Rectangle r, int o, int d) {
+        return (o == SwingConstants.VERTICAL) ? r.height - CARD_H : r.width  - CARD_W;
+    }
+    @Override public boolean getScrollableTracksViewportWidth()  { return true;  }
+    @Override public boolean getScrollableTracksViewportHeight() { return false; }
+}
 }
 

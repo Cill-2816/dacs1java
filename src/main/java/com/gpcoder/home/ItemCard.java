@@ -16,50 +16,55 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 import com.gpcoder.model.MenuItem;
 
 public class ItemCard extends RoundedPanel {
+
     private final MenuItem item;
-    private final JLabel qty;
+    private final JLabel   qty;
 
     public ItemCard(MenuItem item) {
         super(20);
         this.item = item;
 
-        setPreferredSize(new Dimension(230, 300));
+        /* Kích thước chuẩn của thẻ – PHẢI khớp với CARD_W/CARD_H trong HomeUI */
+        setPreferredSize(new Dimension(220, 300));
+
         setLayout(new BorderLayout());
         setBackground(new Color(36, 40, 45));
+
         Border outer = BorderFactory.createLineBorder(new Color(50, 54, 58), 1);
         Border inner = BorderFactory.createEmptyBorder(25, 10, 10, 10);
         setBorder(BorderFactory.createCompoundBorder(outer, inner));
+
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // ===== Title =====
+        /* ---------- Title ---------- */
         JLabel title = new JLabel(item.getName());
         title.setForeground(Color.WHITE);
         title.setFont(new Font("Arial", Font.BOLD, 18));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // ===== Description =====
+        /* ---------- Description ---------- */
         JTextPane desc = new JTextPane();
         desc.setContentType("text/html");
-        desc.setText("<html><div style='text-align: center;color: #9c9c9c;font-family: Arial;font-size: 12px;font-weight: bold;'>" + item.getDescription() + "</div></html>");
+        desc.setText(
+            "<html><div style='text-align:center;color:#9c9c9c;" + "font-family:Arial;font-size:12px;font-weight:bold;'>" + item.getDescription() + "</div></html>");
         desc.setEditable(false);
         desc.setOpaque(false);
         desc.setBorder(null);
         desc.setAlignmentX(Component.CENTER_ALIGNMENT);
         desc.setMaximumSize(new Dimension(Integer.MAX_VALUE, Short.MAX_VALUE));
 
-        // ===== Price =====
-        JLabel price = new JLabel(Double.toString(item.getPrice()));
-        price.setForeground(Color.WHITE);
-        price.setFont(new Font("Arial", Font.BOLD, 18));
-        price.setHorizontalAlignment(SwingConstants.CENTER);
+        /* ---------- Price (nếu vẫn cần) ---------- */
+        // JLabel price = new JLabel(Double.toString(item.getPrice()));
+        // price.setForeground(Color.WHITE);
+        // price.setFont(new Font("Arial", Font.BOLD, 18));
+        // price.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // ===== Food Image =====
+        /* ---------- Food Image ---------- */
         ImageIcon foodImage;
         try {
             foodImage = new ImageIcon(item.getImagePath());
@@ -71,20 +76,21 @@ public class ItemCard extends RoundedPanel {
         JLabel imageLabel = new JLabel(foodImage);
         imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // ===== Panel chứa nút trừ/cộng và số lượng =====
+        /* ---------- Control ( – / qty / + ) ---------- */
         JPanel control = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
         control.setBackground(new Color(36, 40, 45));
 
         ImageIcon minusIcon = new ImageIcon("image/minus.png");
-        ImageIcon plusIcon = new ImageIcon("image/plus.png");
-        Image scaledMinus = minusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
-        Image scaledPlus = plusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
+        ImageIcon plusIcon  = new ImageIcon("image/plus.png");
+        Image scaledMinus   = minusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
+        Image scaledPlus    = plusIcon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
         minusIcon = new ImageIcon(scaledMinus);
-        plusIcon = new ImageIcon(scaledPlus);
+        plusIcon  = new ImageIcon(scaledPlus);
 
         CircleButton minus = new CircleButton(minusIcon, new Color(52, 53, 56), 32);
         minus.setHoverColor(Color.decode("#5A5B5E"));
-        CircleButton plus = new CircleButton(plusIcon, new Color(235, 87, 87), 32);
+
+        CircleButton plus  = new CircleButton(plusIcon,  new Color(235, 87, 87), 32);
         plus.setHoverColor(Color.decode("#FF6B6B"));
 
         qty = new JLabel("0");
@@ -95,7 +101,6 @@ public class ItemCard extends RoundedPanel {
             int count = Integer.parseInt(qty.getText());
             if (count > 0) qty.setText(String.valueOf(count - 1));
         });
-
         plus.addActionListener(e -> {
             int count = Integer.parseInt(qty.getText());
             qty.setText(String.valueOf(count + 1));
@@ -105,10 +110,11 @@ public class ItemCard extends RoundedPanel {
         control.add(qty);
         control.add(plus);
 
-        // ===== Panel chứa tất cả thành phần =====
+        /* ---------- Details Panel ---------- */
         JPanel details = new JPanel();
         details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
         details.setOpaque(false);
+
         details.add(Box.createVerticalStrut(10));
         details.add(imageLabel);
         details.add(Box.createVerticalStrut(10));
@@ -120,4 +126,10 @@ public class ItemCard extends RoundedPanel {
 
         add(details, BorderLayout.CENTER);
     }
-} 
+
+    /* ===== KHÔNG CHO PHÉP KÉO GIÃN THẺ ===== */
+    @Override
+    public Dimension getMaximumSize() {
+        return getPreferredSize();   // GridLayout sẽ tôn trọng kích thước cố định
+    }
+}
