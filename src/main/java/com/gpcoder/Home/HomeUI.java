@@ -345,8 +345,8 @@ public class HomeUI extends JFrame {
         RoundedButton searchButton = new RoundedButton("", 20);
         searchButton.setPreferredSize(new Dimension(50, 40));
         searchButton.setBackground(new Color(44, 47, 51));
-        ImageIcon filterIcon = new ImageIcon("image/setting.png");
-        Image filterImg = filterIcon.getImage().getScaledInstance(64,64, Image.SCALE_SMOOTH);
+        ImageIcon filterIcon = new ImageIcon("image/search.png");
+        Image filterImg = filterIcon.getImage().getScaledInstance(32,32, Image.SCALE_SMOOTH);
         searchButton.setIcon(new ImageIcon(filterImg));
         searchButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
